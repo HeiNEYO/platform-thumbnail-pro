@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { ExternalLink } from "lucide-react";
 
 interface ResourceCardProps {
@@ -22,11 +23,13 @@ export function ResourceCard({ resource }: ResourceCardProps) {
       className="group block rounded-lg border border-[#2a2a2a] bg-[#2a2a2a] overflow-hidden transition-colors hover:border-indigo-500/50"
     >
       {resource.previewUrl && (
-        <div className="aspect-video bg-[#1a1a1a] overflow-hidden">
-          <img
+        <div className="aspect-video bg-[#1a1a1a] overflow-hidden relative">
+          <Image
             src={resource.previewUrl}
             alt=""
-            className="h-full w-full object-cover transition-transform group-hover:scale-105"
+            fill
+            unoptimized
+            className="object-cover transition-transform group-hover:scale-105"
           />
         </div>
       )}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { createClient } from "@/lib/supabase/client";
 import { UserAvatar } from "@/components/ui/UserAvatar";
@@ -17,30 +17,9 @@ export default function ProfilePage() {
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const isDevMode = process.env.NEXT_PUBLIC_DEV_MODE === 'true';
+  const isDevMode = process.env.NEXT_PUBLIC_DEV_MODE === "true";
 
-  useEffect(() => {
-    if (user) {
-      // Extraire le prénom du full_name
-      const nameParts = user.full_name?.split(" ") || [];
-      setFirstName(nameParts[0] || "");
-      setEmail(user.email || "");
-      setAvatarUrl(user.avatar_url);
-      
-      // En mode dev, valeurs mock
-      if (isDevMode) {
-        setAccountNumber("TP-001234");
-        setXp(1250);
-        setCompletedEvaluations(3);
-        return;
-      }
-
-      // Charger les données depuis Supabase
-      loadProfileData();
-    }
-  }, [user]);
-
-  const loadProfileData = async () => {
+  const loadProfileData = useCallback(async () => {
     if (!user || isDevMode) return;
 
     try {
@@ -82,7 +61,23 @@ export default function ProfilePage() {
     } catch (err) {
       console.error("Erreur lors du chargement:", err);
     }
-  };
+  }, [user, isDevMode]);
+
+  useEffect(() => {
+    if (user) {
+      const nameParts = user.full_name?.split(" ") || [];
+      setFirstName(nameParts[0] || "");
+      setEmail(user.email || "");
+      setAvatarUrl(user.avatar_url);
+      if (isDevMode) {
+        setAccountNumber("TP-001234");
+        setXp(1250);
+        setCompletedEvaluations(3);
+        return;
+      }
+      loadProfileData();
+    }
+  }, [user, isDevMode, loadProfileData]);
 
   const handleAvatarClick = () => {
     fileInputRef.current?.click();
@@ -223,7 +218,7 @@ export default function ProfilePage() {
               <h2 className="text-xl font-bold text-white break-words mb-2">
                 {firstName || "Utilisateur"}
               </h2>
-              <p className="text-xs text-white/70">Cliquez sur l'icône pour changer votre photo</p>
+              <p className="text-xs text-white/70">Cliquez sur l&apos;icône pour changer votre photo</p>
             </div>
           </div>
 
@@ -247,7 +242,7 @@ export default function ProfilePage() {
                   <span className="text-xs text-success font-bold">{completedEvaluations}</span>
                 </div>
                 <p className="text-3xl font-bold text-white break-words mb-2">{completedEvaluations}</p>
-                <p className="text-xs text-white/50">Système d'évaluation à venir</p>
+                <p className="text-xs text-white/50">Système d&apos;évaluation à venir</p>
               </div>
             </div>
           </div>
@@ -296,7 +291,7 @@ export default function ProfilePage() {
                 disabled
                 className="w-full rounded-lg border border-card-border bg-black/50 px-4 py-3 text-white/50 text-sm cursor-not-allowed truncate"
               />
-              <p className="text-xs text-white/50 mt-1.5">L'email ne peut pas être modifié</p>
+              <p className="text-xs text-white/50 mt-1.5">L&apos;email ne peut pas être modifié</p>
             </div>
 
             <div className="mt-auto pt-4 flex-shrink-0">

@@ -2,6 +2,9 @@
   "name": "platform-thumbnail-pro",
   "version": "0.1.0",
   "private": true,
+  "overrides": {
+    "@next/swc": "15.5.11"
+  },
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",
@@ -17,6 +20,7 @@
     "react-dom": "^19.0.0"
   },
   "devDependencies": {
+    "@next/swc": "15.5.11",
     "@types/node": "^22.0.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",

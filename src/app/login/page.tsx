@@ -67,9 +67,9 @@ export default function LoginPage() {
           <div className="text-center mb-8">
             <h1 className="text-[19.6px] font-bold text-white mb-2">Bon retour</h1>
             <p className="text-[12.74px] text-white/70">
-              Vous n'avez pas encore de compte ?{" "}
+              Vous n&apos;avez pas encore de compte ?{" "}
               <Link href="/register" className="text-primary font-semibold hover:opacity-80 transition-opacity">
-                S'inscrire
+                S&apos;inscrire
               </Link>
             </p>
           </div>

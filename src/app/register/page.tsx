@@ -170,7 +170,7 @@ export default function RegisterPage() {
               disabled={submitting}
               className="w-full rounded-xl bg-primary hover:bg-primary-hover disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold py-3.5 transition-all duration-200 text-[13.72px]"
             >
-              {submitting ? "Création..." : "S'inscrire"}
+              {submitting ? "Création..." : "S\u2019inscrire"}
             </button>
           </form>
         </div>

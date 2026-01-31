@@ -1,5 +1,7 @@
 "use client";
 
+import Image from "next/image";
+
 interface UserAvatarProps {
   name: string;
   photo?: string | null;
@@ -25,10 +27,13 @@ function getInitials(name: string): string {
 export function UserAvatar({ name, photo, size = "md", className = "" }: UserAvatarProps) {
   const s = sizeClasses[size];
   if (photo) {
+    const sizePx = size === "sm" ? 32 : size === "md" ? 40 : 96;
     return (
-      <img
+      <Image
         src={photo}
         alt={name}
+        width={sizePx}
+        height={sizePx}
         className={`rounded-full object-cover ${s} ${className}`}
       />
     );

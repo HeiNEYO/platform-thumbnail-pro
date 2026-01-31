@@ -74,7 +74,7 @@ git commit -m "Initial commit - Plateforme Thumbnail Pro"
 Dans le terminal (toujours à la racine du projet) :
 
 ```bash
-git remote add origin https://github.com/TON_USER/TON_REPO.git
+git remote add origin https://github.com/heineyo/platform-thumbnail-pro.git
 git branch -M main
 git push -u origin main
 ```
@@ -136,6 +136,22 @@ Sans cette étape, la **connexion ne fonctionnera pas** sur le site en ligne.
    - `https://platform-thumbnail-pro-xxxx.vercel.app/**`
    - `https://ton-projet.vercel.app/**` (si tu as un domaine personnalisé)
 5. **Save**.
+
+---
+
+## Important : pousser le code après des corrections
+
+Si tu as corrigé des erreurs de build (apostrophes, hooks, `next/image`) **en local**, Vercel ne les verra pas tant que tu n’as pas **committé et poussé** sur GitHub.
+
+À la racine du projet, dans un terminal :
+
+```bash
+git add .
+git commit -m "Fix build: ESLint errors (apostrophes, hooks, next/image)"
+git push origin main
+```
+
+Ensuite, Vercel redéploiera automatiquement avec le nouveau commit.
 
 ---
 

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { 
@@ -100,11 +101,11 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
         {/* Logo + Breadcrumbs */}
         <div className="flex items-center gap-[22px]">
           <Link href="/dashboard" className="flex items-center gap-[11px]">
-            <img
+            <Image
               src="/images/logo.png"
               alt="Thumbnail Pro Logo"
-              width={27.5}
-              height={27.5}
+              width={28}
+              height={28}
               className="shrink-0"
             />
             <span className="text-[17.6px] font-bold text-white">
@@ -119,7 +120,7 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
         {/* Actions Right */}
         <div className="flex items-center gap-[15.4px]">
           <button className="px-[15.4px] py-[6.6px] rounded-lg bg-black border border-card-border text-white text-[13.2px] font-medium hover:bg-card-hover transition-colors">
-            Parraine un ami et gagne jusqu'à 600€
+            Parraine un ami et gagne jusqu&apos;à 600€
           </button>
           <button className="p-[6.6px] text-white/70 hover:text-white transition-colors">
             <Bell className="h-[19.8px] w-[19.8px]" />

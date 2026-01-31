@@ -209,7 +209,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       clearTimeout(loadingTimeout);
       subscription.unsubscribe();
     };
-  }, [supabase, fetchUserProfile]);
+  }, [supabase, fetchUserProfile, isDevMode]);
 
   const signIn = useCallback(
     async (email: string, password: string, rememberMe: boolean = false) => {
@@ -263,7 +263,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return { error: err instanceof Error ? err : new Error("Erreur de connexion") };
       }
     },
-    [supabase, isDevMode]
+    [supabase, isDevMode, fetchUserProfile]
   );
 
   const signOut = useCallback(async () => {
