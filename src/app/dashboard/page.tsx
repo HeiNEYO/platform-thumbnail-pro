@@ -56,7 +56,9 @@ export default async function DashboardHomePage() {
     getGlobalProgress(authUser.id),
   ]);
 
-  const displayName = profile?.full_name ?? authUser.email ?? "Membre";
+  type ProfileRow = { full_name: string | null; role: string };
+  const displayName =
+    (profile as ProfileRow | null)?.full_name ?? authUser.email ?? "Membre";
   const level = getLevel(progressPercent);
 
   // Compter les modules complétés
