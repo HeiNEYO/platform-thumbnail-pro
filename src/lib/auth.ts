@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { createClient as createBrowserClient } from "@/lib/supabase/client";
-import type { UserRole } from "@/lib/supabase/database.types";
+import type { UserRole, UserRow } from "@/lib/supabase/database.types";
 
 export interface AuthUser {
   id: string;
@@ -27,12 +27,13 @@ export async function signUp(
   if (authError) return { error: authError as unknown as Error };
   if (!authData.user) return { error: new Error("User not created") };
 
-  const { error: dbError } = await supabase.from("users").insert({
+  const insertPayload = {
     id: authData.user.id,
     email: authData.user.email!,
     full_name: fullName,
     role: "member",
-  });
+  };
+  const { error: dbError } = await supabase.from("users").insert(insertPayload as never);
   if (dbError) return { error: dbError as unknown as Error };
   return { error: null };
 }
@@ -61,11 +62,12 @@ export async function getUser(): Promise<AuthUser | null> {
   } = await supabase.auth.getUser();
   if (!authUser) return null;
 
-  const { data: row } = await supabase
+  const { data } = await supabase
     .from("users")
     .select("id, email, full_name, avatar_url, role")
     .eq("id", authUser.id)
     .single();
+  const row = data as UserRow | null;
   if (!row) return null;
 
   return {
@@ -83,13 +85,11 @@ export async function updateProfile(
   updates: { full_name?: string; avatar_url?: string }
 ): Promise<{ error: Error | null }> {
   const supabase = createBrowserClient();
-  const { error } = await supabase
-    .from("users")
-    .update({
-      ...(updates.full_name !== undefined && { full_name: updates.full_name }),
-      ...(updates.avatar_url !== undefined && { avatar_url: updates.avatar_url }),
-      updated_at: new Date().toISOString(),
-    })
-    .eq("id", userId);
+  const updatePayload = {
+    ...(updates.full_name !== undefined && { full_name: updates.full_name }),
+    ...(updates.avatar_url !== undefined && { avatar_url: updates.avatar_url }),
+    updated_at: new Date().toISOString(),
+  };
+  const { error } = await supabase.from("users").update(updatePayload as never).eq("id", userId);
   return { error: error as unknown as Error };
 }

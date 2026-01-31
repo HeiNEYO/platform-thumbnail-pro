@@ -3,7 +3,7 @@
 import { createContext, useContext, useState, useCallback, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
 import type { AuthUser } from "@/lib/auth";
-import type { UserRole } from "@/lib/supabase/database.types";
+import type { UserRole, UserRow } from "@/lib/supabase/database.types";
 
 interface AuthContextType {
   user: AuthUser | null;
@@ -45,13 +45,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         .single();
 
       // Si le profil existe, le retourner
-      if (data && !error) {
+      const row = data as UserRow | null;
+      if (row && !error) {
         return {
-          id: data.id,
-          email: data.email,
-          full_name: data.full_name,
-          avatar_url: data.avatar_url,
-          role: data.role as UserRole,
+          id: row.id,
+          email: row.email,
+          full_name: row.full_name,
+          avatar_url: row.avatar_url,
+          role: row.role as UserRole,
         };
       }
 
@@ -59,14 +60,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (error?.code === 'PGRST116' || error?.message?.includes('No rows')) {
         console.log("Profil non trouvé, création automatique...");
         
+        const insertPayload = {
+          id: authId,
+          email: authEmail,
+          full_name: null,
+          role: "member",
+        };
         const { data: newProfile, error: insertError } = await supabase
           .from("users")
-          .insert({
-            id: authId,
-            email: authEmail,
-            full_name: null,
-            role: 'member',
-          })
+          .insert(insertPayload as never)
           .select()
           .single();
 
@@ -82,13 +84,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           };
         }
 
-        if (newProfile) {
+        const newRow = newProfile as UserRow | null;
+        if (newRow) {
           return {
-            id: newProfile.id,
-            email: newProfile.email,
-            full_name: newProfile.full_name,
-            avatar_url: newProfile.avatar_url,
-            role: newProfile.role as UserRole,
+            id: newRow.id,
+            email: newRow.email,
+            full_name: newRow.full_name,
+            avatar_url: newRow.avatar_url,
+            role: newRow.role as UserRole,
           };
         }
       }

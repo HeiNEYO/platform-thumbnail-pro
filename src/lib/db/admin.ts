@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import type { UserRow } from "@/lib/supabase/database.types";
+import type { UserRow, ModuleRow } from "@/lib/supabase/database.types";
 
 export interface UserWithStats extends UserRow {
   completed_episodes?: number;
@@ -10,11 +10,12 @@ export interface UserWithStats extends UserRow {
 
 export async function getAllUsers(): Promise<UserWithStats[]> {
   const supabase = await createClient();
-  const { data: users, error: usersError } = await supabase
+  const { data: usersData, error: usersError } = await supabase
     .from("users")
     .select("*")
     .order("created_at", { ascending: false });
-  if (usersError || !users?.length) return [];
+  const users = (usersData ?? []) as UserRow[];
+  if (usersError || !users.length) return [];
 
   const { count: totalEpisodes } = await supabase
     .from("episodes")
@@ -46,10 +47,11 @@ export async function getUserStats(userId: string): Promise<{
   byModule: { moduleId: string; completed: number; total: number; percent: number }[];
 }> {
   const supabase = await createClient();
-  const { data: modules } = await supabase
+  const { data: modulesData } = await supabase
     .from("modules")
     .select("id")
     .order("order_index");
+  const modules = (modulesData ?? []) as Pick<ModuleRow, "id">[];
   const { count: totalEpisodes } = await supabase
     .from("episodes")
     .select("*", { count: "exact", head: true });
@@ -59,21 +61,21 @@ export async function getUserStats(userId: string): Promise<{
     .eq("user_id", userId);
 
   const byModule: { moduleId: string; completed: number; total: number; percent: number }[] = [];
-  for (const m of modules ?? []) {
+  for (const m of modules) {
     const { count: modTotal } = await supabase
       .from("episodes")
       .select("*", { count: "exact", head: true })
       .eq("module_id", m.id);
+    const { data: episodeRows } = await supabase
+      .from("episodes")
+      .select("id")
+      .eq("module_id", m.id);
+    const episodeIds = (episodeRows ?? []).map((e: { id: string }) => e.id);
     const { count: modCompleted } = await supabase
       .from("progress")
       .select("*", { count: "exact", head: true })
       .eq("user_id", userId)
-      .in(
-        "episode_id",
-        (
-          await supabase.from("episodes").select("id").eq("module_id", m.id)
-        ).data?.map((e) => e.id) ?? []
-      );
+      .in("episode_id", episodeIds);
     const total = modTotal ?? 0;
     const completed = modCompleted ?? 0;
     byModule.push({

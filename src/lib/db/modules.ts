@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import type { ModuleRow } from "@/lib/supabase/database.types";
+import type { ModuleRow, EpisodeRow } from "@/lib/supabase/database.types";
 
 export async function getModules(): Promise<ModuleRow[]> {
   try {
@@ -14,7 +14,7 @@ export async function getModules(): Promise<ModuleRow[]> {
       return [];
     }
     
-    return data ?? [];
+    return (data ?? []) as ModuleRow[];
   } catch (err) {
     console.error("Erreur dans getModules:", err);
     return [];
@@ -36,7 +36,7 @@ export async function getModuleById(id: string): Promise<ModuleRow | null> {
       return null;
     }
     
-    return data;
+    return data as ModuleRow | null;
   } catch (err) {
     console.error("Erreur dans getModuleById:", err);
     return null;
@@ -49,12 +49,13 @@ export async function getModuleProgress(
 ): Promise<number> {
   try {
     const supabase = await createClient();
-    const { data: episodes } = await supabase
+    const { data: episodesData } = await supabase
       .from("episodes")
       .select("id")
       .eq("module_id", moduleId);
+    const episodes = (episodesData ?? []) as Pick<EpisodeRow, "id">[];
     
-    if (!episodes?.length) return 0;
+    if (!episodes.length) return 0;
 
     const { count } = await supabase
       .from("progress")

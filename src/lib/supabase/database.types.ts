@@ -12,6 +12,7 @@ export interface Database {
           full_name: string | null;
           avatar_url: string | null;
           role: UserRole;
+          account_number?: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -21,6 +22,7 @@ export interface Database {
           full_name?: string | null;
           avatar_url?: string | null;
           role?: UserRole;
+          account_number?: string | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -30,6 +32,7 @@ export interface Database {
           full_name?: string | null;
           avatar_url?: string | null;
           role?: UserRole;
+          account_number?: string | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -178,6 +181,7 @@ export interface Database {
 }
 
 export type UserRow = Database["public"]["Tables"]["users"]["Row"];
+export type UsersUpdate = Database["public"]["Tables"]["users"]["Update"];
 export type ModuleRow = Database["public"]["Tables"]["modules"]["Row"];
 export type EpisodeRow = Database["public"]["Tables"]["episodes"]["Row"];
 export type ProgressRow = Database["public"]["Tables"]["progress"]["Row"];

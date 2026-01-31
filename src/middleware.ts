@@ -58,7 +58,8 @@ export async function middleware(request: NextRequest) {
         .eq("id", session.user.id)
         .single();
 
-      if (userData?.role !== "admin") {
+      const roleRow = userData as { role: string } | null;
+      if (roleRow?.role !== "admin") {
         return NextResponse.redirect(new URL("/dashboard", request.url));
       }
     }

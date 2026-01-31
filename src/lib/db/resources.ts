@@ -9,7 +9,7 @@ export async function getResources(
   if (category) query = query.eq("category", category);
   const { data, error } = await query;
   if (error) return [];
-  return data ?? [];
+  return (data ?? []) as ResourceRow[];
 }
 
 export async function getResourceCategories(): Promise<string[]> {
@@ -19,6 +19,7 @@ export async function getResourceCategories(): Promise<string[]> {
     .select("category")
     .order("category");
   if (error) return [];
-  const set = new Set<string>((data ?? []).map((r) => r.category));
+  const rows = (data ?? []) as Pick<ResourceRow, "category">[];
+  const set = new Set<string>(rows.map((r) => r.category));
   return Array.from(set);
 }

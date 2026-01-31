@@ -22,14 +22,14 @@ export async function markEpisodeComplete(
   episodeId: string
 ): Promise<{ error: Error | null }> {
   const supabase = createClient();
-  const { error } = await supabase.from("progress").upsert(
-    {
-      user_id: userId,
-      episode_id: episodeId,
-      completed_at: new Date().toISOString(),
-    },
-    { onConflict: "user_id,episode_id" }
-  );
+  const payload = {
+    user_id: userId,
+    episode_id: episodeId,
+    completed_at: new Date().toISOString(),
+  };
+  const { error } = await supabase.from("progress").upsert(payload as never, {
+    onConflict: "user_id,episode_id",
+  });
   return { error: error as unknown as Error };
 }
 

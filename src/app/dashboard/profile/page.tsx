@@ -5,6 +5,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { createClient } from "@/lib/supabase/client";
 import { UserAvatar } from "@/components/ui/UserAvatar";
 import { Camera, Save, Loader2 } from "lucide-react";
+import type { UserRow } from "@/lib/supabase/database.types";
 
 export default function ProfilePage() {
   const { user } = useAuth();
@@ -25,8 +26,8 @@ export default function ProfilePage() {
     try {
       const supabase = createClient();
       
-      // Récupérer le profil complet
-      const { data: profile, error } = await supabase
+      // Récupérer le profil complet (cast pour contourner l'inférence never du client Supabase)
+      const { data: rawProfile, error } = await supabase
         .from("users")
         .select("*")
         .eq("id", user.id)
@@ -37,12 +38,12 @@ export default function ProfilePage() {
         return;
       }
 
+      const profile: UserRow | null = rawProfile as UserRow | null;
       if (profile) {
-        // Extraire le prénom
         const nameParts = profile.full_name?.split(" ") || [];
         setFirstName(nameParts[0] || "");
         setEmail(profile.email || "");
-        setAccountNumber(profile.account_number || `TP-${user.id.slice(0, 6).toUpperCase()}`);
+        setAccountNumber(profile.account_number ?? `TP-${user.id.slice(0, 6).toUpperCase()}`);
         
         // Calculer l'XP basé sur la progression (à adapter selon votre logique)
         // Pour l'instant, on simule avec un calcul basique
@@ -125,10 +126,10 @@ export default function ProfilePage() {
         .from("avatars")
         .getPublicUrl(filePath);
 
-      // Mettre à jour le profil
+      // Mettre à jour le profil (assertion pour contourner le typage .update(never) du client Supabase)
       const { error: updateError } = await supabase
         .from("users")
-        .update({ avatar_url: publicUrl })
+        .update({ avatar_url: publicUrl } as never)
         .eq("id", user.id);
 
       if (updateError) {
@@ -155,13 +156,13 @@ export default function ProfilePage() {
     try {
       const supabase = createClient();
       
-      // Mettre à jour le prénom (full_name)
+      // Mettre à jour le prénom (full_name) — assertion pour contourner le typage .update(never) du client Supabase
       const { error } = await supabase
         .from("users")
         .update({
           full_name: firstName,
           account_number: accountNumber,
-        })
+        } as never)
         .eq("id", user.id);
 
       if (error) {
