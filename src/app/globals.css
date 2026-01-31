@@ -1,0 +1,90 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Palette Design Épuré - Fonds noirs purs */
+  --background: #000000;
+  --background-secondary: #000000;
+  --foreground: #ffffff;
+  --foreground-muted: #a1a1aa;
+  
+  /* Cards & Surfaces - Noirs */
+  --card: #000000;
+  --card-hover: #0a0a0a;
+  --card-border: #1a1a1a;
+  
+  /* Bleu Premium Principal */
+  --primary: #0013F5;
+  --primary-hover: #1a2fff;
+  
+  /* Sidebar - Noir */
+  --sidebar: #000000;
+  --sidebar-border: #1a1a1a;
+  --sidebar-selected: #0a0a0a;
+  
+  /* États */
+  --success: #10b981;
+  --warning: #f59e0b;
+  --error: #ef4444;
+  
+  /* Bordures */
+  --border: #1a1a1a;
+}
+
+* {
+  @apply border-border;
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--background);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--card-border);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--border);
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.4s ease-out;
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+  
+  .bg-gradient-premium {
+    background: linear-gradient(135deg, #0013F5 0%, #4d5eff 100%);
+  }
+}

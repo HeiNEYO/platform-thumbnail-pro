@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Connexion Supabase</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <h1>Test Connexion Supabase</h1>
+    <button onclick="testConnection()">Tester la connexion</button>
+    <div id="result"></div>
+
+    <script>
+        const SUPABASE_URL = 'https://zhdlqmkpdsygszrxjezd.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpoZGxxbWtwZHN5Z3N6cnhqZXpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk3NDY1ODYsImV4cCI6MjA4NTMyMjU4Nn0.9X-asTninwNvebWtORr3c3eppJT2uQLfBdLte3qb7u0';
+
+        async function testConnection() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = '<p>Test en cours...</p>';
+
+            try {
+                // Test 1: Créer le client
+                const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+                resultDiv.innerHTML += '<p>✅ Client créé</p>';
+
+                // Test 2: Test de connexion simple (health check)
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 5000);
+
+                try {
+                    const response = await fetch(`${SUPABASE_URL}/rest/v1/`, {
+                        method: 'GET',
+                        headers: {
+                            'apikey': SUPABASE_KEY,
+                            'Authorization': `Bearer ${SUPABASE_KEY}`
+                        },
+                        signal: controller.signal
+                    });
+                    clearTimeout(timeoutId);
+                    resultDiv.innerHTML += `<p>✅ Connexion HTTP réussie (Status: ${response.status})</p>`;
+                } catch (fetchError) {
+                    clearTimeout(timeoutId);
+                    if (fetchError.name === 'AbortError') {
+                        resultDiv.innerHTML += '<p>❌ Timeout: Supabase ne répond pas après 5 secondes</p>';
+                        resultDiv.innerHTML += '<p>💡 Vérifie:</p><ul><li>Que le projet Supabase est actif dans le Dashboard</li><li>Ta connexion internet</li><li>Les paramètres CORS dans Supabase</li></ul>';
+                    } else {
+                        resultDiv.innerHTML += `<p>❌ Erreur de connexion: ${fetchError.message}</p>`;
+                    }
+                }
+
+                // Test 3: Test auth (sans vraiment se connecter)
+                resultDiv.innerHTML += '<p>Test auth.getSession()...</p>';
+                const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+                if (sessionError) {
+                    resultDiv.innerHTML += `<p>⚠️ getSession erreur (normal si pas connecté): ${sessionError.message}</p>`;
+                } else {
+                    resultDiv.innerHTML += '<p>✅ getSession fonctionne</p>';
+                }
+
+            } catch (error) {
+                resultDiv.innerHTML += `<p>❌ Erreur: ${error.message}</p>`;
+            }
+        }
+    </script>
+</body>
+</html>
