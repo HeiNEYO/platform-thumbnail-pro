@@ -8,7 +8,7 @@ import {
   Home, BookOpen, FolderOpen, User, LogOut, 
   HelpCircle, ShoppingBag, Bell,
   Heart, FileText, BarChart3, GraduationCap,
-  Compass, Menu, X
+  Compass, Menu, X, Users, Shield
 } from "lucide-react";
 import { Suspense } from "react";
 import { RequireAuth } from "@/components/RequireAuth";
@@ -60,6 +60,24 @@ const navSections = [
   },
 ];
 
+const gradeConfig = {
+  member: {
+    label: "Membre",
+    color: "#82ACFF",
+    icon: Users,
+  },
+  intervenant: {
+    label: "Intervenant",
+    color: "#82FFBC",
+    icon: GraduationCap,
+  },
+  admin: {
+    label: "Admin",
+    color: "#FF8282",
+    icon: Shield,
+  },
+} as const;
+
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
     <Suspense fallback={<SiteSkeleton />}>
@@ -77,6 +95,8 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const displayName = user?.full_name ?? user?.email ?? "";
+  const roleKey = (user?.role || "member") as keyof typeof gradeConfig;
+  const grade = gradeConfig[roleKey] || gradeConfig.member;
 
   // Fonction pour générer les breadcrumbs
   return (
@@ -253,11 +273,15 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
               <UserAvatar name={displayName} photo={user?.avatar_url} size="sm" />
               <div className="min-w-0 flex-1">
                 <p className="text-sm font-semibold text-white truncate">{displayName}</p>
-                <div className="flex items-center gap-2 mt-1">
-                  <span className="px-1.5 py-0.5 bg-yellow-500/20 text-yellow-500 text-[10px] font-medium rounded">
-                    Plus
-                  </span>
-                  <span className="text-[10px] text-white/50">Membre</span>
+                <div
+                  className="mt-1 inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-medium"
+                  style={{
+                    borderColor: `${grade.color}50`,
+                    backgroundColor: "rgba(255, 255, 255, 0.05)",
+                  }}
+                >
+                  <grade.icon className="h-4 w-4" style={{ color: grade.color }} />
+                  <span style={{ color: grade.color }}>{grade.label}</span>
                 </div>
               </div>
             </div>
