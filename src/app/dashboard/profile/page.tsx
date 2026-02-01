@@ -29,10 +29,10 @@ export default function ProfilePage() {
     try {
       const supabase = createClient();
       
-      // Récupérer le profil complet (cast pour contourner l'inférence never du client Supabase)
+      // Récupérer seulement les colonnes de base qui existent toujours
       const { data: rawProfile, error } = await supabase
         .from("users")
-        .select("*")
+        .select("id, email, full_name, avatar_url")
         .eq("id", user.id)
         .single();
 
@@ -41,15 +41,31 @@ export default function ProfilePage() {
         return;
       }
 
-      const profile: UserRow | null = rawProfile as UserRow | null;
+      const profile: any = rawProfile;
       if (profile) {
         const nameParts = profile.full_name?.split(" ") || [];
         setFirstName(nameParts[0] || "");
         setEmail(profile.email || "");
         setAvatarUrl(profile.avatar_url);
-        // Charger les handles sans le @ (il sera ajouté visuellement)
-        setTwitterHandle(profile.twitter_handle?.replace(/^@+/, "") || "");
-        setDiscordTag(profile.discord_tag?.replace(/^@+/, "") || "");
+        
+        // Essayer de charger les handles si les colonnes existent (sans erreur si elles n'existent pas)
+        try {
+          const { data: handlesData } = await supabase
+            .from("users")
+            .select("twitter_handle, discord_tag")
+            .eq("id", user.id)
+            .single();
+          
+          if (handlesData) {
+            const handles = handlesData as any;
+            setTwitterHandle(handles.twitter_handle?.replace(/^@+/, "") || "");
+            setDiscordTag(handles.discord_tag?.replace(/^@+/, "") || "");
+          }
+        } catch {
+          // Ignorer si les colonnes n'existent pas encore
+          setTwitterHandle("");
+          setDiscordTag("");
+        }
         
         // Calculer l'XP basé sur la progression (à adapter selon votre logique)
         // Pour l'instant, on simule avec un calcul basique
@@ -219,38 +235,41 @@ export default function ProfilePage() {
     try {
       const supabase = createClient();
       
-      // Nettoyer les handles : retirer le @ s'il est présent et les espaces
-      const cleanTwitterHandle = twitterHandle.trim().replace(/^@+/, "").trim() || null;
-      const cleanDiscordTag = discordTag.trim().replace(/^@+/, "").trim() || null;
-      
-      // Préparer les données à sauvegarder (simplement, sans validation)
-      const updateData: any = {
+      // Sauvegarder d'abord les données de base (toujours présentes)
+      const baseUpdateData: any = {
         full_name: firstName.trim() || null,
         avatar_url: avatarUrl,
       };
       
-      // Ajouter les handles seulement s'ils ne sont pas vides
-      if (cleanTwitterHandle) {
-        updateData.twitter_handle = cleanTwitterHandle;
-      } else {
-        updateData.twitter_handle = null;
-      }
-      
-      if (cleanDiscordTag) {
-        updateData.discord_tag = cleanDiscordTag;
-      } else {
-        updateData.discord_tag = null;
-      }
-      
-      // Mettre à jour le profil — assertion pour contourner le typage .update(never) du client Supabase
-      const { error } = await supabase
+      const { error: baseError } = await supabase
         .from("users")
-        .update(updateData as never)
+        .update(baseUpdateData as never)
         .eq("id", user.id);
 
-      if (error) {
-        console.error("Erreur Supabase:", error);
-        throw new Error(error.message || "Erreur lors de la sauvegarde");
+      if (baseError) {
+        console.error("Erreur Supabase (base):", baseError);
+        throw new Error(baseError.message || "Erreur lors de la sauvegarde");
+      }
+
+      // Ensuite, essayer de sauvegarder les handles (ignorer l'erreur si les colonnes n'existent pas)
+      const cleanTwitterHandle = twitterHandle.trim().replace(/^@+/, "").trim() || null;
+      const cleanDiscordTag = discordTag.trim().replace(/^@+/, "").trim() || null;
+      
+      if (cleanTwitterHandle || cleanDiscordTag) {
+        try {
+          const handlesUpdateData: any = {};
+          if (cleanTwitterHandle) handlesUpdateData.twitter_handle = cleanTwitterHandle;
+          if (cleanDiscordTag) handlesUpdateData.discord_tag = cleanDiscordTag;
+          
+          await supabase
+            .from("users")
+            .update(handlesUpdateData as never)
+            .eq("id", user.id);
+          // Ignorer les erreurs si les colonnes n'existent pas
+        } catch (handlesError) {
+          // Les colonnes n'existent peut-être pas encore, ce n'est pas grave
+          console.log("Les colonnes Discord/X n'existent peut-être pas encore");
+        }
       }
 
       // Rafraîchir le profil dans le contexte
