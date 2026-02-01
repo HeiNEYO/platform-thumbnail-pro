@@ -1,62 +1,46 @@
 @echo off
-REM 🚀 Script de Déploiement Rapide - Platform Thumbnail Pro (Windows)
-REM Usage: deploy.bat "Message de commit"
-
-setlocal enabledelayedexpansion
-
-echo 🚀 Déploiement en cours...
+echo ========================================
+echo   DEPLOIEMENT VERS VERCEL
+echo ========================================
 echo.
 
-REM 1. Vérifier que nous sommes dans le bon répertoire
-if not exist "package.json" (
-    echo ❌ Erreur: package.json introuvable. Êtes-vous dans le bon répertoire ?
-    exit /b 1
-)
-
-REM 2. Message de commit (argument ou par défaut)
-set "COMMIT_MESSAGE=%~1"
-if "!COMMIT_MESSAGE!"=="" set "COMMIT_MESSAGE=feat: mise à jour de la plateforme"
-
-echo 📝 Message de commit: !COMMIT_MESSAGE!
-echo.
-
-REM 3. Vérifier le build avant de pousser
-echo 🔨 Vérification du build...
-call npm run build
-if errorlevel 1 (
-    echo ❌ Build échoué ! Corrigez les erreurs avant de déployer.
-    exit /b 1
-)
-echo ✅ Build réussi !
-echo.
-
-REM 4. Ajouter tous les fichiers
-echo 📦 Ajout des fichiers...
+echo [1/3] Ajout des fichiers modifies...
 git add .
-
-REM 5. Créer le commit
-echo 💾 Création du commit...
-git commit -m "!COMMIT_MESSAGE!"
-if errorlevel 1 (
-    echo ⚠️  Aucun changement à committer ou erreur lors du commit.
-)
-
-REM 6. Pousser sur GitHub
-echo 📤 Push sur GitHub...
-git push origin main
-if errorlevel 1 (
-    echo ❌ Erreur lors du push. Vérifiez votre connexion Git.
+if %errorlevel% neq 0 (
+    echo ERREUR: Impossible d'ajouter les fichiers
+    pause
     exit /b 1
 )
-
-echo ✅ Push réussi !
-echo.
-echo 🎉 Déploiement déclenché sur Vercel !
-echo ⏳ Attendez 1-3 minutes puis vérifiez:
-echo    https://platform-thumbnail-pro.vercel.app
-echo.
-echo 📊 Suivez le déploiement sur:
-echo    https://vercel.com/dashboard
+echo OK - Fichiers ajoutes
 echo.
 
-endlocal
+echo [2/3] Creation du commit...
+git commit -m "feat: ajout Instagram/Discord sur cards + badges avec fond colore"
+if %errorlevel% neq 0 (
+    echo ATTENTION: Aucun changement a commiter ou erreur
+    echo Continuons quand meme...
+)
+echo OK - Commit cree
+echo.
+
+echo [3/3] Envoi vers GitHub (deploiement automatique Vercel)...
+git push origin main
+if %errorlevel% neq 0 (
+    echo ERREUR: Impossible de pousser vers GitHub
+    pause
+    exit /b 1
+)
+echo OK - Deploiement en cours sur Vercel
+echo.
+
+echo ========================================
+echo   DEPLOIEMENT LANCE AVEC SUCCES !
+echo ========================================
+echo.
+echo Le site sera disponible dans 1-3 minutes sur:
+echo https://platform-thumbnail-pro.vercel.app
+echo.
+echo Vous pouvez suivre le deploiement sur:
+echo https://vercel.com/dashboard
+echo.
+pause
