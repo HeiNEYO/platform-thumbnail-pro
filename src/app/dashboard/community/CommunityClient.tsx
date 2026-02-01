@@ -6,6 +6,38 @@ import { MemberCard } from "@/components/ui/MemberCard";
 import { createClient } from "@/lib/supabase/client";
 import type { CommunityMember } from "@/lib/db/community";
 
+function mapMembersFromRows(rows: any[]): CommunityMember[] {
+  return rows
+    .map((row: any) => {
+      const twitterHandle = row.twitter_handle && row.twitter_handle.trim() !== "" ? row.twitter_handle.trim() : null;
+      const discordTag = row.discord_tag && row.discord_tag.trim() !== "" ? row.discord_tag.trim() : null;
+      const communityScore = typeof row.community_score === "number" ? row.community_score : 0;
+
+      return {
+        id: row.id,
+        full_name: row.full_name,
+        email: row.email,
+        avatar_url: row.avatar_url,
+        twitter_handle: twitterHandle,
+        discord_tag: discordTag,
+        community_score: communityScore,
+        role: (row.role || "member") as "member" | "admin" | "intervenant",
+      };
+    })
+    .sort((a, b) => b.community_score - a.community_score);
+}
+
+async function queryMembers(fallbackWithoutScore = false) {
+  const supabase = createClient();
+  const columns = fallbackWithoutScore
+    ? "id, email, full_name, avatar_url, role, twitter_handle, discord_tag"
+    : "id, email, full_name, avatar_url, role, twitter_handle, discord_tag, community_score";
+  return supabase
+    .from("users")
+    .select(columns)
+    .order("created_at", { ascending: false });
+}
+
 export function CommunityClient({ initialMembers }: { initialMembers: CommunityMember[] }) {
   const { user: currentUser } = useAuth();
   const [members, setMembers] = useState<CommunityMember[]>(initialMembers);
@@ -18,32 +50,26 @@ export function CommunityClient({ initialMembers }: { initialMembers: CommunityM
       setError(null);
 
       try {
-        const supabase = createClient();
-        const { data, error } = await supabase
-          .from("users")
-          .select("id, email, full_name, avatar_url, role, twitter_handle, discord_tag, community_score")
-          .order("created_at", { ascending: false });
+        let { data, error } = await queryMembers();
+
+        if (error) {
+          const message = (error.message || "").toLowerCase();
+          const requiresFallback =
+            message.includes("community_score") || message.includes("column \"community_score\"");
+
+          if (requiresFallback) {
+            console.warn("⚠️ Column community_score missing, retry without it (client)");
+            ({ data, error } = await queryMembers(true));
+          } else {
+            throw error;
+          }
+        }
 
         if (error) {
           throw error;
         }
 
-        const mapped = (data || []).map((row: any) => {
-          const twitterHandle = row.twitter_handle && row.twitter_handle.trim() !== "" ? row.twitter_handle.trim() : null;
-          const discordTag = row.discord_tag && row.discord_tag.trim() !== "" ? row.discord_tag.trim() : null;
-          const communityScore = typeof row.community_score === "number" ? row.community_score : 0;
-
-          return {
-            id: row.id,
-            full_name: row.full_name,
-            email: row.email,
-            avatar_url: row.avatar_url,
-            twitter_handle: twitterHandle,
-            discord_tag: discordTag,
-            community_score: communityScore,
-            role: (row.role || "member") as "member" | "admin" | "intervenant",
-          };
-        });
+        const mapped = mapMembersFromRows(data || []);
 
         let finalMembers = mapped.sort((a, b) => b.community_score - a.community_score);
 
