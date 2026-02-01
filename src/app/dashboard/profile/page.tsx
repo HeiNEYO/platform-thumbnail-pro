@@ -11,7 +11,6 @@ export default function ProfilePage() {
   const { user, refreshUserProfile } = useAuth();
   const [firstName, setFirstName] = useState("");
   const [email, setEmail] = useState("");
-  const [accountNumber, setAccountNumber] = useState("");
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [twitterHandle, setTwitterHandle] = useState("");
   const [discordTag, setDiscordTag] = useState("");
@@ -47,7 +46,6 @@ export default function ProfilePage() {
         const nameParts = profile.full_name?.split(" ") || [];
         setFirstName(nameParts[0] || "");
         setEmail(profile.email || "");
-        setAccountNumber(profile.account_number ?? `TP-${user.id.slice(0, 6).toUpperCase()}`);
         setAvatarUrl(profile.avatar_url);
         // Charger les handles sans le @ (il sera ajouté visuellement)
         setTwitterHandle(profile.twitter_handle?.replace(/^@+/, "") || "");
@@ -79,7 +77,6 @@ export default function ProfilePage() {
       setEmail(user.email || "");
       setAvatarUrl(user.avatar_url);
       if (isDevMode) {
-        setAccountNumber("TP-001234");
         setTwitterHandle("");
         setDiscordTag("");
         setXp(1250);
@@ -229,7 +226,6 @@ export default function ProfilePage() {
       // Préparer les données à sauvegarder (simplement, sans validation)
       const updateData: any = {
         full_name: firstName.trim() || null,
-        account_number: accountNumber.trim() || null,
         avatar_url: avatarUrl,
       };
       
@@ -397,20 +393,6 @@ export default function ProfilePage() {
                 className="w-full rounded-lg border border-card-border bg-black px-4 py-3 text-white text-sm placeholder-white/50 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
                 placeholder="Votre prénom"
                 maxLength={50}
-              />
-            </div>
-
-            <div className="flex-shrink-0">
-              <label className="block text-sm font-semibold text-white mb-2">
-                Numéro de compte
-              </label>
-              <input
-                type="text"
-                value={accountNumber}
-                onChange={(e) => setAccountNumber(e.target.value)}
-                className="w-full rounded-lg border border-card-border bg-black px-4 py-3 text-white text-sm placeholder-white/50 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
-                placeholder="TP-XXXXXX"
-                maxLength={20}
               />
             </div>
 
