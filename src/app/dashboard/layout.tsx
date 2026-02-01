@@ -195,7 +195,7 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
 
       <div className="flex flex-1 overflow-hidden">
         {/* Sidebar - Design inspiré de l'image */}
-        <aside className="w-[240px] shrink-0 bg-[#0a0a0a] border-r border-sidebar-border flex flex-col overflow-y-auto">
+        <aside className="hidden lg:flex w-[240px] shrink-0 bg-[#0a0a0a] border-r border-sidebar-border flex flex-col overflow-y-auto">
           {/* Navigation principale - Toutes les sections */}
           <nav className="flex-1 p-3">
             {/* Sections toujours ouvertes */}
