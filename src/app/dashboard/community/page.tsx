@@ -24,24 +24,22 @@ export default async function CommunityPage() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  let members = await getAllCommunityMembers();
-
-  // Si aucun membre, vérifier s'il y a des utilisateurs dans la table
-  if (members.length === 0) {
-    const { data: usersCheck } = await supabase
-      .from("users")
-      .select("id")
-      .limit(1);
-    
-    if (usersCheck && usersCheck.length > 0) {
-      // Il y a des utilisateurs mais la requête a échoué, réessayer sans les nouveaux champs
-      const { data: allUsers } = await supabase
+  let members: any[] = [];
+  
+  try {
+    members = await getAllCommunityMembers();
+  } catch (error) {
+    console.error("❌ Erreur lors du chargement initial des membres:", error);
+    // En cas d'erreur, essayer une requête simple sans les nouveaux champs
+    try {
+      const { data: fallbackUsers, error: fallbackError } = await supabase
         .from("users")
         .select("id, email, full_name, avatar_url, role")
-        .order("created_at", { ascending: false });
+        .order("created_at", { ascending: false })
+        .limit(100); // Limiter pour éviter les timeouts
       
-      if (allUsers) {
-        members = allUsers.map((row: { id: string; email: string; full_name: string | null; avatar_url: string | null; role?: string }) => ({
+      if (!fallbackError && fallbackUsers) {
+        members = fallbackUsers.map((row: any) => ({
           id: row.id,
           full_name: row.full_name,
           email: row.email,
@@ -52,6 +50,19 @@ export default async function CommunityPage() {
           role: (row.role || "member") as "member" | "admin" | "intervenant",
         }));
       }
+    } catch (fallbackErr) {
+      console.error("❌ Erreur même avec le fallback:", fallbackErr);
+      // En dernier recours, retourner au moins l'utilisateur connecté
+      members = [{
+        id: user.id,
+        full_name: user.user_metadata?.full_name ?? null,
+        email: user.email ?? "",
+        avatar_url: user.user_metadata?.avatar_url ?? null,
+        twitter_handle: null,
+        discord_tag: null,
+        community_score: 0,
+        role: "member",
+      }];
     }
   }
 

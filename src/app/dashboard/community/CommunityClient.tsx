@@ -27,11 +27,16 @@ function mapMembersFromRows(rows: any[]): CommunityMember[] {
     .sort((a, b) => b.community_score - a.community_score);
 }
 
+/**
+ * Récupère TOUS les membres de la communauté sans aucun filtre
+ * Tous les membres authentifiés doivent pouvoir voir tous les autres membres
+ */
 async function queryMembers(fallbackWithoutScore = false) {
   const supabase = createClient();
   const columns = fallbackWithoutScore
     ? "id, email, full_name, avatar_url, role, twitter_handle, discord_tag"
     : "id, email, full_name, avatar_url, role, twitter_handle, discord_tag, community_score";
+  // Récupération de TOUS les utilisateurs sans filtre
   return supabase
     .from("users")
     .select(columns)
@@ -43,24 +48,50 @@ export function CommunityClient({ initialMembers }: { initialMembers: CommunityM
   const [members, setMembers] = useState<CommunityMember[]>(initialMembers);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [hasLoaded, setHasLoaded] = useState(false);
 
   useEffect(() => {
+    // Si on a déjà des membres initiaux, ne pas recharger immédiatement
+    // Attendre un peu avant de recharger pour éviter les requêtes multiples
+    if (initialMembers.length > 0 && !hasLoaded) {
+      setHasLoaded(true);
+      return;
+    }
+
     const loadMembers = async () => {
+      // Éviter les requêtes multiples simultanées
+      if (loading) return;
+      
       setLoading(true);
       setError(null);
 
       try {
+        // Essayer d'abord avec community_score
         let { data, error } = await queryMembers();
 
         if (error) {
           const message = (error.message || "").toLowerCase();
           const requiresFallback =
-            message.includes("community_score") || message.includes("column \"community_score\"");
+            message.includes("community_score") || 
+            message.includes("column \"community_score\"") ||
+            message.includes("does not exist");
 
           if (requiresFallback) {
             console.warn("⚠️ Column community_score missing, retry without it (client)");
             ({ data, error } = await queryMembers(true));
+            
+            // Si le fallback échoue aussi, vérifier les politiques RLS
+            if (error) {
+              const rlsError = message.includes("policy") || message.includes("permission") || message.includes("row-level");
+              if (rlsError) {
+                console.error("❌ Erreur RLS détectée. Vérifiez les politiques dans Supabase.");
+                throw new Error("Erreur de permissions. Vérifiez que les politiques RLS permettent aux membres de voir tous les autres membres.");
+              }
+              throw error;
+            }
           } else {
+            // Autre type d'erreur
+            console.error("❌ Erreur lors de la récupération des membres:", error);
             throw error;
           }
         }
@@ -69,7 +100,27 @@ export function CommunityClient({ initialMembers }: { initialMembers: CommunityM
           throw error;
         }
 
-        const mapped = mapMembersFromRows(data || []);
+        if (!data || data.length === 0) {
+          console.warn("⚠️ Aucune donnée retournée par la requête");
+          // Si aucun membre mais qu'on a un utilisateur connecté, afficher au moins son profil
+          if (currentUser) {
+            setMembers([{
+              id: currentUser.id,
+              full_name: currentUser.full_name ?? null,
+              email: currentUser.email ?? "",
+              avatar_url: currentUser.avatar_url ?? null,
+              twitter_handle: null,
+              discord_tag: null,
+              community_score: 0,
+              role: "member",
+            }]);
+            return;
+          }
+          setMembers([]);
+          return;
+        }
+
+        const mapped = mapMembersFromRows(data);
 
         let finalMembers = mapped.sort((a, b) => b.community_score - a.community_score);
 
@@ -89,16 +140,43 @@ export function CommunityClient({ initialMembers }: { initialMembers: CommunityM
         }
 
         setMembers(finalMembers);
+        setHasLoaded(true);
+        console.log(`✅ ${finalMembers.length} membre(s) chargé(s) avec succès`);
       } catch (err: any) {
         console.error("❌ Erreur lors du chargement des membres:", err);
-        setError(err.message || "Erreur lors du chargement des membres");
+        const errorMessage = err.message || err.toString() || "Erreur lors du chargement des membres";
+        
+        // Ne pas afficher l'erreur si on a déjà des membres initiaux
+        // Cela évite de casser l'affichage si le rechargement échoue
+        if (initialMembers.length === 0) {
+          setError(errorMessage);
+        } else {
+          // Garder les membres initiaux même en cas d'erreur
+          console.warn("⚠️ Erreur lors du rechargement, utilisation des données initiales");
+        }
+        
+        // Afficher plus de détails en développement
+        if (process.env.NODE_ENV === "development") {
+          console.error("Détails de l'erreur:", {
+            message: err.message,
+            code: err.code,
+            details: err.details,
+            hint: err.hint,
+            status: err.status,
+          });
+        }
       } finally {
         setLoading(false);
       }
     };
 
-    loadMembers();
-  }, [currentUser]);
+    // Délai pour éviter les requêtes multiples au chargement
+    const timeoutId = setTimeout(() => {
+      loadMembers();
+    }, 500);
+
+    return () => clearTimeout(timeoutId);
+  }, [currentUser, hasLoaded, initialMembers.length, loading]);
 
   if (loading) {
     return (

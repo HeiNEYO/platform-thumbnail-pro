@@ -32,36 +32,72 @@ function mapMembers(rows: any[]) {
     .sort((a, b) => b.community_score - a.community_score);
 }
 
+/**
+ * Récupère TOUS les membres de la communauté sans aucun filtre
+ * Tous les membres authentifiés doivent pouvoir voir tous les autres membres
+ * Les politiques RLS dans Supabase doivent permettre cette visibilité
+ */
 export async function getAllCommunityMembers(): Promise<CommunityMember[]> {
   const supabase = await createClient();
 
   try {
+    // Récupération de TOUS les utilisateurs sans filtre
+    // Les politiques RLS doivent permettre à tous les membres authentifiés de voir tous les autres
+    // Limiter à 1000 pour éviter les timeouts
     let query = supabase
       .from("users")
       .select("id, email, full_name, avatar_url, role, twitter_handle, discord_tag, community_score")
-      .order("created_at", { ascending: false });
+      .order("created_at", { ascending: false })
+      .limit(1000);
 
     const { data: users, error } = await query;
 
     if (error) {
       const message = (error.message || "").toLowerCase();
-      const isMissingColumn = message.includes("community_score") || message.includes("column \"community_score\"");
+      const isMissingColumn = 
+        message.includes("community_score") || 
+        message.includes("column \"community_score\"") ||
+        message.includes("does not exist");
+      
       if (isMissingColumn) {
         console.warn("⚠️ Colonne community_score absente, on la retire");
         const { data: fallbackUsers, error: fallbackError } = await supabase
           .from("users")
           .select("id, email, full_name, avatar_url, role, twitter_handle, discord_tag")
-          .order("created_at", { ascending: false });
+          .order("created_at", { ascending: false })
+          .limit(1000);
 
         if (fallbackError) {
           console.error("❌ Erreur lors de la récupération des membres (fallback):", fallbackError);
+          
+          // Vérifier si c'est une erreur RLS
+          const rlsError = fallbackError.message?.toLowerCase().includes("policy") || 
+                          fallbackError.message?.toLowerCase().includes("permission") ||
+                          fallbackError.message?.toLowerCase().includes("row-level");
+          
+          if (rlsError) {
+            console.error("❌ Erreur RLS détectée. Les politiques ne permettent pas la lecture.");
+            console.error("💡 Exécutez le script supabase-fix-community-visibility.sql dans Supabase");
+          }
+          
           return [];
         }
 
-        return mapMembers(fallbackUsers);
+        return mapMembers(fallbackUsers || []);
       }
 
-      console.error("❌ Erreur lors de la récupération des membres:", error);
+      // Vérifier si c'est une erreur RLS
+      const rlsError = message.includes("policy") || 
+                      message.includes("permission") ||
+                      message.includes("row-level");
+      
+      if (rlsError) {
+        console.error("❌ Erreur RLS détectée. Les politiques ne permettent pas la lecture.");
+        console.error("💡 Exécutez le script supabase-fix-community-visibility.sql dans Supabase");
+      } else {
+        console.error("❌ Erreur lors de la récupération des membres:", error);
+      }
+      
       return [];
     }
 
