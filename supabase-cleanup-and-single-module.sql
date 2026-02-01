@@ -1,20 +1,48 @@
 -- ============================================
--- FORMATION MINIA MAKING - UN SEUL MODULE
+-- NETTOYAGE ET CRÉATION D'UN SEUL MODULE POUR TOUTE LA FORMATION
 -- ============================================
 -- À exécuter dans Supabase : SQL Editor → New query → Coller → Run
 --
--- Ce script crée UN SEUL module "Formation Minia Making" avec tous les épisodes
--- basés sur les screenshots fournis.
+-- Ce script :
+-- 1. Supprime tous les modules et épisodes existants (doublons)
+-- 2. Supprime "Introduction au Graphisme" si présent
+-- 3. Crée un seul module "Formation Minia Making" avec tous les épisodes
 -- ============================================
 
--- Supprimer les anciens modules et épisodes (optionnel, décommentez si nécessaire)
--- DELETE FROM public.episodes;
--- DELETE FROM public.modules;
+-- ============================================
+-- 1. CRÉER LES TABLES SI ELLES N'EXISTENT PAS
+-- ============================================
+CREATE TABLE IF NOT EXISTS public.modules (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  title text NOT NULL,
+  description text,
+  order_index int NOT NULL DEFAULT 0,
+  duration_estimate text,
+  image_url text,
+  created_at timestamptz DEFAULT now(),
+  updated_at timestamptz DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS public.episodes (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  module_id uuid NOT NULL REFERENCES public.modules(id) ON DELETE CASCADE,
+  title text NOT NULL,
+  duration text,
+  order_index int NOT NULL DEFAULT 0,
+  video_url text,
+  created_at timestamptz DEFAULT now(),
+  updated_at timestamptz DEFAULT now()
+);
 
 -- ============================================
--- CRÉER UN SEUL MODULE POUR TOUTE LA FORMATION
+-- 2. SUPPRIMER TOUS LES MODULES ET ÉPISODES EXISTANTS
 -- ============================================
--- Note: Assurez-vous d'avoir ajouté la colonne image_url avec supabase-add-module-image.sql
+DELETE FROM public.episodes;
+DELETE FROM public.modules;
+
+-- ============================================
+-- 2. CRÉER UN SEUL MODULE POUR TOUTE LA FORMATION
+-- ============================================
 INSERT INTO public.modules (id, title, description, order_index, duration_estimate, image_url)
 VALUES (
   gen_random_uuid(),
@@ -26,7 +54,7 @@ VALUES (
 ) ON CONFLICT DO NOTHING;
 
 -- ============================================
--- AJOUTER TOUS LES ÉPISODES DANS CE MODULE UNIQUE
+-- 3. AJOUTER TOUS LES ÉPISODES DANS CE MODULE UNIQUE
 -- ============================================
 DO $$
 DECLARE
@@ -137,7 +165,7 @@ BEGIN
 END $$;
 
 -- ============================================
--- VÉRIFICATION
+-- 4. VÉRIFICATION
 -- ============================================
 SELECT 
   m.title as module_title,

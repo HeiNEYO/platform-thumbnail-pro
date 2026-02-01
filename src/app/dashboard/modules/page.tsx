@@ -3,8 +3,9 @@ import { createClient } from "@/lib/supabase/server";
 import { getModules } from "@/lib/db/modules";
 import { getEpisodesByModule } from "@/lib/db/episodes";
 import { isEpisodeCompleted } from "@/lib/db/episodes";
+import { getModuleProgress } from "@/lib/db/modules";
 import { BookOpen } from "lucide-react";
-import { ModulesAccordionClient } from "@/components/ModulesAccordionClient";
+import { FormationCard } from "@/components/FormationCard";
 
 // Force le rendu dynamique car on utilise cookies() pour l'authentification
 export const dynamic = 'force-dynamic';
@@ -62,22 +63,28 @@ export default async function ModulesPage() {
       );
     }
 
-    // Récupérer les épisodes et la progression pour chaque module
-    const modulesWithEpisodes = await Promise.all(
+    // Récupérer les statistiques pour chaque module (épisodes, progression)
+    const modulesWithStats = await Promise.all(
       modules.map(async (module) => {
         try {
           const episodes = await getEpisodesByModule(module.id);
           const completedFlags = await Promise.all(
             episodes.map((ep) => isEpisodeCompleted(authUser.id, ep.id))
           );
+          const completedCount = completedFlags.filter(Boolean).length;
+          
           return {
             ...module,
-            episodes,
-            completedFlags,
+            episodeCount: episodes.length,
+            completedCount,
           };
         } catch (err) {
           console.error(`Erreur pour le module ${module.id}:`, err);
-          return { ...module, episodes: [], completedFlags: [] };
+          return {
+            ...module,
+            episodeCount: 0,
+            completedCount: 0,
+          };
         }
       })
     );
@@ -89,14 +96,16 @@ export default async function ModulesPage() {
             Formation
           </h1>
           <p className="text-white/70 text-sm">
-            {modules.length} module{modules.length > 1 ? "s" : ""} disponible{modules.length > 1 ? "s" : ""}
+            {modules.length} formation{modules.length > 1 ? "s" : ""} disponible{modules.length > 1 ? "s" : ""}
           </p>
         </div>
 
-        <ModulesAccordionClient
-          modules={modulesWithEpisodes}
-          userId={authUser.id}
-        />
+        {/* Grille de cartes de formation */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {modulesWithStats.map((module) => (
+            <FormationCard key={module.id} module={module} />
+          ))}
+        </div>
       </div>
     );
   } catch (error) {

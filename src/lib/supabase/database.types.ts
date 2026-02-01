@@ -53,6 +53,7 @@ export interface Database {
           description: string | null;
           order_index: number;
           duration_estimate: string | null;
+          image_url: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -62,6 +63,7 @@ export interface Database {
           description?: string | null;
           order_index: number;
           duration_estimate?: string | null;
+          image_url?: string | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -71,6 +73,7 @@ export interface Database {
           description?: string | null;
           order_index?: number;
           duration_estimate?: string | null;
+          image_url?: string | null;
           created_at?: string;
           updated_at?: string;
         };
