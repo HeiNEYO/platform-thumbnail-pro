@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { createClient } from "@/lib/supabase/client";
 import { UserAvatar } from "@/components/ui/UserAvatar";
-import { Save, Loader2 } from "lucide-react";
+import { Save, Loader2, Upload, X } from "lucide-react";
 import type { UserRow } from "@/lib/supabase/database.types";
 
 export default function ProfilePage() {
@@ -12,9 +12,12 @@ export default function ProfilePage() {
   const [firstName, setFirstName] = useState("");
   const [email, setEmail] = useState("");
   const [accountNumber, setAccountNumber] = useState("");
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [xp, setXp] = useState(0);
   const [completedEvaluations, setCompletedEvaluations] = useState(0);
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const isDevMode = process.env.NEXT_PUBLIC_DEV_MODE === "true" || process.env.NEXT_PUBLIC_DEMO_MODE === "true";
 
   const loadProfileData = useCallback(async () => {
@@ -41,6 +44,7 @@ export default function ProfilePage() {
         setFirstName(nameParts[0] || "");
         setEmail(profile.email || "");
         setAccountNumber(profile.account_number ?? `TP-${user.id.slice(0, 6).toUpperCase()}`);
+        setAvatarUrl(profile.avatar_url);
         
         // Calculer l'XP basé sur la progression (à adapter selon votre logique)
         // Pour l'instant, on simule avec un calcul basique
@@ -66,6 +70,7 @@ export default function ProfilePage() {
       const nameParts = user.full_name?.split(" ") || [];
       setFirstName(nameParts[0] || "");
       setEmail(user.email || "");
+      setAvatarUrl(user.avatar_url);
       if (isDevMode) {
         setAccountNumber("TP-001234");
         setXp(1250);
@@ -75,6 +80,105 @@ export default function ProfilePage() {
       loadProfileData();
     }
   }, [user, isDevMode, loadProfileData]);
+
+  const handleAvatarUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file || !user) return;
+
+    // Vérifier la taille (max 4MB)
+    if (file.size > 4 * 1024 * 1024) {
+      alert("L'image est trop grande. Taille maximale : 4MB");
+      return;
+    }
+
+    // Vérifier le type
+    if (!file.type.startsWith("image/")) {
+      alert("Veuillez sélectionner une image");
+      return;
+    }
+
+    setUploading(true);
+
+    try {
+      const supabase = createClient();
+      
+      // Générer un nom de fichier unique
+      const fileExt = file.name.split(".").pop();
+      const fileName = `${user.id}-${Date.now()}.${fileExt}`;
+      const filePath = fileName;
+
+      // Upload vers Supabase Storage
+      const { error: uploadError } = await supabase.storage
+        .from("avatars")
+        .upload(filePath, file, {
+          cacheControl: "3600",
+          upsert: true,
+        });
+
+      if (uploadError) {
+        throw uploadError;
+      }
+
+      // Récupérer l'URL publique
+      const { data: { publicUrl } } = supabase.storage
+        .from("avatars")
+        .getPublicUrl(filePath);
+
+      // Mettre à jour le profil avec la nouvelle URL
+      const { error: updateError } = await supabase
+        .from("users")
+        .update({ avatar_url: publicUrl } as never)
+        .eq("id", user.id);
+
+      if (updateError) {
+        throw updateError;
+      }
+
+      // Mettre à jour l'état local
+      setAvatarUrl(publicUrl);
+      alert("Photo de profil mise à jour avec succès");
+    } catch (error) {
+      console.error("Erreur lors de l'upload:", error);
+      alert("Erreur lors de l'upload de la photo");
+    } finally {
+      setUploading(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+    }
+  };
+
+  const handleRemoveAvatar = async () => {
+    if (!user || !avatarUrl) return;
+
+    if (!confirm("Voulez-vous supprimer votre photo de profil ?")) {
+      return;
+    }
+
+    setUploading(true);
+
+    try {
+      const supabase = createClient();
+      
+      // Supprimer l'URL de la base de données
+      const { error } = await supabase
+        .from("users")
+        .update({ avatar_url: null } as never)
+        .eq("id", user.id);
+
+      if (error) {
+        throw error;
+      }
+
+      setAvatarUrl(null);
+      alert("Photo de profil supprimée");
+    } catch (error) {
+      console.error("Erreur lors de la suppression:", error);
+      alert("Erreur lors de la suppression");
+    } finally {
+      setUploading(false);
+    }
+  };
 
   const handleSave = async () => {
     if (!user || isDevMode) {
@@ -93,6 +197,7 @@ export default function ProfilePage() {
         .update({
           full_name: firstName,
           account_number: accountNumber,
+          avatar_url: avatarUrl,
         } as never)
         .eq("id", user.id);
 
@@ -121,16 +226,58 @@ export default function ProfilePage() {
         <div className="flex flex-col gap-6 min-h-0">
           <div className="rounded-lg border border-card-border bg-black p-8 overflow-hidden flex-shrink-0">
             <div className="flex flex-col items-center text-center">
-              <div className="mb-5">
+              <div className="mb-5 relative group">
                 <UserAvatar
                   name={firstName || user?.email || ""}
-                  photo={null}
+                  photo={avatarUrl}
                   size="lg"
                 />
+                {/* Overlay pour upload */}
+                <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity rounded-full flex items-center justify-center cursor-pointer">
+                  <div className="flex flex-col items-center gap-2">
+                    <Upload className="h-6 w-6 text-white" />
+                    <span className="text-xs text-white">Modifier</span>
+                  </div>
+                </div>
+                {/* Bouton pour changer la photo */}
+                <button
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={uploading}
+                  className="absolute inset-0 opacity-0 cursor-pointer disabled:cursor-not-allowed"
+                  aria-label="Changer la photo de profil"
+                />
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleAvatarUpload}
+                  className="hidden"
+                  disabled={uploading}
+                />
+                {/* Bouton supprimer si photo existe */}
+                {avatarUrl && (
+                  <button
+                    onClick={handleRemoveAvatar}
+                    disabled={uploading}
+                    className="absolute -top-2 -right-2 bg-error hover:bg-error/80 text-white rounded-full p-1.5 shadow-lg transition-colors disabled:opacity-50"
+                    aria-label="Supprimer la photo"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                )}
               </div>
+              {uploading && (
+                <div className="mb-2 text-xs text-white/70 flex items-center gap-2">
+                  <Loader2 className="h-3 w-3 animate-spin" />
+                  <span>Upload en cours...</span>
+                </div>
+              )}
               <h2 className="text-xl font-bold text-white break-words mb-2">
                 {firstName || "Utilisateur"}
               </h2>
+              <p className="text-xs text-white/50 mb-4">
+                Cliquez sur la photo pour la modifier (max 4MB)
+              </p>
             </div>
           </div>
 

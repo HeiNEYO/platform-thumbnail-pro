@@ -1,6 +1,7 @@
 "use client";
 
-import { Twitter, MessageCircle } from "lucide-react";
+import Link from "next/link";
+import { Twitter } from "lucide-react";
 import { UserAvatar } from "./UserAvatar";
 import { DiscordIcon } from "./DiscordIcon";
 import type { CommunityMember } from "@/lib/db/community";
@@ -14,7 +15,10 @@ export function MemberCard({ member }: MemberCardProps) {
   const score = member.community_score || 0;
 
   return (
-    <div className="rounded-lg border border-card-border bg-black p-5 hover:border-primary/30 transition-all duration-200">
+    <Link
+      href={`/dashboard/profile/${member.id}`}
+      className="block rounded-lg border border-card-border bg-black p-5 hover:border-primary/30 transition-all duration-200 cursor-pointer"
+    >
       {/* En-tête avec identifiant et titre */}
       <div className="flex items-start justify-between mb-4">
         <div className="flex-1 min-w-0">
@@ -61,6 +65,6 @@ export function MemberCard({ member }: MemberCardProps) {
           </div>
         )}
       </div>
-    </div>
+    </Link>
   );
 }
