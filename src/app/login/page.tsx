@@ -70,7 +70,7 @@ export default function LoginPage() {
         {isDemoMode && (
           <div
             className="rounded-lg border border-primary/50 bg-primary/10 text-primary text-center text-xs font-medium px-4 py-3 mb-4"
-            style={{ borderColor: "rgba(0,19,245,0.5)", background: "rgba(0,19,245,0.1)", color: "#0013F5" }}
+            style={{ borderColor: "rgba(92,111,255,0.5)", background: "rgba(92,111,255,0.1)", color: "#5C6FFF" }}
           >
             Mode démo : cliquez sur « Se connecter » pour accéder au dashboard (sans Supabase).
           </div>

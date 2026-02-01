@@ -15,8 +15,8 @@
   --card-border: #1f1f1f;
   
   /* Bleu Premium Principal */
-  --primary: #0013F5;
-  --primary-hover: #1a2fff;
+  --primary: #5C6FFF;
+  --primary-hover: #7F85FF;
   
   /* Sidebar - Gris foncé */
   --sidebar: #0a0a0a;
@@ -126,6 +126,6 @@ body {
   }
   
   .bg-gradient-premium {
-    background: linear-gradient(135deg, #0013F5 0%, #4d5eff 100%);
+    background: linear-gradient(135deg, #5C6FFF 0%, #7F85FF 100%);
   }
 }
