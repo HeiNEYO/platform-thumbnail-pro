@@ -218,11 +218,83 @@ export function CommunityClient({ initialMembers }: { initialMembers: CommunityM
     );
   }
 
+  // Séparer les membres par rôle et trier par score dans chaque section
+  const admins = members
+    .filter((m) => m.role === "admin")
+    .sort((a, b) => b.community_score - a.community_score);
+  
+  const intervenants = members
+    .filter((m) => m.role === "intervenant")
+    .sort((a, b) => b.community_score - a.community_score);
+  
+  const regularMembers = members
+    .filter((m) => m.role === "member" || (!m.role || (m.role !== "admin" && m.role !== "intervenant")))
+    .sort((a, b) => b.community_score - a.community_score);
+
+  // Composant de section réutilisable
+  const Section = ({ 
+    title, 
+    members: sectionMembers, 
+    showDivider = true 
+  }: { 
+    title: string; 
+    members: CommunityMember[]; 
+    showDivider?: boolean;
+  }) => {
+    if (sectionMembers.length === 0) return null;
+
+    return (
+      <div className="space-y-4">
+        {showDivider && (
+          <div className="relative my-6">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-white/10"></div>
+            </div>
+          </div>
+        )}
+        
+        {/* Titre de section */}
+        <div className="flex items-center gap-3">
+          <h2 className="text-xl font-bold text-white uppercase tracking-wider">
+            {title}
+          </h2>
+          <span className="text-sm text-white/50 font-medium">
+            ({sectionMembers.length})
+          </span>
+        </div>
+
+        {/* Grille de cartes */}
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {sectionMembers.map((member) => (
+            <MemberCard key={member.id} member={member} />
+          ))}
+        </div>
+      </div>
+    );
+  };
+
   return (
-    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-      {members.map((member) => (
-        <MemberCard key={member.id} member={member} />
-      ))}
+    <div className="space-y-8">
+      {/* Section Administrateurs */}
+      <Section 
+        title="Administrateurs" 
+        members={admins} 
+        showDivider={false}
+      />
+
+      {/* Section Intervenants */}
+      <Section 
+        title="Intervenants" 
+        members={intervenants}
+        showDivider={admins.length > 0}
+      />
+
+      {/* Section Membres */}
+      <Section 
+        title="Membres" 
+        members={regularMembers}
+        showDivider={admins.length > 0 || intervenants.length > 0}
+      />
     </div>
   );
 }
