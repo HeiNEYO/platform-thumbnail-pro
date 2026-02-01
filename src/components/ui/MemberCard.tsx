@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { Twitter, Users, GraduationCap, Shield } from "lucide-react";
 import { UserAvatar } from "./UserAvatar";
 import { DiscordIcon } from "./DiscordIcon";
@@ -47,8 +48,9 @@ export function MemberCard({ member }: MemberCardProps) {
   }
 
   return (
-    <div 
-      className="rounded-lg border border-card-border p-5 relative overflow-hidden"
+    <Link
+      href={`/dashboard/profile/${member.id}`}
+      className="block rounded-lg border border-card-border p-5 relative overflow-hidden hover:border-primary/30 transition-all duration-200"
       style={{
         background: "linear-gradient(135deg, rgba(10, 10, 10, 0.95) 0%, rgba(36, 36, 36, 0.98) 100%)",
       }}
@@ -90,10 +92,16 @@ export function MemberCard({ member }: MemberCardProps) {
       <div className="flex items-center gap-4 text-white/60 text-xs">
         {/* Twitter */}
         {member.twitter_handle ? (
-          <div className="flex items-center gap-2">
+          <a
+            href={`https://twitter.com/${member.twitter_handle.replace(/^@+/, "")}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={(e) => e.stopPropagation()}
+            className="flex items-center gap-2 hover:text-primary transition-colors"
+          >
             <Twitter className="h-4 w-4 shrink-0" />
             <span className="truncate">@{member.twitter_handle}</span>
-          </div>
+          </a>
         ) : (
           <div className="flex items-center gap-2 text-white/30">
             <Twitter className="h-4 w-4 shrink-0" />
@@ -103,10 +111,16 @@ export function MemberCard({ member }: MemberCardProps) {
 
         {/* Discord */}
         {member.discord_tag ? (
-          <div className="flex items-center gap-2">
+          <a
+            href={`https://discord.com/users/${member.discord_tag.replace(/^@+/, "")}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={(e) => e.stopPropagation()}
+            className="flex items-center gap-2 hover:text-primary transition-colors"
+          >
             <DiscordIcon className="h-4 w-4 shrink-0" />
             <span className="truncate">@{member.discord_tag}</span>
-          </div>
+          </a>
         ) : (
           <div className="flex items-center gap-2 text-white/30">
             <DiscordIcon className="h-4 w-4 shrink-0" />
@@ -114,6 +128,6 @@ export function MemberCard({ member }: MemberCardProps) {
           </div>
         )}
       </div>
-    </div>
+    </Link>
   );
 }
