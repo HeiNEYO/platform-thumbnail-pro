@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { MemberCard } from "@/components/ui/MemberCard";
 import { createClient } from "@/lib/supabase/client";
@@ -48,20 +48,27 @@ export function CommunityClient({ initialMembers }: { initialMembers: CommunityM
   const [members, setMembers] = useState<CommunityMember[]>(initialMembers);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [hasLoaded, setHasLoaded] = useState(false);
+  const hasLoadedRef = useRef(false);
+  const isLoadingRef = useRef(false);
 
   useEffect(() => {
     // Si on a déjà des membres initiaux, ne pas recharger immédiatement
-    // Attendre un peu avant de recharger pour éviter les requêtes multiples
-    if (initialMembers.length > 0 && !hasLoaded) {
-      setHasLoaded(true);
+    // Utiliser les données du serveur directement
+    if (initialMembers.length > 0 && !hasLoadedRef.current) {
+      hasLoadedRef.current = true;
+      return;
+    }
+
+    // Si on a déjà chargé ou si une requête est en cours, ne pas recharger
+    if (hasLoadedRef.current || isLoadingRef.current) {
       return;
     }
 
     const loadMembers = async () => {
       // Éviter les requêtes multiples simultanées
-      if (loading) return;
+      if (isLoadingRef.current) return;
       
+      isLoadingRef.current = true;
       setLoading(true);
       setError(null);
 
@@ -140,7 +147,7 @@ export function CommunityClient({ initialMembers }: { initialMembers: CommunityM
         }
 
         setMembers(finalMembers);
-        setHasLoaded(true);
+        hasLoadedRef.current = true;
         console.log(`✅ ${finalMembers.length} membre(s) chargé(s) avec succès`);
       } catch (err: any) {
         console.error("❌ Erreur lors du chargement des membres:", err);
@@ -167,16 +174,15 @@ export function CommunityClient({ initialMembers }: { initialMembers: CommunityM
         }
       } finally {
         setLoading(false);
+        isLoadingRef.current = false;
       }
     };
 
-    // Délai pour éviter les requêtes multiples au chargement
-    const timeoutId = setTimeout(() => {
+    // Ne charger qu'une seule fois, seulement si on n'a pas de membres initiaux
+    if (initialMembers.length === 0 && currentUser) {
       loadMembers();
-    }, 500);
-
-    return () => clearTimeout(timeoutId);
-  }, [currentUser, hasLoaded, initialMembers.length, loading]);
+    }
+  }, [currentUser?.id, initialMembers.length]); // Dépendances minimales pour éviter les re-renders
 
   if (loading) {
     return (
