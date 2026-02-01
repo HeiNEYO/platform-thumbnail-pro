@@ -9,6 +9,7 @@ export interface CommunityMember {
   twitter_handle: string | null;
   discord_tag: string | null;
   community_score: number;
+  role: "member" | "admin" | "intervenant";
 }
 
 export async function getAllCommunityMembers(): Promise<CommunityMember[]> {
@@ -18,7 +19,7 @@ export async function getAllCommunityMembers(): Promise<CommunityMember[]> {
     // Essayer d'abord avec les nouveaux champs
     let query = supabase
       .from("users")
-      .select("id, email, full_name, avatar_url, twitter_handle, discord_tag, community_score");
+      .select("id, email, full_name, avatar_url, twitter_handle, discord_tag, community_score, role");
     
     const { data, error } = await query.order("community_score", { ascending: false });
 
@@ -46,6 +47,7 @@ export async function getAllCommunityMembers(): Promise<CommunityMember[]> {
         twitter_handle: null,
         discord_tag: null,
         community_score: 0,
+        role: (row.role || "member") as "member" | "admin" | "intervenant",
       }));
     }
 
@@ -59,6 +61,7 @@ export async function getAllCommunityMembers(): Promise<CommunityMember[]> {
       twitter_handle: row.twitter_handle || null,
       discord_tag: row.discord_tag || null,
       community_score: row.community_score || 0,
+      role: (row.role || "member") as "member" | "admin" | "intervenant",
     }));
   } catch (err) {
     console.error("Erreur inattendue lors de la récupération des membres:", err);

@@ -37,11 +37,11 @@ export default async function CommunityPage() {
       // Il y a des utilisateurs mais la requête a échoué, réessayer sans les nouveaux champs
       const { data: allUsers } = await supabase
         .from("users")
-        .select("id, email, full_name, avatar_url")
+        .select("id, email, full_name, avatar_url, role")
         .order("created_at", { ascending: false });
       
       if (allUsers) {
-        members = allUsers.map((row: { id: string; email: string; full_name: string | null; avatar_url: string | null }) => ({
+        members = allUsers.map((row: { id: string; email: string; full_name: string | null; avatar_url: string | null; role?: string }) => ({
           id: row.id,
           full_name: row.full_name,
           email: row.email,
@@ -49,6 +49,7 @@ export default async function CommunityPage() {
           twitter_handle: null,
           discord_tag: null,
           community_score: 0,
+          role: (row.role || "member") as "member" | "admin" | "intervenant",
         }));
       }
     }

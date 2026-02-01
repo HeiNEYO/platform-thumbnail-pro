@@ -28,7 +28,7 @@ export function CommunityClient({ initialMembers }: { initialMembers: CommunityM
         // Essayer avec les nouveaux champs
         const { data, error: queryError } = await supabase
           .from("users")
-          .select("id, email, full_name, avatar_url, twitter_handle, discord_tag, community_score")
+          .select("id, email, full_name, avatar_url, twitter_handle, discord_tag, community_score, role")
           .order("community_score", { ascending: false });
 
         console.log("📊 Résultat requête:", { dataCount: data?.length, error: queryError });
@@ -39,7 +39,7 @@ export function CommunityClient({ initialMembers }: { initialMembers: CommunityM
           // Fallback : essayer sans les nouveaux champs
           const { data: fallbackData, error: fallbackError } = await supabase
             .from("users")
-            .select("id, email, full_name, avatar_url")
+            .select("id, email, full_name, avatar_url, role")
             .order("created_at", { ascending: false });
 
           console.log("📊 Résultat fallback:", { dataCount: fallbackData?.length, error: fallbackError });
@@ -58,6 +58,7 @@ export function CommunityClient({ initialMembers }: { initialMembers: CommunityM
               twitter_handle: null,
               discord_tag: null,
               community_score: 0,
+              role: (row.role || "member") as "member" | "admin" | "intervenant",
             }));
             
             // Vérifier si l'utilisateur actuel est dans la liste
@@ -78,6 +79,7 @@ export function CommunityClient({ initialMembers }: { initialMembers: CommunityM
             twitter_handle: row.twitter_handle || null,
             discord_tag: row.discord_tag || null,
             community_score: row.community_score || 0,
+            role: (row.role || "member") as "member" | "admin" | "intervenant",
           }));
           
           // Vérifier si l'utilisateur actuel est dans la liste
