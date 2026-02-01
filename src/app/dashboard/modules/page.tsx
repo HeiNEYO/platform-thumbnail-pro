@@ -89,7 +89,19 @@ export default async function ModulesPage() {
       })
     );
 
-    // Calculer les statistiques globales de la formation
+    // Filtrer pour n'afficher que les 5 modules demandés : Les Outils, Les Bases, La Pratique, Business, Bonus
+    const modulesToDisplay = modulesWithStats.filter((module) => {
+      const title = module.title;
+      return (
+        title === "1 • Les Outils" ||
+        title === "2 • Les Bases" ||
+        title === "3 • La Pratique" ||
+        title === "4 • Business" ||
+        title === "5 • Bonus"
+      );
+    }).sort((a, b) => a.order_index - b.order_index); // Trier par order_index pour avoir le bon ordre
+
+    // Calculer les statistiques globales de la formation (tous les modules)
     const totalEpisodes = modulesWithStats.reduce((sum, m) => sum + m.episodeCount, 0);
     const totalCompleted = modulesWithStats.reduce((sum, m) => sum + m.completedCount, 0);
     const globalProgress = totalEpisodes > 0 ? Math.round((totalCompleted / totalEpisodes) * 100) : 0;
@@ -156,10 +168,10 @@ export default async function ModulesPage() {
           </div>
         )}
 
-        {/* Modules style Netflix - cartes scrollables */}
+        {/* Modules style Netflix - cartes scrollables (uniquement les 5 modules demandés) */}
         <div>
           <h2 className="text-xl font-bold text-white mb-4">Modules de la formation</h2>
-          <NetflixStyleModuleCards modules={modulesWithStats} />
+          <NetflixStyleModuleCards modules={modulesToDisplay} />
         </div>
       </div>
     );
