@@ -251,24 +251,35 @@ export default function ProfilePage() {
         throw new Error(baseError.message || "Erreur lors de la sauvegarde");
       }
 
-      // Ensuite, essayer de sauvegarder les handles (ignorer l'erreur si les colonnes n'existent pas)
+      // Sauvegarder les handles (toujours, même si vides pour les mettre à null)
       const cleanTwitterHandle = twitterHandle.trim().replace(/^@+/, "").trim() || null;
       const cleanDiscordTag = discordTag.trim().replace(/^@+/, "").trim() || null;
       
-      if (cleanTwitterHandle || cleanDiscordTag) {
-        try {
-          const handlesUpdateData: any = {};
-          if (cleanTwitterHandle) handlesUpdateData.twitter_handle = cleanTwitterHandle;
-          if (cleanDiscordTag) handlesUpdateData.discord_tag = cleanDiscordTag;
-          
-          await supabase
-            .from("users")
-            .update(handlesUpdateData as never)
-            .eq("id", user.id);
-          // Ignorer les erreurs si les colonnes n'existent pas
-        } catch (handlesError) {
-          // Les colonnes n'existent peut-être pas encore, ce n'est pas grave
-          console.log("Les colonnes Discord/X n'existent peut-être pas encore");
+      // Préparer les données de mise à jour avec les handles (toujours inclure pour mettre à jour)
+      const handlesUpdateData: any = {
+        twitter_handle: cleanTwitterHandle,
+        discord_tag: cleanDiscordTag,
+      };
+      
+      // Essayer de sauvegarder les handles
+      const { error: handlesError } = await supabase
+        .from("users")
+        .update(handlesUpdateData as never)
+        .eq("id", user.id);
+      
+      if (handlesError) {
+        console.error("Erreur lors de la sauvegarde des handles:", handlesError);
+        // Si les colonnes n'existent pas, afficher un message mais ne pas bloquer
+        if (handlesError.message?.includes("column") || handlesError.message?.includes("schema") || handlesError.code === "PGRST116") {
+          console.warn("Les colonnes Discord/X n'existent peut-être pas encore dans Supabase");
+          setSaveMessage({ 
+            type: "error", 
+            text: "Les colonnes Discord/X n'existent pas encore. Veuillez exécuter le script SQL dans Supabase (voir supabase-add-social-handles.sql)" 
+          });
+          setTimeout(() => setSaveMessage(null), 10000);
+          return;
+        } else {
+          throw handlesError;
         }
       }
 
