@@ -64,6 +64,35 @@ body {
   background-color: rgba(10, 10, 10, 0.5) !important;
 }
 
+.referral-btn {
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: transparent;
+  box-shadow: 0 0 15px rgba(92, 111, 255, 0.25);
+}
+
+.referral-btn::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(120deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.35) 50%, rgba(255, 255, 255, 0) 100%);
+  transform: translateX(-100%);
+  transition: none;
+  pointer-events: none;
+}
+
+.referral-btn:hover::after {
+  animation: flash-gradient 1s ease-in-out;
+}
+
+@keyframes flash-gradient {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(100%);
+  }
+}
+
 /* Scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
