@@ -62,13 +62,21 @@ export function CommunityClient({ initialMembers }: { initialMembers: CommunityM
         // Mapper les membres avec leurs handles
         const mappedMembers = baseData.map((row: any) => {
           const handles = handlesMap[row.id] || {};
+          // Nettoyer les handles : s'assurer qu'ils ne sont pas des chaînes vides
+          const twitterHandle = handles.twitter_handle && handles.twitter_handle.trim() !== "" 
+            ? handles.twitter_handle.trim() 
+            : null;
+          const discordTag = handles.discord_tag && handles.discord_tag.trim() !== "" 
+            ? handles.discord_tag.trim() 
+            : null;
+          
           return {
             id: row.id,
             full_name: row.full_name,
             email: row.email,
             avatar_url: row.avatar_url,
-            twitter_handle: handles.twitter_handle || null,
-            discord_tag: handles.discord_tag || null,
+            twitter_handle: twitterHandle,
+            discord_tag: discordTag,
             community_score: handles.community_score || 0,
             role: (row.role || "member") as "member" | "admin" | "intervenant",
           };
@@ -83,10 +91,26 @@ export function CommunityClient({ initialMembers }: { initialMembers: CommunityM
         console.log("👥 Membres avec handles:", membersWithHandles.length);
         if (membersWithHandles.length > 0) {
           console.log("📋 Exemples de handles:", membersWithHandles.slice(0, 3).map(m => ({
+            id: m.id,
             name: m.full_name || m.email,
             twitter: m.twitter_handle,
-            discord: m.discord_tag
+            discord: m.discord_tag,
+            twitterType: typeof m.twitter_handle,
+            discordType: typeof m.discord_tag,
           })));
+        } else {
+          console.warn("⚠️ Aucun membre avec handles trouvé !");
+          console.log("📋 Tous les membres:", mappedMembers.map(m => ({
+            id: m.id,
+            name: m.full_name || m.email,
+            twitter: m.twitter_handle,
+            discord: m.discord_tag,
+          })));
+        }
+        
+        // Vérifier les données brutes de handlesData
+        if (handlesData) {
+          console.log("🔍 Données brutes handlesData:", handlesData.slice(0, 3));
         }
         
         setMembers(mappedMembers);

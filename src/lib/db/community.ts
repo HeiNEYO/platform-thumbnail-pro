@@ -49,13 +49,21 @@ export async function getAllCommunityMembers(): Promise<CommunityMember[]> {
     // Mapper les données avec les handles
     const members = baseData.map((row: UserRow) => {
       const handles = handlesMap[row.id] || {};
+      // Nettoyer les handles : s'assurer qu'ils ne sont pas des chaînes vides
+      const twitterHandle = handles.twitter_handle && handles.twitter_handle.trim() !== "" 
+        ? handles.twitter_handle.trim() 
+        : null;
+      const discordTag = handles.discord_tag && handles.discord_tag.trim() !== "" 
+        ? handles.discord_tag.trim() 
+        : null;
+      
       return {
         id: row.id,
         full_name: row.full_name,
         email: row.email,
         avatar_url: row.avatar_url,
-        twitter_handle: handles.twitter_handle || null,
-        discord_tag: handles.discord_tag || null,
+        twitter_handle: twitterHandle,
+        discord_tag: discordTag,
         community_score: handles.community_score || 0,
         role: (row.role || "member") as "member" | "admin" | "intervenant",
       };
