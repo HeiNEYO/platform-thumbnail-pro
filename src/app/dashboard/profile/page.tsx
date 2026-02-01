@@ -222,25 +222,39 @@ export default function ProfilePage() {
     try {
       const supabase = createClient();
       
-      // Nettoyer les handles : retirer le @ s'il est présent
-      const cleanTwitterHandle = twitterHandle.trim().replace(/^@/, "") || null;
-      const cleanDiscordTag = discordTag.trim().replace(/^@/, "") || null;
+      // Nettoyer les handles : retirer le @ s'il est présent et les espaces
+      const cleanTwitterHandle = twitterHandle.trim().replace(/^@+/, "").trim() || null;
+      const cleanDiscordTag = discordTag.trim().replace(/^@+/, "").trim() || null;
       
-      // Mettre à jour le prénom (full_name) — assertion pour contourner le typage .update(never) du client Supabase
+      // Préparer les données à sauvegarder (simplement, sans validation)
+      const updateData: any = {
+        full_name: firstName.trim() || null,
+        account_number: accountNumber.trim() || null,
+        avatar_url: avatarUrl,
+      };
+      
+      // Ajouter les handles seulement s'ils ne sont pas vides
+      if (cleanTwitterHandle) {
+        updateData.twitter_handle = cleanTwitterHandle;
+      } else {
+        updateData.twitter_handle = null;
+      }
+      
+      if (cleanDiscordTag) {
+        updateData.discord_tag = cleanDiscordTag;
+      } else {
+        updateData.discord_tag = null;
+      }
+      
+      // Mettre à jour le profil — assertion pour contourner le typage .update(never) du client Supabase
       const { error } = await supabase
         .from("users")
-        .update({
-          full_name: firstName.trim() || null,
-          account_number: accountNumber.trim() || null,
-          avatar_url: avatarUrl,
-          twitter_handle: cleanTwitterHandle,
-          discord_tag: cleanDiscordTag,
-        } as never)
+        .update(updateData as never)
         .eq("id", user.id);
 
       if (error) {
         console.error("Erreur Supabase:", error);
-        throw error;
+        throw new Error(error.message || "Erreur lors de la sauvegarde");
       }
 
       // Rafraîchir le profil dans le contexte
