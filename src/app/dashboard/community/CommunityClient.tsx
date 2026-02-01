@@ -1,40 +1,10 @@
- "use client";
+"use client";
 
 import { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { MemberCard } from "@/components/ui/MemberCard";
 import { createClient } from "@/lib/supabase/client";
 import type { CommunityMember } from "@/lib/db/community";
-
-const baseColumns = ["id", "email", "full_name", "avatar_url", "role"];
-const optionalColumns = ["discord_tag", "instagram_handle", "community_score"];
-
-async function loadMembersFromSupabase() {
-  const supabase = createClient();
-  let optional = [...optionalColumns];
-
-  while (true) {
-    const columnsToSelect = [...baseColumns, ...optional].join(", ");
-    const { data, error } = await supabase
-      .from("users")
-      .select(columnsToSelect)
-      .order("created_at", { ascending: false });
-
-    if (!error) {
-      return data || [];
-    }
-
-    const message = (error.message || "").toLowerCase();
-    const missingColumn = optional.find((column) => message.includes(column));
-
-    if (!missingColumn) {
-      throw error;
-    }
-
-    console.warn(`⚠️ Colonne ${missingColumn} manquante, on la retire de la requête`);
-    optional = optional.filter((column) => column !== missingColumn);
-  }
-}
 
 export function CommunityClient({ initialMembers }: { initialMembers: CommunityMember[] }) {
   const { user: currentUser } = useAuth();
@@ -48,11 +18,19 @@ export function CommunityClient({ initialMembers }: { initialMembers: CommunityM
       setError(null);
 
       try {
-        const rows = await loadMembersFromSupabase();
-        const mapped = rows.map((row: any) => {
+        const supabase = createClient();
+        const { data, error } = await supabase
+          .from("users")
+          .select("id, email, full_name, avatar_url, role, twitter_handle, discord_tag, community_score")
+          .order("created_at", { ascending: false });
+
+        if (error) {
+          throw error;
+        }
+
+        const mapped = (data || []).map((row: any) => {
+          const twitterHandle = row.twitter_handle && row.twitter_handle.trim() !== "" ? row.twitter_handle.trim() : null;
           const discordTag = row.discord_tag && row.discord_tag.trim() !== "" ? row.discord_tag.trim() : null;
-          const instagramHandle =
-            row.instagram_handle && row.instagram_handle.trim() !== "" ? row.instagram_handle.trim() : null;
           const communityScore = typeof row.community_score === "number" ? row.community_score : 0;
 
           return {
@@ -60,9 +38,8 @@ export function CommunityClient({ initialMembers }: { initialMembers: CommunityM
             full_name: row.full_name,
             email: row.email,
             avatar_url: row.avatar_url,
-            twitter_handle: null,
+            twitter_handle: twitterHandle,
             discord_tag: discordTag,
-            instagram_handle: instagramHandle,
             community_score: communityScore,
             role: (row.role || "member") as "member" | "admin" | "intervenant",
           };
@@ -79,7 +56,6 @@ export function CommunityClient({ initialMembers }: { initialMembers: CommunityM
               avatar_url: currentUser.avatar_url ?? null,
               twitter_handle: null,
               discord_tag: null,
-              instagram_handle: null,
               community_score: 0,
               role: "member",
             },

@@ -48,7 +48,6 @@ export default async function CommunityPage() {
           avatar_url: row.avatar_url,
           twitter_handle: null,
           discord_tag: null,
-          instagram_handle: null,
           community_score: 0,
           role: (row.role || "member") as "member" | "admin" | "intervenant",
         }));

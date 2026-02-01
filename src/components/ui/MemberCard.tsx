@@ -3,7 +3,6 @@
 import { Twitter, Users, GraduationCap, Shield } from "lucide-react";
 import { UserAvatar } from "./UserAvatar";
 import { DiscordIcon } from "./DiscordIcon";
-import { InstagramIcon } from "./InstagramIcon";
 import type { CommunityMember } from "@/lib/db/community";
 
 interface MemberCardProps {
@@ -41,10 +40,8 @@ export function MemberCard({ member }: MemberCardProps) {
   // Debug : vérifier les handles (toujours actif pour debug)
   console.log(`🔍 MemberCard [${displayName}]:`, {
     id: member.id,
+    twitter: member.twitter_handle,
     discord: member.discord_tag,
-    instagram: member.instagram_handle,
-    hasDiscord: !!member.discord_tag,
-    hasInstagram: !!member.instagram_handle,
   });
 
   return (
@@ -88,8 +85,21 @@ export function MemberCard({ member }: MemberCardProps) {
       </div>
 
       {/* Informations sociales en bas - Affichage seulement si remplis */}
-      {(member.discord_tag || member.instagram_handle) && (
+      {(member.twitter_handle || member.discord_tag) && (
         <div className="flex items-center gap-4 text-white/60 text-xs">
+          {/* Twitter/X - Affiché seulement si rempli */}
+          {member.twitter_handle && (
+            <a
+              href={`https://twitter.com/${member.twitter_handle.replace(/^@+/, "")}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 hover:text-primary transition-colors"
+            >
+              <Twitter className="h-4 w-4 shrink-0" />
+              <span className="truncate">{member.twitter_handle}</span>
+            </a>
+          )}
+
           {/* Discord - Affiché seulement si rempli */}
           {member.discord_tag && (
             <a
@@ -100,19 +110,6 @@ export function MemberCard({ member }: MemberCardProps) {
             >
               <DiscordIcon className="h-4 w-4 shrink-0" />
               <span className="truncate">{member.discord_tag}</span>
-            </a>
-          )}
-
-          {/* Instagram - Affiché seulement si rempli */}
-          {member.instagram_handle && (
-            <a
-              href={`https://instagram.com/${member.instagram_handle.replace(/^@+/, "")}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-2 hover:text-primary transition-colors"
-            >
-              <InstagramIcon className="h-4 w-4 shrink-0" />
-              <span className="truncate">{member.instagram_handle}</span>
             </a>
           )}
         </div>

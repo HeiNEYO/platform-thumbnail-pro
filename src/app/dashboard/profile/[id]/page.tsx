@@ -2,7 +2,7 @@ import { redirect, notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { UserAvatar } from "@/components/ui/UserAvatar";
 import { DiscordIcon } from "@/components/ui/DiscordIcon";
-import { InstagramIcon } from "@/components/ui/InstagramIcon";
+import { Twitter } from "lucide-react";
 import { getGlobalProgress } from "@/lib/db/progress";
 
 // Force le rendu dynamique car on utilise cookies() pour l'authentification
@@ -35,7 +35,7 @@ export default async function PublicProfilePage({
   // Récupérer le profil de l'utilisateur ciblé
   const { data: profileData, error } = await supabase
     .from("users")
-    .select("id, email, full_name, avatar_url, discord_tag, instagram_handle, community_score, created_at")
+    .select("id, email, full_name, avatar_url, discord_tag, twitter_handle, community_score, created_at")
     .eq("id", userId)
     .single();
 
@@ -49,7 +49,7 @@ export default async function PublicProfilePage({
     full_name: string | null;
     avatar_url: string | null;
     discord_tag: string | null;
-    instagram_handle: string | null;
+    twitter_handle: string | null;
     community_score: number | null;
     created_at: string;
   };
@@ -116,17 +116,17 @@ export default async function PublicProfilePage({
 
             {/* Réseaux sociaux */}
             <div className="flex flex-wrap gap-4 pt-2">
+              {profile.twitter_handle ? (
+                <div className="flex items-center gap-2 text-white/70 text-sm">
+                  <Twitter className="h-5 w-5 text-white/60" />
+                  <span>@{profile.twitter_handle}</span>
+                </div>
+              ) : null}
+              
               {profile.discord_tag ? (
                 <div className="flex items-center gap-2 text-white/70 text-sm">
                   <DiscordIcon className="h-5 w-5 text-white/60" />
                   <span>@{profile.discord_tag}</span>
-                </div>
-              ) : null}
-              
-              {profile.instagram_handle ? (
-                <div className="flex items-center gap-2 text-white/70 text-sm">
-                  <InstagramIcon className="h-5 w-5 text-white/60" />
-                  <span>@{profile.instagram_handle}</span>
                 </div>
               ) : null}
             </div>
