@@ -25,74 +25,71 @@ export function CommunityClient({ initialMembers }: { initialMembers: CommunityM
         const { data: { user: authUser } } = await supabase.auth.getUser();
         console.log("🔍 Utilisateur connecté:", authUser?.id, authUser?.email);
         
-        // Essayer avec les nouveaux champs
-        const { data, error: queryError } = await supabase
+        // Charger les données de base
+        const { data: baseData, error: baseError } = await supabase
           .from("users")
-          .select("id, email, full_name, avatar_url, twitter_handle, discord_tag, community_score, role")
-          .order("community_score", { ascending: false });
+          .select("id, email, full_name, avatar_url, role")
+          .order("created_at", { ascending: false });
 
-        console.log("📊 Résultat requête:", { dataCount: data?.length, error: queryError });
+        if (baseError) {
+          throw baseError;
+        }
 
-        if (queryError) {
-          console.error("❌ Erreur requête avec nouveaux champs:", queryError);
-          
-          // Fallback : essayer sans les nouveaux champs
-          const { data: fallbackData, error: fallbackError } = await supabase
-            .from("users")
-            .select("id, email, full_name, avatar_url, role")
-            .order("created_at", { ascending: false });
+        if (!baseData) {
+          setMembers([]);
+          return;
+        }
 
-          console.log("📊 Résultat fallback:", { dataCount: fallbackData?.length, error: fallbackError });
+        // Charger les handles séparément (pour éviter les erreurs si les colonnes n'existent pas)
+        let handlesMap: Record<string, { twitter_handle?: string | null; discord_tag?: string | null; community_score?: number }> = {};
+        
+        const { data: handlesData, error: handlesError } = await supabase
+          .from("users")
+          .select("id, twitter_handle, discord_tag, community_score");
 
-          if (fallbackError) {
-            console.error("❌ Erreur fallback:", fallbackError);
-            throw fallbackError;
-          }
+        if (handlesError) {
+          console.warn("⚠️ Erreur lors du chargement des handles:", handlesError.message);
+        } else if (handlesData) {
+          handlesData.forEach((row: any) => {
+            handlesMap[row.id] = {
+              twitter_handle: row.twitter_handle || null,
+              discord_tag: row.discord_tag || null,
+              community_score: row.community_score || 0,
+            };
+          });
+        }
 
-          if (fallbackData) {
-            const mappedMembers = fallbackData.map((row: any) => ({
-              id: row.id,
-              full_name: row.full_name,
-              email: row.email,
-              avatar_url: row.avatar_url,
-              twitter_handle: null,
-              discord_tag: null,
-              community_score: 0,
-              role: (row.role || "member") as "member" | "admin" | "intervenant",
-            }));
-            
-            // Vérifier si l'utilisateur actuel est dans la liste
-            const isCurrentUserInList = authUser && mappedMembers.some(m => m.id === authUser.id);
-            console.log("✅ Utilisateur actuel dans la liste:", isCurrentUserInList);
-            if (!isCurrentUserInList && authUser) {
-              console.warn("⚠️ L'utilisateur actuel n'est pas dans la liste des membres !");
-            }
-            
-            setMembers(mappedMembers);
-          }
-        } else if (data) {
-          const mappedMembers = data.map((row: any) => ({
+        // Mapper les membres avec leurs handles
+        const mappedMembers = baseData.map((row: any) => {
+          const handles = handlesMap[row.id] || {};
+          return {
             id: row.id,
             full_name: row.full_name,
             email: row.email,
             avatar_url: row.avatar_url,
-            twitter_handle: row.twitter_handle || null,
-            discord_tag: row.discord_tag || null,
-            community_score: row.community_score || 0,
+            twitter_handle: handles.twitter_handle || null,
+            discord_tag: handles.discord_tag || null,
+            community_score: handles.community_score || 0,
             role: (row.role || "member") as "member" | "admin" | "intervenant",
-          }));
-          
-          // Vérifier si l'utilisateur actuel est dans la liste
-          const isCurrentUserInList = authUser && mappedMembers.some(m => m.id === authUser.id);
-          console.log("✅ Utilisateur actuel dans la liste:", isCurrentUserInList);
-          if (!isCurrentUserInList && authUser) {
-            console.warn("⚠️ L'utilisateur actuel n'est pas dans la liste des membres !");
-            console.log("📋 IDs dans la liste:", mappedMembers.map(m => m.id));
-            console.log("👤 ID utilisateur actuel:", authUser.id);
-          }
-          
-          setMembers(mappedMembers);
+          };
+        });
+
+        // Trier par score communautaire
+        mappedMembers.sort((a, b) => b.community_score - a.community_score);
+
+        // Debug : vérifier les handles chargés
+        console.log("📊 Membres chargés:", mappedMembers.length);
+        const membersWithHandles = mappedMembers.filter(m => m.twitter_handle || m.discord_tag);
+        console.log("👥 Membres avec handles:", membersWithHandles.length);
+        if (membersWithHandles.length > 0) {
+          console.log("📋 Exemples de handles:", membersWithHandles.slice(0, 3).map(m => ({
+            name: m.full_name || m.email,
+            twitter: m.twitter_handle,
+            discord: m.discord_tag
+          })));
         }
+        
+        setMembers(mappedMembers);
       } catch (err: any) {
         console.error("❌ Erreur lors du chargement des membres:", err);
         setError(err.message || "Erreur lors du chargement des membres");

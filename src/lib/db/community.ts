@@ -27,25 +27,23 @@ export async function getAllCommunityMembers(): Promise<CommunityMember[]> {
       return [];
     }
 
-    // Essayer de charger les handles et scores en une seule requête (ignorer l'erreur si les colonnes n'existent pas)
+    // Charger les handles et scores en une seule requête
     let handlesMap: Record<string, { twitter_handle?: string | null; discord_tag?: string | null; community_score?: number }> = {};
     
-    try {
-      const { data: handlesData } = await supabase
-        .from("users")
-        .select("id, twitter_handle, discord_tag, community_score");
+    const { data: handlesData, error: handlesError } = await supabase
+      .from("users")
+      .select("id, twitter_handle, discord_tag, community_score");
 
-      if (handlesData) {
-        handlesData.forEach((row: any) => {
-          handlesMap[row.id] = {
-            twitter_handle: row.twitter_handle,
-            discord_tag: row.discord_tag,
-            community_score: row.community_score || 0,
-          };
-        });
-      }
-    } catch {
-      // Les colonnes n'existent peut-être pas encore, ce n'est pas grave
+    if (handlesError) {
+      console.warn("Erreur lors du chargement des handles (colonnes peuvent ne pas exister):", handlesError.message);
+    } else if (handlesData) {
+      handlesData.forEach((row: any) => {
+        handlesMap[row.id] = {
+          twitter_handle: row.twitter_handle || null,
+          discord_tag: row.discord_tag || null,
+          community_score: row.community_score || 0,
+        };
+      });
     }
 
     // Mapper les données avec les handles
