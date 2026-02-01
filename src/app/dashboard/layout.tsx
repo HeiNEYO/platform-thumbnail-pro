@@ -128,7 +128,7 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
 
         {/* Actions Right */}
         <div className="flex items-center gap-[15.4px]">
-          <button className="referral-btn px-[15.4px] py-[6.6px] rounded-lg text-white text-[13.2px] font-medium relative overflow-hidden transition-all duration-200">
+          <button className="hidden md:inline-flex referral-btn px-[15.4px] py-[6.6px] rounded-lg text-white text-[13.2px] font-medium relative overflow-hidden transition-all duration-200">
             Parraine un ami et gagne 200€
           </button>
           <button className="p-[6.6px] text-white/70 hover:text-white transition-colors">
