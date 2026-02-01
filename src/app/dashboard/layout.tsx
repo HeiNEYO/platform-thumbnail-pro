@@ -202,8 +202,8 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
       )}
 
       <div className="flex flex-1 overflow-hidden">
-        {/* Sidebar - Design inspiré de l'image */}
-        <aside className="hidden lg:flex w-[240px] shrink-0 bg-[#0a0a0a] border-r border-sidebar-border flex flex-col overflow-y-auto">
+        {/* Sidebar - Design inspiré de l'image - Fixée pour rester visible */}
+        <aside className="hidden lg:flex w-[240px] shrink-0 bg-[#0a0a0a] border-r border-sidebar-border flex flex-col sticky top-[61.6px] h-[calc(100vh-61.6px)] overflow-y-auto">
           {/* Navigation principale - Toutes les sections */}
           <nav className="flex-1 p-3">
             {/* Sections toujours ouvertes */}
@@ -295,8 +295,8 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
           </div>
         </aside>
 
-        {/* Main Content */}
-        <main className="flex-1 overflow-auto bg-[#0a0a0a]">
+        {/* Main Content - Zone de scroll indépendante */}
+        <main className="flex-1 overflow-y-auto bg-[#0a0a0a] h-[calc(100vh-61.6px)]">
           <div className="p-7 max-w-7xl mx-auto">{children}</div>
         </main>
       </div>
