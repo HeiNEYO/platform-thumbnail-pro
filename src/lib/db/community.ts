@@ -14,25 +14,54 @@ export interface CommunityMember {
 export async function getAllCommunityMembers(): Promise<CommunityMember[]> {
   const supabase = await createClient();
   
-  const { data, error } = await supabase
-    .from("users")
-    .select("id, email, full_name, avatar_url, twitter_handle, discord_tag, community_score")
-    .order("community_score", { ascending: false });
+  try {
+    // Essayer d'abord avec les nouveaux champs
+    let query = supabase
+      .from("users")
+      .select("id, email, full_name, avatar_url, twitter_handle, discord_tag, community_score");
+    
+    const { data, error } = await query.order("community_score", { ascending: false });
 
-  if (error) {
-    console.error("Erreur lors de la récupération des membres:", error);
+    if (error) {
+      // Si erreur (colonnes manquantes), essayer sans les nouveaux champs
+      console.warn("Erreur avec nouveaux champs, tentative sans:", error.message);
+      
+      const { data: fallbackData, error: fallbackError } = await supabase
+        .from("users")
+        .select("id, email, full_name, avatar_url")
+        .order("created_at", { ascending: false });
+
+      if (fallbackError) {
+        console.error("Erreur lors de la récupération des membres:", fallbackError);
+        return [];
+      }
+
+      if (!fallbackData) return [];
+
+      return fallbackData.map((row: UserRow) => ({
+        id: row.id,
+        full_name: row.full_name,
+        email: row.email,
+        avatar_url: row.avatar_url,
+        twitter_handle: null,
+        discord_tag: null,
+        community_score: 0,
+      }));
+    }
+
+    if (!data) return [];
+
+    return data.map((row: UserRow & { twitter_handle?: string | null; discord_tag?: string | null; community_score?: number | null }) => ({
+      id: row.id,
+      full_name: row.full_name,
+      email: row.email,
+      avatar_url: row.avatar_url,
+      twitter_handle: row.twitter_handle || null,
+      discord_tag: row.discord_tag || null,
+      community_score: row.community_score || 0,
+    }));
+  } catch (err) {
+    console.error("Erreur inattendue lors de la récupération des membres:", err);
     return [];
   }
-
-  if (!data) return [];
-
-  return data.map((row: UserRow & { twitter_handle?: string | null; discord_tag?: string | null; community_score?: number | null }) => ({
-    id: row.id,
-    full_name: row.full_name,
-    email: row.email,
-    avatar_url: row.avatar_url,
-    twitter_handle: row.twitter_handle || null,
-    discord_tag: row.discord_tag || null,
-    community_score: row.community_score || 0,
-  }));
 }

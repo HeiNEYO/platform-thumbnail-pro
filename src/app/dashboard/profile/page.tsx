@@ -8,7 +8,7 @@ import { Save, Loader2, Upload, X } from "lucide-react";
 import type { UserRow } from "@/lib/supabase/database.types";
 
 export default function ProfilePage() {
-  const { user } = useAuth();
+  const { user, refreshUserProfile } = useAuth();
   const [firstName, setFirstName] = useState("");
   const [email, setEmail] = useState("");
   const [accountNumber, setAccountNumber] = useState("");
@@ -136,6 +136,10 @@ export default function ProfilePage() {
 
       // Mettre à jour l'état local
       setAvatarUrl(publicUrl);
+      
+      // Rafraîchir le profil dans le contexte pour mettre à jour partout
+      await refreshUserProfile();
+      
       alert("Photo de profil mise à jour avec succès");
     } catch (error) {
       console.error("Erreur lors de l'upload:", error);
@@ -171,6 +175,10 @@ export default function ProfilePage() {
       }
 
       setAvatarUrl(null);
+      
+      // Rafraîchir le profil dans le contexte pour mettre à jour partout
+      await refreshUserProfile();
+      
       alert("Photo de profil supprimée");
     } catch (error) {
       console.error("Erreur lors de la suppression:", error);

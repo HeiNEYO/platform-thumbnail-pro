@@ -13,6 +13,7 @@ interface AuthContextType {
   loading: boolean;
   signIn: (email: string, password: string, rememberMe?: boolean) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
+  refreshUserProfile: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -330,12 +331,29 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
+  const refreshUserProfile = useCallback(async () => {
+    if (!user || isDevMode) return;
+
+    const client = clientRef.current;
+    if (!client) return;
+
+    try {
+      const profile = await fetchUserProfile(user.id, user.email);
+      if (profile) {
+        setUser(profile);
+      }
+    } catch (error) {
+      console.error("Erreur lors du rafraîchissement du profil:", error);
+    }
+  }, [user, isDevMode, fetchUserProfile]);
+
   const value: AuthContextType = {
     user,
     role: user?.role ?? null,
     loading,
     signIn,
     signOut,
+    refreshUserProfile,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getAllCommunityMembers } from "@/lib/db/community";
-import { MemberCard } from "@/components/ui/MemberCard";
+import { CommunityClient } from "./CommunityClient";
 
 // Force le rendu dynamique car on utilise cookies() pour l'authentification
 export const dynamic = 'force-dynamic';
@@ -24,7 +24,35 @@ export default async function CommunityPage() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  const members = await getAllCommunityMembers();
+  let members = await getAllCommunityMembers();
+
+  // Si aucun membre, vérifier s'il y a des utilisateurs dans la table
+  if (members.length === 0) {
+    const { data: usersCheck } = await supabase
+      .from("users")
+      .select("id")
+      .limit(1);
+    
+    if (usersCheck && usersCheck.length > 0) {
+      // Il y a des utilisateurs mais la requête a échoué, réessayer sans les nouveaux champs
+      const { data: allUsers } = await supabase
+        .from("users")
+        .select("id, email, full_name, avatar_url")
+        .order("created_at", { ascending: false });
+      
+      if (allUsers) {
+        members = allUsers.map((row: { id: string; email: string; full_name: string | null; avatar_url: string | null }) => ({
+          id: row.id,
+          full_name: row.full_name,
+          email: row.email,
+          avatar_url: row.avatar_url,
+          twitter_handle: null,
+          discord_tag: null,
+          community_score: 0,
+        }));
+      }
+    }
+  }
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -33,21 +61,15 @@ export default async function CommunityPage() {
         <p className="text-white/70 text-sm">
           Découvrez tous les membres de la plateforme et connectez-vous avec eux
         </p>
+        {members.length > 0 && (
+          <p className="text-white/50 text-xs mt-1">
+            {members.length} membre{members.length > 1 ? "s" : ""} inscrit{members.length > 1 ? "s" : ""}
+          </p>
+        )}
       </div>
 
-      {/* Grille des membres */}
-      {members.length === 0 ? (
-        <div className="rounded-lg border border-card-border bg-black p-12 text-center">
-          <p className="text-white/70 mb-2">Aucun membre pour le moment.</p>
-          <p className="text-xs text-white/50">Les membres apparaîtront ici une fois inscrits.</p>
-        </div>
-      ) : (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {members.map((member) => (
-            <MemberCard key={member.id} member={member} />
-          ))}
-        </div>
-      )}
+      {/* Composant client pour recharger et afficher les erreurs */}
+      <CommunityClient initialMembers={members} />
     </div>
   );
 }

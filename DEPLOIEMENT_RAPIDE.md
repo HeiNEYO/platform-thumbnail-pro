@@ -1,5 +1,19 @@
 # ⚡ Déploiement Rapide - Vercel
 
+## 🚀 Commandes Prêtes à Copier
+
+### **Déploiement Ultra-Rapide (3 commandes)**
+
+```bash
+git add .
+git commit -m "feat: ajout des logs de debug pour la communauté"
+git push origin main
+```
+
+**→ Vercel déploie automatiquement en 1-3 minutes !**
+
+---
+
 ## 🎯 Workflow en 5 Étapes
 
 ```
