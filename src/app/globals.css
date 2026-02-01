@@ -37,17 +37,23 @@
 }
 
 html {
-  background: #000000;
-  color: #ffffff;
+  background: #000000 !important;
+  color: #ffffff !important;
 }
 
 body {
-  color: var(--foreground);
-  background: #000000;
+  color: var(--foreground) !important;
+  background: #000000 !important;
   font-family: var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   min-height: 100vh;
+}
+
+/* Forcer le fond noir partout */
+#__next,
+[data-nextjs-scroll-focus-boundary] {
+  background: #000000 !important;
 }
 
 /* Scrollbar */

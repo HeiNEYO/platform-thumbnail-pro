@@ -25,63 +25,46 @@ export function CommunityClient({ initialMembers }: { initialMembers: CommunityM
         const { data: { user: authUser } } = await supabase.auth.getUser();
         console.log("🔍 Utilisateur connecté:", authUser?.id, authUser?.email);
         
-        // Charger les données de base
-        const { data: baseData, error: baseError } = await supabase
+        // Charger TOUS les utilisateurs avec leurs handles en une seule requête
+        const { data: allUsersData, error: allUsersError } = await supabase
           .from("users")
-          .select("id, email, full_name, avatar_url, role")
+          .select("id, email, full_name, avatar_url, role, twitter_handle, discord_tag, community_score")
           .order("created_at", { ascending: false });
 
-        if (baseError) {
-          throw baseError;
+        if (allUsersError) {
+          console.error("❌ Erreur lors du chargement complet:", allUsersError);
+          throw allUsersError;
         }
 
-        if (!baseData) {
+        if (!allUsersData) {
           setMembers([]);
           return;
         }
 
-        // Charger les handles séparément (pour éviter les erreurs si les colonnes n'existent pas)
-        let handlesMap: Record<string, { twitter_handle?: string | null; discord_tag?: string | null; community_score?: number }> = {};
+        console.log("✅ Tous les utilisateurs chargés:", allUsersData.length);
         
-        const { data: handlesData, error: handlesError } = await supabase
-          .from("users")
-          .select("id, twitter_handle, discord_tag, community_score");
-
-        console.log("🔍 Chargement handles - handlesData:", handlesData);
-        console.log("🔍 Chargement handles - handlesError:", handlesError);
-
-        if (handlesError) {
-          console.error("❌ Erreur lors du chargement des handles:", handlesError);
-        } else if (handlesData) {
-          console.log("✅ Handles chargés avec succès, nombre:", handlesData.length);
-          handlesData.forEach((row: any) => {
-            const twitterHandle = row.twitter_handle && row.twitter_handle.trim() !== "" ? row.twitter_handle.trim() : null;
-            const discordTag = row.discord_tag && row.discord_tag.trim() !== "" ? row.discord_tag.trim() : null;
-            
-            if (twitterHandle || discordTag) {
-              console.log(`  → User ${row.id}: twitter="${twitterHandle}", discord="${discordTag}"`);
-            }
-            
-            handlesMap[row.id] = {
-              twitter_handle: twitterHandle,
-              discord_tag: discordTag,
-              community_score: row.community_score || 0,
-            };
-          });
-          console.log("📋 HandlesMap créé avec", Object.keys(handlesMap).length, "entrées");
-        } else {
-          console.warn("⚠️ Aucune donnée handlesData retournée");
+        // Afficher les handles trouvés
+        const usersWithHandles = allUsersData.filter((u: any) => 
+          (u.twitter_handle && u.twitter_handle.trim() !== "") || 
+          (u.discord_tag && u.discord_tag.trim() !== "")
+        );
+        console.log("👥 Utilisateurs avec handles:", usersWithHandles.length);
+        if (usersWithHandles.length > 0) {
+          console.log("📋 Handles trouvés:", usersWithHandles.map((u: any) => ({
+            email: u.email,
+            twitter: u.twitter_handle,
+            discord: u.discord_tag,
+          })));
         }
 
-        // Mapper les membres avec leurs handles
-        const mappedMembers = baseData.map((row: any) => {
-          const handles = handlesMap[row.id] || {};
+        // Mapper directement depuis allUsersData (qui contient déjà les handles)
+        const mappedMembers = allUsersData.map((row: any) => {
           // Nettoyer les handles : s'assurer qu'ils ne sont pas des chaînes vides
-          const twitterHandle = handles.twitter_handle && handles.twitter_handle.trim() !== "" 
-            ? handles.twitter_handle.trim() 
+          const twitterHandle = row.twitter_handle && row.twitter_handle.trim() !== "" 
+            ? row.twitter_handle.trim() 
             : null;
-          const discordTag = handles.discord_tag && handles.discord_tag.trim() !== "" 
-            ? handles.discord_tag.trim() 
+          const discordTag = row.discord_tag && row.discord_tag.trim() !== "" 
+            ? row.discord_tag.trim() 
             : null;
           
           return {
@@ -91,7 +74,7 @@ export function CommunityClient({ initialMembers }: { initialMembers: CommunityM
             avatar_url: row.avatar_url,
             twitter_handle: twitterHandle,
             discord_tag: discordTag,
-            community_score: handles.community_score || 0,
+            community_score: row.community_score || 0,
             role: (row.role || "member") as "member" | "admin" | "intervenant",
           };
         });
@@ -120,11 +103,6 @@ export function CommunityClient({ initialMembers }: { initialMembers: CommunityM
             twitter: m.twitter_handle,
             discord: m.discord_tag,
           })));
-        }
-        
-        // Vérifier les données brutes de handlesData
-        if (handlesData) {
-          console.log("🔍 Données brutes handlesData:", handlesData.slice(0, 3));
         }
         
         setMembers(mappedMembers);

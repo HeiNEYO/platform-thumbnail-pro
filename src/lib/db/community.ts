@@ -16,60 +16,45 @@ export async function getAllCommunityMembers(): Promise<CommunityMember[]> {
   const supabase = await createClient();
   
   try {
-    // Charger d'abord les données de base (toujours présentes)
-    const { data: baseData, error: baseError } = await supabase
+    // Charger TOUS les utilisateurs avec leurs handles en une seule requête
+    const { data: allUsersData, error: allUsersError } = await supabase
       .from("users")
-      .select("id, email, full_name, avatar_url, role")
+      .select("id, email, full_name, avatar_url, role, twitter_handle, discord_tag, community_score")
       .order("created_at", { ascending: false });
 
-    if (baseError || !baseData) {
-      console.error("Erreur lors de la récupération des membres:", baseError);
+    if (allUsersError) {
+      console.error("❌ Erreur lors de la récupération des membres:", allUsersError);
       return [];
     }
 
-    // Charger les handles et scores en une seule requête
-    let handlesMap: Record<string, { twitter_handle?: string | null; discord_tag?: string | null; community_score?: number }> = {};
-    
-    const { data: handlesData, error: handlesError } = await supabase
-      .from("users")
-      .select("id, twitter_handle, discord_tag, community_score");
-
-    if (handlesError) {
-      console.warn("⚠️ Erreur lors du chargement des handles:", handlesError.message);
-    } else if (handlesData) {
-      console.log("✅ Handles chargés (serveur):", handlesData.length, "utilisateurs");
-      handlesData.forEach((row: any) => {
-        // Nettoyer les handles : retirer les espaces et vérifier qu'ils ne sont pas vides
-        const twitterHandle = row.twitter_handle && row.twitter_handle.trim() !== "" 
-          ? row.twitter_handle.trim() 
-          : null;
-        const discordTag = row.discord_tag && row.discord_tag.trim() !== "" 
-          ? row.discord_tag.trim() 
-          : null;
-        
-        if (twitterHandle || discordTag) {
-          console.log(`  → User ${row.id}: twitter="${twitterHandle}", discord="${discordTag}"`);
-        }
-        
-        handlesMap[row.id] = {
-          twitter_handle: twitterHandle,
-          discord_tag: discordTag,
-          community_score: row.community_score || 0,
-        };
-      });
-    } else {
-      console.warn("⚠️ Aucune donnée handlesData (serveur)");
+    if (!allUsersData) {
+      return [];
     }
 
-    // Mapper les données avec les handles
-    const members = baseData.map((row: UserRow) => {
-      const handles = handlesMap[row.id] || {};
+    console.log("✅ Membres chargés (serveur):", allUsersData.length);
+    
+    // Afficher les handles trouvés
+    const usersWithHandles = allUsersData.filter((u: any) => 
+      (u.twitter_handle && u.twitter_handle.trim() !== "") || 
+      (u.discord_tag && u.discord_tag.trim() !== "")
+    );
+    console.log("👥 Utilisateurs avec handles (serveur):", usersWithHandles.length);
+    if (usersWithHandles.length > 0) {
+      console.log("📋 Handles trouvés (serveur):", usersWithHandles.map((u: any) => ({
+        email: u.email,
+        twitter: u.twitter_handle,
+        discord: u.discord_tag,
+      })));
+    }
+
+    // Mapper les données avec les handles nettoyés
+    const members = allUsersData.map((row: any) => {
       // Nettoyer les handles : s'assurer qu'ils ne sont pas des chaînes vides
-      const twitterHandle = handles.twitter_handle && handles.twitter_handle.trim() !== "" 
-        ? handles.twitter_handle.trim() 
+      const twitterHandle = row.twitter_handle && row.twitter_handle.trim() !== "" 
+        ? row.twitter_handle.trim() 
         : null;
-      const discordTag = handles.discord_tag && handles.discord_tag.trim() !== "" 
-        ? handles.discord_tag.trim() 
+      const discordTag = row.discord_tag && row.discord_tag.trim() !== "" 
+        ? row.discord_tag.trim() 
         : null;
       
       return {
@@ -79,7 +64,7 @@ export async function getAllCommunityMembers(): Promise<CommunityMember[]> {
         avatar_url: row.avatar_url,
         twitter_handle: twitterHandle,
         discord_tag: discordTag,
-        community_score: handles.community_score || 0,
+        community_score: row.community_score || 0,
         role: (row.role || "member") as "member" | "admin" | "intervenant",
       };
     });
