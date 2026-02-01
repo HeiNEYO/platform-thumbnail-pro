@@ -13,13 +13,18 @@ create table if not exists public.favorites (
   constraint favorites_item_check check (
     (item_type = 'episode' and episode_id is not null and resource_id is null) or
     (item_type = 'resource' and resource_id is not null and episode_id is null)
-  ),
-  constraint favorites_unique unique (user_id, item_type, coalesce(episode_id::text, resource_id::text))
+  )
 );
 
 create index if not exists idx_favorites_user_id on public.favorites(user_id);
 create index if not exists idx_favorites_episode_id on public.favorites(episode_id) where episode_id is not null;
 create index if not exists idx_favorites_resource_id on public.favorites(resource_id) where resource_id is not null;
+create unique index if not exists idx_favorites_unique_episode
+  on public.favorites(user_id, item_type, episode_id)
+  where item_type = 'episode';
+create unique index if not exists idx_favorites_unique_resource
+  on public.favorites(user_id, item_type, resource_id)
+  where item_type = 'resource';
 
 -- RLS
 alter table public.favorites enable row level security;
