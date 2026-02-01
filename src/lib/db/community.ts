@@ -87,24 +87,7 @@ export async function getAllCommunityMembers(): Promise<CommunityMember[]> {
       return [];
     }
 
-    const members = mapMembers(users);
-      const twitterHandle = row.twitter_handle && row.twitter_handle.trim() !== "" ? row.twitter_handle.trim() : null;
-      const discordTag = row.discord_tag && row.discord_tag.trim() !== "" ? row.discord_tag.trim() : null;
-      const communityScore = typeof row.community_score === "number" ? row.community_score : 0;
-
-      return {
-        id: row.id,
-        full_name: row.full_name,
-        email: row.email,
-        avatar_url: row.avatar_url,
-        twitter_handle: twitterHandle,
-        discord_tag: discordTag,
-        community_score: communityScore,
-        role: (row.role || "member") as "member" | "admin" | "intervenant",
-      };
-    });
-
-    return members.sort((a, b) => b.community_score - a.community_score);
+    return mapMembers(users);
   } catch (err) {
     console.error("Erreur inattendue lors de la récupération des membres:", err);
     return [];
