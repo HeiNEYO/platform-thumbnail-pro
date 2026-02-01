@@ -119,14 +119,14 @@ export default async function PublicProfilePage({
               {profile.twitter_handle ? (
                 <div className="flex items-center gap-2 text-white/70 text-sm">
                   <Twitter className="h-5 w-5 text-white/60" />
-                  <span>{profile.twitter_handle}</span>
+                  <span>@{profile.twitter_handle}</span>
                 </div>
               ) : null}
               
               {profile.discord_tag ? (
                 <div className="flex items-center gap-2 text-white/70 text-sm">
                   <DiscordIcon className="h-5 w-5 text-white/60" />
-                  <span>{profile.discord_tag}</span>
+                  <span>@{profile.discord_tag}</span>
                 </div>
               ) : null}
             </div>

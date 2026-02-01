@@ -13,6 +13,8 @@ export default function ProfilePage() {
   const [email, setEmail] = useState("");
   const [accountNumber, setAccountNumber] = useState("");
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const [twitterHandle, setTwitterHandle] = useState("");
+  const [discordTag, setDiscordTag] = useState("");
   const [xp, setXp] = useState(0);
   const [completedEvaluations, setCompletedEvaluations] = useState(0);
   const [saving, setSaving] = useState(false);
@@ -45,6 +47,8 @@ export default function ProfilePage() {
         setEmail(profile.email || "");
         setAccountNumber(profile.account_number ?? `TP-${user.id.slice(0, 6).toUpperCase()}`);
         setAvatarUrl(profile.avatar_url);
+        setTwitterHandle(profile.twitter_handle || "");
+        setDiscordTag(profile.discord_tag || "");
         
         // Calculer l'XP basé sur la progression (à adapter selon votre logique)
         // Pour l'instant, on simule avec un calcul basique
@@ -73,6 +77,8 @@ export default function ProfilePage() {
       setAvatarUrl(user.avatar_url);
       if (isDevMode) {
         setAccountNumber("TP-001234");
+        setTwitterHandle("");
+        setDiscordTag("");
         setXp(1250);
         setCompletedEvaluations(3);
         return;
@@ -206,6 +212,8 @@ export default function ProfilePage() {
           full_name: firstName,
           account_number: accountNumber,
           avatar_url: avatarUrl,
+          twitter_handle: twitterHandle || null,
+          discord_tag: discordTag || null,
         } as never)
         .eq("id", user.id);
 
@@ -359,6 +367,36 @@ export default function ProfilePage() {
                 className="w-full rounded-lg border border-card-border bg-black/50 px-4 py-3 text-white/50 text-sm cursor-not-allowed truncate"
               />
               <p className="text-xs text-white/50 mt-1.5">L&apos;email ne peut pas être modifié</p>
+            </div>
+
+            <div className="flex-shrink-0">
+              <label className="block text-sm font-semibold text-white mb-2">
+                @ X (Twitter)
+              </label>
+              <input
+                type="text"
+                value={twitterHandle}
+                onChange={(e) => setTwitterHandle(e.target.value)}
+                className="w-full rounded-lg border border-card-border bg-black px-4 py-3 text-white text-sm placeholder-white/50 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+                placeholder="@votre_handle"
+                maxLength={50}
+              />
+              <p className="text-xs text-white/50 mt-1.5">Votre nom d&apos;utilisateur X (sans le @)</p>
+            </div>
+
+            <div className="flex-shrink-0">
+              <label className="block text-sm font-semibold text-white mb-2">
+                @ Discord
+              </label>
+              <input
+                type="text"
+                value={discordTag}
+                onChange={(e) => setDiscordTag(e.target.value)}
+                className="w-full rounded-lg border border-card-border bg-black px-4 py-3 text-white text-sm placeholder-white/50 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+                placeholder="votre_tag#1234"
+                maxLength={50}
+              />
+              <p className="text-xs text-white/50 mt-1.5">Votre tag Discord (ex: username#1234)</p>
             </div>
 
             <div className="mt-auto pt-4 flex-shrink-0">
