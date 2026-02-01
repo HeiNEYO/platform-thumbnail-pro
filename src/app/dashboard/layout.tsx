@@ -274,10 +274,10 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
               <div className="min-w-0 flex-1">
                 <p className="text-sm font-semibold text-white truncate">{displayName}</p>
                 <div
-                  className="mt-1 inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-medium"
+                  className="mt-1 inline-flex items-center gap-1 rounded-md border px-2 py-0.5 text-[11px] font-medium"
                   style={{
-                    borderColor: `${grade.color}50`,
-                    backgroundColor: "rgba(255, 255, 255, 0.05)",
+                    borderColor: `${grade.color}60`,
+                    backgroundColor: `${grade.color}20`,
                   }}
                 >
                   <grade.icon className="h-4 w-4" style={{ color: grade.color }} />
