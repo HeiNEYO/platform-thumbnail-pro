@@ -12,8 +12,8 @@ export default function ProfilePage() {
   const [firstName, setFirstName] = useState("");
   const [email, setEmail] = useState("");
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
-  const [twitterHandle, setTwitterHandle] = useState("");
   const [discordTag, setDiscordTag] = useState("");
+  const [instagramHandle, setInstagramHandle] = useState("");
   const [xp, setXp] = useState(0);
   const [completedEvaluations, setCompletedEvaluations] = useState(0);
   const [saving, setSaving] = useState(false);
@@ -52,19 +52,19 @@ export default function ProfilePage() {
         try {
           const { data: handlesData } = await supabase
             .from("users")
-            .select("twitter_handle, discord_tag")
+            .select("discord_tag, instagram_handle")
             .eq("id", user.id)
             .single();
           
           if (handlesData) {
             const handles = handlesData as any;
-            setTwitterHandle(handles.twitter_handle?.replace(/^@+/, "") || "");
             setDiscordTag(handles.discord_tag?.replace(/^@+/, "") || "");
+            setInstagramHandle(handles.instagram_handle?.replace(/^@+/, "") || "");
           }
         } catch {
           // Ignorer si les colonnes n'existent pas encore
-          setTwitterHandle("");
           setDiscordTag("");
+          setInstagramHandle("");
         }
         
         // Calculer l'XP basé sur la progression (à adapter selon votre logique)
@@ -93,8 +93,8 @@ export default function ProfilePage() {
       setEmail(user.email || "");
       setAvatarUrl(user.avatar_url);
       if (isDevMode) {
-        setTwitterHandle("");
         setDiscordTag("");
+        setInstagramHandle("");
         setXp(1250);
         setCompletedEvaluations(3);
         return;
@@ -252,13 +252,13 @@ export default function ProfilePage() {
       }
 
       // Sauvegarder les handles (toujours, même si vides pour les mettre à null)
-      const cleanTwitterHandle = twitterHandle.trim().replace(/^@+/, "").trim() || null;
       const cleanDiscordTag = discordTag.trim().replace(/^@+/, "").trim() || null;
+      const cleanInstagramHandle = instagramHandle.trim().replace(/^@+/, "").trim() || null;
       
       // Préparer les données de mise à jour avec les handles (toujours inclure pour mettre à jour)
       const handlesUpdateData: any = {
-        twitter_handle: cleanTwitterHandle,
         discord_tag: cleanDiscordTag,
+        instagram_handle: cleanInstagramHandle,
       };
       
       // Essayer de sauvegarder les handles
@@ -280,10 +280,10 @@ export default function ProfilePage() {
           errorCode === "PGRST116" ||
           errorCode === "42703"
         ) {
-          console.warn("Les colonnes Discord/X n'existent pas encore dans Supabase");
+          console.warn("Les colonnes Discord/Instagram n'existent pas encore dans Supabase");
           setSaveMessage({ 
             type: "error", 
-            text: "⚠️ Les colonnes Discord/X n'existent pas encore. Exécutez le script SQL dans Supabase : supabase-add-handles-simple.sql" 
+            text: "⚠️ Les colonnes Discord/Instagram n'existent pas encore. Exécutez le script SQL dans Supabase : supabase-add-instagram-handle.sql" 
           });
           setTimeout(() => setSaveMessage(null), 12000);
           return;
@@ -450,28 +450,6 @@ export default function ProfilePage() {
 
             <div className="flex-shrink-0">
               <label className="block text-sm font-semibold text-white mb-2">
-                @ X (Twitter)
-              </label>
-              <div className="relative">
-                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-white/70 text-sm">@</span>
-                <input
-                  type="text"
-                  value={twitterHandle}
-                  onChange={(e) => {
-                    // Retirer le @ s'il est saisi manuellement
-                    const value = e.target.value.replace(/^@+/, "");
-                    setTwitterHandle(value);
-                  }}
-                  className="w-full rounded-lg border border-card-border bg-black pl-8 pr-4 py-3 text-white text-sm placeholder-white/50 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
-                  placeholder="votre_handle"
-                  maxLength={50}
-                />
-              </div>
-              <p className="text-xs text-white/50 mt-1.5">Votre nom d&apos;utilisateur X</p>
-            </div>
-
-            <div className="flex-shrink-0">
-              <label className="block text-sm font-semibold text-white mb-2">
                 @ Discord
               </label>
               <div className="relative">
@@ -490,6 +468,28 @@ export default function ProfilePage() {
                 />
               </div>
               <p className="text-xs text-white/50 mt-1.5">Votre tag Discord (ex: username#1234)</p>
+            </div>
+
+            <div className="flex-shrink-0">
+              <label className="block text-sm font-semibold text-white mb-2">
+                @ Instagram
+              </label>
+              <div className="relative">
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-white/70 text-sm">@</span>
+                <input
+                  type="text"
+                  value={instagramHandle}
+                  onChange={(e) => {
+                    // Retirer le @ s'il est saisi manuellement
+                    const value = e.target.value.replace(/^@+/, "");
+                    setInstagramHandle(value);
+                  }}
+                  className="w-full rounded-lg border border-card-border bg-black pl-8 pr-4 py-3 text-white text-sm placeholder-white/50 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+                  placeholder="votre_handle"
+                  maxLength={50}
+                />
+              </div>
+              <p className="text-xs text-white/50 mt-1.5">Votre nom d&apos;utilisateur Instagram</p>
             </div>
 
             {/* Message de succès/erreur */}

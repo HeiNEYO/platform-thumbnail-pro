@@ -28,7 +28,7 @@ export function CommunityClient({ initialMembers }: { initialMembers: CommunityM
         // Charger TOUS les utilisateurs avec leurs handles en une seule requête
         const { data: allUsersData, error: allUsersError } = await supabase
           .from("users")
-          .select("id, email, full_name, avatar_url, role, twitter_handle, discord_tag, community_score")
+          .select("id, email, full_name, avatar_url, role, discord_tag, instagram_handle, community_score")
           .order("created_at", { ascending: false });
 
         if (allUsersError) {
@@ -45,26 +45,26 @@ export function CommunityClient({ initialMembers }: { initialMembers: CommunityM
         
         // Afficher les handles trouvés
         const usersWithHandles = allUsersData.filter((u: any) => 
-          (u.twitter_handle && u.twitter_handle.trim() !== "") || 
-          (u.discord_tag && u.discord_tag.trim() !== "")
+          (u.discord_tag && u.discord_tag.trim() !== "") || 
+          (u.instagram_handle && u.instagram_handle.trim() !== "")
         );
         console.log("👥 Utilisateurs avec handles:", usersWithHandles.length);
         if (usersWithHandles.length > 0) {
           console.log("📋 Handles trouvés:", usersWithHandles.map((u: any) => ({
             email: u.email,
-            twitter: u.twitter_handle,
             discord: u.discord_tag,
+            instagram: u.instagram_handle,
           })));
         }
 
         // Mapper directement depuis allUsersData (qui contient déjà les handles)
         const mappedMembers = allUsersData.map((row: any) => {
           // Nettoyer les handles : s'assurer qu'ils ne sont pas des chaînes vides
-          const twitterHandle = row.twitter_handle && row.twitter_handle.trim() !== "" 
-            ? row.twitter_handle.trim() 
-            : null;
           const discordTag = row.discord_tag && row.discord_tag.trim() !== "" 
             ? row.discord_tag.trim() 
+            : null;
+          const instagramHandle = row.instagram_handle && row.instagram_handle.trim() !== "" 
+            ? row.instagram_handle.trim() 
             : null;
           
           return {
@@ -72,8 +72,9 @@ export function CommunityClient({ initialMembers }: { initialMembers: CommunityM
             full_name: row.full_name,
             email: row.email,
             avatar_url: row.avatar_url,
-            twitter_handle: twitterHandle,
+            twitter_handle: null, // On garde pour compatibilité mais on n'affiche plus
             discord_tag: discordTag,
+            instagram_handle: instagramHandle,
             community_score: row.community_score || 0,
             role: (row.role || "member") as "member" | "admin" | "intervenant",
           };
@@ -84,24 +85,22 @@ export function CommunityClient({ initialMembers }: { initialMembers: CommunityM
 
         // Debug : vérifier les handles chargés
         console.log("📊 Membres chargés:", mappedMembers.length);
-        const membersWithHandles = mappedMembers.filter(m => m.twitter_handle || m.discord_tag);
+        const membersWithHandles = mappedMembers.filter(m => m.discord_tag || m.instagram_handle);
         console.log("👥 Membres avec handles:", membersWithHandles.length);
         if (membersWithHandles.length > 0) {
           console.log("📋 Exemples de handles:", membersWithHandles.slice(0, 3).map(m => ({
             id: m.id,
             name: m.full_name || m.email,
-            twitter: m.twitter_handle,
             discord: m.discord_tag,
-            twitterType: typeof m.twitter_handle,
-            discordType: typeof m.discord_tag,
+            instagram: m.instagram_handle,
           })));
         } else {
           console.warn("⚠️ Aucun membre avec handles trouvé !");
           console.log("📋 Tous les membres:", mappedMembers.map(m => ({
             id: m.id,
             name: m.full_name || m.email,
-            twitter: m.twitter_handle,
             discord: m.discord_tag,
+            instagram: m.instagram_handle,
           })));
         }
         

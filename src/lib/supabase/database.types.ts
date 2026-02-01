@@ -15,6 +15,7 @@ export interface Database {
           account_number?: string | null;
           twitter_handle?: string | null;
           discord_tag?: string | null;
+          instagram_handle?: string | null;
           community_score?: number | null;
           created_at: string;
           updated_at: string;
@@ -28,6 +29,7 @@ export interface Database {
           account_number?: string | null;
           twitter_handle?: string | null;
           discord_tag?: string | null;
+          instagram_handle?: string | null;
           community_score?: number | null;
           created_at?: string;
           updated_at?: string;
@@ -41,6 +43,7 @@ export interface Database {
           account_number?: string | null;
           twitter_handle?: string | null;
           discord_tag?: string | null;
+          instagram_handle?: string | null;
           community_score?: number | null;
           created_at?: string;
           updated_at?: string;
