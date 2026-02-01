@@ -13,6 +13,9 @@ export interface Database {
           avatar_url: string | null;
           role: UserRole;
           account_number?: string | null;
+          twitter_handle?: string | null;
+          discord_tag?: string | null;
+          community_score?: number | null;
           created_at: string;
           updated_at: string;
         };
@@ -23,6 +26,9 @@ export interface Database {
           avatar_url?: string | null;
           role?: UserRole;
           account_number?: string | null;
+          twitter_handle?: string | null;
+          discord_tag?: string | null;
+          community_score?: number | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -33,6 +39,9 @@ export interface Database {
           avatar_url?: string | null;
           role?: UserRole;
           account_number?: string | null;
+          twitter_handle?: string | null;
+          discord_tag?: string | null;
+          community_score?: number | null;
           created_at?: string;
           updated_at?: string;
         };

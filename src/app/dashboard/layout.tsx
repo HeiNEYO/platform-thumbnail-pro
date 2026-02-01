@@ -16,17 +16,19 @@ import { UserAvatar } from "@/components/ui/UserAvatar";
 import { DiscountCodeModal } from "@/components/ui/DiscountCodeModal";
 import { DiscordIcon } from "@/components/ui/DiscordIcon";
 
-// Liens directs principaux (toujours visibles en haut)
-const directLinks = [
-  { href: "/dashboard", label: "Accueil", icon: Home },
-  { href: "/dashboard/favorites", label: "Mes favoris", icon: Heart },
-  { href: "/dashboard/stats", label: "Statistiques", icon: BarChart3 },
-  { href: "/dashboard/notes", label: "Mes notes", icon: FileText },
-  { href: "/dashboard/profile", label: "Profil", icon: User },
-];
-
 // Sections toujours ouvertes (organisées par catégorie)
 const navSections = [
+  {
+    id: "overview",
+    label: "Overview",
+    icon: Home,
+    items: [
+      { href: "/dashboard", label: "Accueil", icon: Home },
+      { href: "/dashboard/favorites", label: "Mes favoris", icon: Heart },
+      { href: "/dashboard/stats", label: "Statistiques", icon: BarChart3 },
+      { href: "/dashboard/notes", label: "Mes notes", icon: FileText },
+    ],
+  },
   {
     id: "academy",
     label: "Academy",
@@ -42,8 +44,16 @@ const navSections = [
     label: "Communauté",
     icon: Compass,
     items: [
-      { href: "/dashboard/discord", label: "Discord", icon: null, customIcon: DiscordIcon },
       { href: "/dashboard/community", label: "Communauté", icon: Compass },
+      { href: "/dashboard/discord", label: "Discord", icon: null, customIcon: DiscordIcon },
+    ],
+  },
+  {
+    id: "account",
+    label: "Compte",
+    icon: User,
+    items: [
+      { href: "/dashboard/profile", label: "Profil", icon: User },
     ],
   },
 ];
@@ -118,34 +128,8 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
       <div className="flex flex-1 overflow-hidden">
         {/* Sidebar - Design inspiré de l'image */}
         <aside className="w-[240px] shrink-0 bg-[#0a0a0a] border-r border-sidebar-border flex flex-col overflow-y-auto">
-          {/* Navigation principale - Liens directs */}
+          {/* Navigation principale - Toutes les sections */}
           <nav className="flex-1 p-3">
-            {/* Liens directs en haut */}
-            <div className="space-y-0.5 mb-6">
-              {directLinks.map((item) => {
-                const active =
-                  pathname === item.href ||
-                  (item.href !== "/dashboard" && pathname.startsWith(item.href));
-                return (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    className={`flex items-center gap-3 px-3 py-2.5 text-sm font-medium transition-all duration-150 rounded-md group ${
-                      active
-                        ? "bg-[#1a1a1a] text-white font-semibold"
-                        : "text-white/70 hover:text-white hover:bg-[#141414]"
-                    }`}
-                  >
-                    <item.icon className={`h-5 w-5 shrink-0 ${active ? "text-white" : "text-white/60 group-hover:text-white/80"}`} />
-                    <span>{item.label}</span>
-                  </Link>
-                );
-              })}
-            </div>
-
-            {/* Séparateur */}
-            <div className="h-px bg-sidebar-border my-4" />
-
             {/* Sections toujours ouvertes */}
             <div className="space-y-4">
               {navSections.map((section) => (
