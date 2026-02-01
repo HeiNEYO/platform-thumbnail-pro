@@ -25,15 +25,49 @@ export function CommunityClient({ initialMembers }: { initialMembers: CommunityM
         const { data: { user: authUser } } = await supabase.auth.getUser();
         console.log("🔍 Utilisateur connecté:", authUser?.id, authUser?.email);
         
-        // Charger TOUS les utilisateurs avec leurs handles en une seule requête
-        const { data: allUsersData, error: allUsersError } = await supabase
+        // Essayer d'abord avec toutes les colonnes (y compris instagram_handle)
+        let allUsersData: any[] | null = null;
+        let allUsersError: any = null;
+        
+        const { data, error } = await supabase
           .from("users")
           .select("id, email, full_name, avatar_url, role, discord_tag, instagram_handle, community_score")
           .order("created_at", { ascending: false });
 
+        allUsersData = data;
+        allUsersError = error;
+
+        // Si erreur due à une colonne manquante (instagram_handle), réessayer sans
         if (allUsersError) {
-          console.error("❌ Erreur lors du chargement complet:", allUsersError);
-          throw allUsersError;
+          const errorMessage = allUsersError.message || "";
+          const errorCode = allUsersError.code || "";
+          
+          if (
+            errorMessage.includes("instagram_handle") ||
+            errorMessage.includes("column") ||
+            errorMessage.includes("does not exist") ||
+            errorCode === "PGRST116" ||
+            errorCode === "42703"
+          ) {
+            console.warn("⚠️ Colonne instagram_handle absente, chargement sans cette colonne");
+            
+            // Réessayer sans instagram_handle
+            const { data: fallbackData, error: fallbackError } = await supabase
+              .from("users")
+              .select("id, email, full_name, avatar_url, role, discord_tag, community_score")
+              .order("created_at", { ascending: false });
+            
+            if (fallbackError) {
+              console.error("❌ Erreur lors du chargement complet (fallback):", fallbackError);
+              throw fallbackError;
+            }
+            
+            allUsersData = fallbackData;
+            allUsersError = null;
+          } else {
+            console.error("❌ Erreur lors du chargement complet:", allUsersError);
+            throw allUsersError;
+          }
         }
 
         if (!allUsersData) {

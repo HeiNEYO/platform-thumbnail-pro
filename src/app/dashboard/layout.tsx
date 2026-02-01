@@ -92,9 +92,9 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-black">
+    <div className="min-h-screen flex flex-col bg-[#0a0a0a]">
       {/* Header Top Bar - Agrandi de 10% */}
-      <header className="h-[61.6px] shrink-0 border-b border-sidebar-border bg-black flex items-center justify-between px-[22px]">
+      <header className="h-[61.6px] shrink-0 border-b border-sidebar-border bg-[#0a0a0a] flex items-center justify-between px-[22px]">
         {/* Logo + Breadcrumbs */}
         <div className="flex items-center gap-[22px]">
           <Link href="/dashboard" className="flex items-center gap-[11px]">
@@ -216,7 +216,7 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
         </aside>
 
         {/* Main Content */}
-        <main className="flex-1 overflow-auto bg-black">
+        <main className="flex-1 overflow-auto bg-[#0a0a0a]">
           <div className="p-7 max-w-7xl mx-auto">{children}</div>
         </main>
       </div>

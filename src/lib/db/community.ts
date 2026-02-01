@@ -17,15 +17,49 @@ export async function getAllCommunityMembers(): Promise<CommunityMember[]> {
   const supabase = await createClient();
   
   try {
-    // Charger TOUS les utilisateurs avec leurs handles en une seule requête
-    const { data: allUsersData, error: allUsersError } = await supabase
+    // Essayer d'abord avec toutes les colonnes (y compris instagram_handle)
+    let allUsersData: any[] | null = null;
+    let allUsersError: any = null;
+    
+    const { data, error } = await supabase
       .from("users")
-      .select("id, email, full_name, avatar_url, role, twitter_handle, discord_tag, instagram_handle, community_score")
+      .select("id, email, full_name, avatar_url, role, discord_tag, instagram_handle, community_score")
       .order("created_at", { ascending: false });
 
+    allUsersData = data;
+    allUsersError = error;
+
+    // Si erreur due à une colonne manquante (instagram_handle), réessayer sans
     if (allUsersError) {
-      console.error("❌ Erreur lors de la récupération des membres:", allUsersError);
-      return [];
+      const errorMessage = allUsersError.message || "";
+      const errorCode = allUsersError.code || "";
+      
+      if (
+        errorMessage.includes("instagram_handle") ||
+        errorMessage.includes("column") ||
+        errorMessage.includes("does not exist") ||
+        errorCode === "PGRST116" ||
+        errorCode === "42703"
+      ) {
+        console.warn("⚠️ Colonne instagram_handle absente, chargement sans cette colonne");
+        
+        // Réessayer sans instagram_handle
+        const { data: fallbackData, error: fallbackError } = await supabase
+          .from("users")
+          .select("id, email, full_name, avatar_url, role, discord_tag, community_score")
+          .order("created_at", { ascending: false });
+        
+        if (fallbackError) {
+          console.error("❌ Erreur lors de la récupération des membres (fallback):", fallbackError);
+          return [];
+        }
+        
+        allUsersData = fallbackData;
+        allUsersError = null;
+      } else {
+        console.error("❌ Erreur lors de la récupération des membres:", allUsersError);
+        return [];
+      }
     }
 
     if (!allUsersData) {
@@ -54,6 +88,7 @@ export async function getAllCommunityMembers(): Promise<CommunityMember[]> {
       const discordTag = row.discord_tag && row.discord_tag.trim() !== "" 
         ? row.discord_tag.trim() 
         : null;
+      // instagram_handle peut ne pas exister dans la base de données
       const instagramHandle = row.instagram_handle && row.instagram_handle.trim() !== "" 
         ? row.instagram_handle.trim() 
         : null;

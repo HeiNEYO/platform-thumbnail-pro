@@ -3,25 +3,25 @@
 @tailwind utilities;
 
 :root {
-  /* Palette Design Épuré - Fonds noirs purs */
-  --background: #000000;
-  --background-secondary: #000000;
+  /* Palette Design Épuré - Fonds gris foncé similaires à la sidebar */
+  --background: #0a0a0a;
+  --background-secondary: #0a0a0a;
   --foreground: #ffffff;
   --foreground-muted: #a1a1aa;
   
-  /* Cards & Surfaces - Noirs */
+  /* Cards & Surfaces - Gris foncé */
   --card: #000000;
-  --card-hover: #0a0a0a;
+  --card-hover: #141414;
   --card-border: #1a1a1a;
   
   /* Bleu Premium Principal */
   --primary: #0013F5;
   --primary-hover: #1a2fff;
   
-  /* Sidebar - Noir */
-  --sidebar: #000000;
+  /* Sidebar - Gris foncé */
+  --sidebar: #0a0a0a;
   --sidebar-border: #1a1a1a;
-  --sidebar-selected: #0a0a0a;
+  --sidebar-selected: #141414;
   
   /* États */
   --success: #10b981;
@@ -37,23 +37,23 @@
 }
 
 html {
-  background: #000000 !important;
-  color: #ffffff !important;
+  background: var(--background);
+  color: var(--foreground);
 }
 
 body {
-  color: var(--foreground) !important;
-  background: #000000 !important;
+  color: var(--foreground);
+  background: var(--background);
   font-family: var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   min-height: 100vh;
 }
 
-/* Forcer le fond noir partout */
+/* Fond pour les conteneurs Next.js */
 #__next,
 [data-nextjs-scroll-focus-boundary] {
-  background: #000000 !important;
+  background: var(--background);
 }
 
 /* Scrollbar */
