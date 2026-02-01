@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { 
   Home, BookOpen, FolderOpen, User, LogOut, 
@@ -79,29 +78,12 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
   const displayName = user?.full_name ?? user?.email ?? "";
 
   // Fonction pour générer les breadcrumbs
-  const getBreadcrumbs = () => {
-    if (pathname === "/dashboard") return "Accueil";
-    if (pathname.startsWith("/dashboard/modules")) {
-      return "Academy > Formation";
-    }
-    if (pathname.startsWith("/dashboard/resources")) {
-      return "Academy > Ressources";
-    }
-    if (pathname.startsWith("/dashboard/discord")) {
-      return "Outils & Services > Discord";
-    }
-    if (pathname.startsWith("/dashboard/profile")) {
-      return "Outils & Services > Profil";
-    }
-    return "Dashboard";
-  };
-
   return (
     <div className="min-h-screen flex flex-col bg-[#0a0a0a]">
       {/* Header Top Bar - Agrandi de 10% */}
       <header className="h-[61.6px] shrink-0 border-b border-sidebar-border bg-[#0a0a0a] flex items-center justify-between px-[22px]">
         {/* Logo + Breadcrumbs */}
-        <div className="flex items-center gap-[22px]">
+        <div className="flex items-center gap-[14px]">
           <button
             className="lg:hidden inline-flex items-center justify-center rounded-full bg-white/5 p-2 text-white/70 hover:text-white hover:bg-white/10 transition-colors"
             aria-label="Ouvrir le menu"
@@ -121,9 +103,6 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
               Thumbnail Pro
             </span>
           </Link>
-          <div className="text-white/70 text-[13.2px]">
-            {getBreadcrumbs()}
-          </div>
         </div>
 
         {/* Actions Right */}
