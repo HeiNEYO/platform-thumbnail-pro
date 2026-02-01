@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { createClient } from "@/lib/supabase/client";
 import { UserAvatar } from "@/components/ui/UserAvatar";
-import { Save, Loader2, Upload, X } from "lucide-react";
+import { Save, Loader2, Upload, X, CheckCircle2, AlertCircle } from "lucide-react";
 import type { UserRow } from "@/lib/supabase/database.types";
 
 export default function ProfilePage() {
@@ -19,6 +19,8 @@ export default function ProfilePage() {
   const [completedEvaluations, setCompletedEvaluations] = useState(0);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [saveMessage, setSaveMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
+  const [uploadMessage, setUploadMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const isDevMode = process.env.NEXT_PUBLIC_DEV_MODE === "true" || process.env.NEXT_PUBLIC_DEMO_MODE === "true";
 
@@ -47,8 +49,9 @@ export default function ProfilePage() {
         setEmail(profile.email || "");
         setAccountNumber(profile.account_number ?? `TP-${user.id.slice(0, 6).toUpperCase()}`);
         setAvatarUrl(profile.avatar_url);
-        setTwitterHandle(profile.twitter_handle || "");
-        setDiscordTag(profile.discord_tag || "");
+        // Charger les handles sans le @ (il sera ajouté visuellement)
+        setTwitterHandle(profile.twitter_handle?.replace(/^@+/, "") || "");
+        setDiscordTag(profile.discord_tag?.replace(/^@+/, "") || "");
         
         // Calculer l'XP basé sur la progression (à adapter selon votre logique)
         // Pour l'instant, on simule avec un calcul basique
@@ -93,13 +96,15 @@ export default function ProfilePage() {
 
     // Vérifier la taille (max 4MB)
     if (file.size > 4 * 1024 * 1024) {
-      alert("L'image est trop grande. Taille maximale : 4MB");
+      setUploadMessage({ type: "error", text: "L'image est trop grande. Taille maximale : 4MB" });
+      setTimeout(() => setUploadMessage(null), 5000);
       return;
     }
 
     // Vérifier le type
     if (!file.type.startsWith("image/")) {
-      alert("Veuillez sélectionner une image");
+      setUploadMessage({ type: "error", text: "Veuillez sélectionner une image" });
+      setTimeout(() => setUploadMessage(null), 5000);
       return;
     }
 
@@ -146,10 +151,15 @@ export default function ProfilePage() {
       // Rafraîchir le profil dans le contexte pour mettre à jour partout
       await refreshUserProfile();
       
-      alert("Photo de profil mise à jour avec succès");
-    } catch (error) {
+      setUploadMessage({ type: "success", text: "Photo de profil mise à jour avec succès !" });
+      setTimeout(() => setUploadMessage(null), 5000);
+    } catch (error: any) {
       console.error("Erreur lors de l'upload:", error);
-      alert("Erreur lors de l'upload de la photo");
+      setUploadMessage({ 
+        type: "error", 
+        text: error.message || "Erreur lors de l'upload de la photo. Veuillez réessayer." 
+      });
+      setTimeout(() => setUploadMessage(null), 5000);
     } finally {
       setUploading(false);
       if (fileInputRef.current) {
@@ -185,10 +195,15 @@ export default function ProfilePage() {
       // Rafraîchir le profil dans le contexte pour mettre à jour partout
       await refreshUserProfile();
       
-      alert("Photo de profil supprimée");
-    } catch (error) {
+      setUploadMessage({ type: "success", text: "Photo de profil supprimée" });
+      setTimeout(() => setUploadMessage(null), 5000);
+    } catch (error: any) {
       console.error("Erreur lors de la suppression:", error);
-      alert("Erreur lors de la suppression");
+      setUploadMessage({ 
+        type: "error", 
+        text: error.message || "Erreur lors de la suppression. Veuillez réessayer." 
+      });
+      setTimeout(() => setUploadMessage(null), 5000);
     } finally {
       setUploading(false);
     }
@@ -196,35 +211,50 @@ export default function ProfilePage() {
 
   const handleSave = async () => {
     if (!user || isDevMode) {
-      alert("Profil sauvegardé (mode dev)");
+      setSaveMessage({ type: "success", text: "Profil sauvegardé (mode dev)" });
+      setTimeout(() => setSaveMessage(null), 3000);
       return;
     }
 
     setSaving(true);
+    setSaveMessage(null);
 
     try {
       const supabase = createClient();
+      
+      // Nettoyer les handles : retirer le @ s'il est présent
+      const cleanTwitterHandle = twitterHandle.trim().replace(/^@/, "") || null;
+      const cleanDiscordTag = discordTag.trim().replace(/^@/, "") || null;
       
       // Mettre à jour le prénom (full_name) — assertion pour contourner le typage .update(never) du client Supabase
       const { error } = await supabase
         .from("users")
         .update({
-          full_name: firstName,
-          account_number: accountNumber,
+          full_name: firstName.trim() || null,
+          account_number: accountNumber.trim() || null,
           avatar_url: avatarUrl,
-          twitter_handle: twitterHandle || null,
-          discord_tag: discordTag || null,
+          twitter_handle: cleanTwitterHandle,
+          discord_tag: cleanDiscordTag,
         } as never)
         .eq("id", user.id);
 
       if (error) {
+        console.error("Erreur Supabase:", error);
         throw error;
       }
 
-      alert("Profil mis à jour avec succès");
-    } catch (err) {
+      // Rafraîchir le profil dans le contexte
+      await refreshUserProfile();
+      
+      setSaveMessage({ type: "success", text: "Profil mis à jour avec succès !" });
+      setTimeout(() => setSaveMessage(null), 5000);
+    } catch (err: any) {
       console.error("Erreur lors de la sauvegarde:", err);
-      alert("Erreur lors de la sauvegarde");
+      setSaveMessage({ 
+        type: "error", 
+        text: err.message || "Erreur lors de la sauvegarde. Veuillez réessayer." 
+      });
+      setTimeout(() => setSaveMessage(null), 5000);
     } finally {
       setSaving(false);
     }
@@ -286,6 +316,20 @@ export default function ProfilePage() {
                 <div className="mb-2 text-xs text-white/70 flex items-center gap-2">
                   <Loader2 className="h-3 w-3 animate-spin" />
                   <span>Upload en cours...</span>
+                </div>
+              )}
+              {uploadMessage && (
+                <div className={`mt-2 flex items-center gap-2 px-3 py-2 rounded-lg border text-xs ${
+                  uploadMessage.type === "success" 
+                    ? "bg-success/10 border-success/30 text-success" 
+                    : "bg-error/10 border-error/30 text-error"
+                }`}>
+                  {uploadMessage.type === "success" ? (
+                    <CheckCircle2 className="h-4 w-4 shrink-0" />
+                  ) : (
+                    <AlertCircle className="h-4 w-4 shrink-0" />
+                  )}
+                  <p className="font-medium">{uploadMessage.text}</p>
                 </div>
               )}
               <h2 className="text-xl font-bold text-white break-words mb-2">
@@ -373,31 +417,61 @@ export default function ProfilePage() {
               <label className="block text-sm font-semibold text-white mb-2">
                 @ X (Twitter)
               </label>
-              <input
-                type="text"
-                value={twitterHandle}
-                onChange={(e) => setTwitterHandle(e.target.value)}
-                className="w-full rounded-lg border border-card-border bg-black px-4 py-3 text-white text-sm placeholder-white/50 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
-                placeholder="@votre_handle"
-                maxLength={50}
-              />
-              <p className="text-xs text-white/50 mt-1.5">Votre nom d&apos;utilisateur X (sans le @)</p>
+              <div className="relative">
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-white/70 text-sm">@</span>
+                <input
+                  type="text"
+                  value={twitterHandle}
+                  onChange={(e) => {
+                    // Retirer le @ s'il est saisi manuellement
+                    const value = e.target.value.replace(/^@+/, "");
+                    setTwitterHandle(value);
+                  }}
+                  className="w-full rounded-lg border border-card-border bg-black pl-8 pr-4 py-3 text-white text-sm placeholder-white/50 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+                  placeholder="votre_handle"
+                  maxLength={50}
+                />
+              </div>
+              <p className="text-xs text-white/50 mt-1.5">Votre nom d&apos;utilisateur X</p>
             </div>
 
             <div className="flex-shrink-0">
               <label className="block text-sm font-semibold text-white mb-2">
                 @ Discord
               </label>
-              <input
-                type="text"
-                value={discordTag}
-                onChange={(e) => setDiscordTag(e.target.value)}
-                className="w-full rounded-lg border border-card-border bg-black px-4 py-3 text-white text-sm placeholder-white/50 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
-                placeholder="votre_tag#1234"
-                maxLength={50}
-              />
+              <div className="relative">
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-white/70 text-sm">@</span>
+                <input
+                  type="text"
+                  value={discordTag}
+                  onChange={(e) => {
+                    // Retirer le @ s'il est saisi manuellement
+                    const value = e.target.value.replace(/^@+/, "");
+                    setDiscordTag(value);
+                  }}
+                  className="w-full rounded-lg border border-card-border bg-black pl-8 pr-4 py-3 text-white text-sm placeholder-white/50 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+                  placeholder="votre_tag#1234"
+                  maxLength={50}
+                />
+              </div>
               <p className="text-xs text-white/50 mt-1.5">Votre tag Discord (ex: username#1234)</p>
             </div>
+
+            {/* Message de succès/erreur */}
+            {saveMessage && (
+              <div className={`flex items-center gap-2 px-4 py-3 rounded-lg border ${
+                saveMessage.type === "success" 
+                  ? "bg-success/10 border-success/30 text-success" 
+                  : "bg-error/10 border-error/30 text-error"
+              }`}>
+                {saveMessage.type === "success" ? (
+                  <CheckCircle2 className="h-5 w-5 shrink-0" />
+                ) : (
+                  <AlertCircle className="h-5 w-5 shrink-0" />
+                )}
+                <p className="text-sm font-medium">{saveMessage.text}</p>
+              </div>
+            )}
 
             <div className="mt-auto pt-4 flex-shrink-0">
               <button
