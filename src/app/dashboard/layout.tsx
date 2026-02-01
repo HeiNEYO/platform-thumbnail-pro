@@ -138,10 +138,14 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
       </header>
 
       {mobileMenuOpen && (
-        <div className="lg:hidden fixed inset-0 z-50 flex">
-          <div className="w-64 bg-[#0a0a0a] border-r border-sidebar-border p-4 space-y-5 shadow-2xl">
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-semibold text-white">Menu</span>
+        <div className="fixed inset-0 z-40 lg:hidden">
+          <div
+            className="absolute inset-0 bg-black/40"
+            onClick={() => setMobileMenuOpen(false)}
+          />
+          <div className="relative flex h-full w-64 flex-col overflow-y-auto bg-[#0a0a0a] border-r border-sidebar-border p-4 shadow-2xl">
+            <div className="flex items-center justify-between pb-4">
+              <span className="text-sm font-semibold text-white">Navigation</span>
               <button
                 className="text-white/60 hover:text-white"
                 onClick={() => setMobileMenuOpen(false)}
@@ -150,25 +154,30 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
                 <X className="h-5 w-5" />
               </button>
             </div>
-            {navSections.map((section) => (
-              <div key={`mobile-${section.id}`} className="space-y-3">
-                <div className="text-xs uppercase tracking-[0.2em] text-white/50">{section.label}</div>
-                <div className="space-y-2">
-                  {section.items.map((item) => (
-                    <Link
-                      key={item.href}
-                      href={item.href}
-                      className="flex items-center gap-3 text-sm text-white/70 hover:text-white hover:bg-white/5 rounded-md px-3 py-2 transition-colors"
-                      onClick={() => setMobileMenuOpen(false)}
-                    >
-                      {item.icon && <item.icon className="h-4 w-4" />}
-                      {item.label}
-                    </Link>
-                  ))}
+            <nav className="flex flex-1 flex-col space-y-4">
+              {navSections.map((section) => (
+                <div key={`mobile-${section.id}`} className="space-y-3">
+                  <div className="flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-white/50">
+                    <section.icon className="h-4 w-4 text-white/50" />
+                    {section.label}
+                  </div>
+                  <div className="space-y-1">
+                    {section.items.map((item) => (
+                      <Link
+                        key={item.href}
+                        href={item.href}
+                        className="flex items-center gap-3 rounded-md px-3 py-2 text-sm text-white/70 transition-colors hover:bg-white/5 hover:text-white"
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
+                        {item.icon ? <item.icon className="h-4 w-4" /> : item.customIcon ? <item.customIcon className="h-4 w-4" /> : null}
+                        {item.label}
+                      </Link>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            ))}
-            <div className="pt-4 border-t border-[#1a1a1a]">
+              ))}
+            </nav>
+            <div className="pt-4 border-t border-sidebar-border">
               <Link
                 href="#"
                 className="flex items-center gap-3 text-sm text-white/70 hover:text-white"
@@ -189,7 +198,6 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
               </button>
             </div>
           </div>
-          <div className="flex-1" onClick={() => setMobileMenuOpen(false)} />
         </div>
       )}
 
