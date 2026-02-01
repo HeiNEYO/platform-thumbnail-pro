@@ -30,37 +30,37 @@ export async function getAllCommunityMembers(): Promise<CommunityMember[]> {
     allUsersError = error;
 
     // Si erreur due à une colonne manquante (instagram_handle), réessayer sans
-    if (allUsersError) {
-      const errorMessage = allUsersError.message || "";
-      const errorCode = allUsersError.code || "";
-      
-      if (
-        errorMessage.includes("instagram_handle") ||
-        errorMessage.includes("column") ||
-        errorMessage.includes("does not exist") ||
-        errorCode === "PGRST116" ||
-        errorCode === "42703"
-      ) {
-        console.warn("⚠️ Colonne instagram_handle absente, chargement sans cette colonne");
-        
-        // Réessayer sans instagram_handle
-        const { data: fallbackData, error: fallbackError } = await supabase
-          .from("users")
-          .select("id, email, full_name, avatar_url, role, discord_tag, community_score")
-          .order("created_at", { ascending: false });
-        
-        if (fallbackError) {
-          console.error("❌ Erreur lors de la récupération des membres (fallback):", fallbackError);
-          return [];
-        }
-        
-        allUsersData = fallbackData;
-        allUsersError = null;
-      } else {
-        console.error("❌ Erreur lors de la récupération des membres:", allUsersError);
-        return [];
-      }
+if (allUsersError) {
+  const errorMessage = allUsersError.message || "";
+  const errorCode = allUsersError.code || "";
+  
+  if (
+    errorMessage.includes("instagram_handle") ||
+    errorMessage.includes("column") ||
+    errorMessage.includes("does not exist") ||
+    errorCode === "PGRST116" ||
+    errorCode === "42703"
+  ) {
+    console.warn("⚠️ Colonne instagram_handle absente, chargement sans cette colonne");
+    
+    // Réessayer sans instagram_handle
+    const { data: fallbackData, error: fallbackError } = await supabase
+      .from("users")
+      .select("id, email, full_name, avatar_url, role, discord_tag, community_score")
+      .order("created_at", { ascending: false });
+    
+    if (fallbackError) {
+      console.error("❌ Erreur lors de la récupération des membres (fallback):", fallbackError);
+      return [];
     }
+    
+    allUsersData = fallbackData;
+    allUsersError = null;
+  } else {
+    console.error("❌ Erreur lors de la récupération des membres:", allUsersError);
+    return [];
+  }
+}
 
     if (!allUsersData) {
       return [];
@@ -83,7 +83,7 @@ export async function getAllCommunityMembers(): Promise<CommunityMember[]> {
     }
 
     // Mapper les données avec les handles nettoyés
-    const members = allUsersData.map((row: any) => {
+const members = allUsersData.map((row: any) => {
       // Nettoyer les handles : s'assurer qu'ils ne sont pas des chaînes vides
       const discordTag = row.discord_tag && row.discord_tag.trim() !== "" 
         ? row.discord_tag.trim() 
@@ -107,7 +107,34 @@ export async function getAllCommunityMembers(): Promise<CommunityMember[]> {
     });
 
     // Trier par score communautaire (décroissant)
-    return members.sort((a, b) => b.community_score - a.community_score);
+const sortedMembers = members.sort((a, b) => b.community_score - a.community_score);
+
+if (sortedMembers.length === 0) {
+  const {
+    data: { user: authUser },
+  } = await supabase.auth.getUser();
+
+  if (authUser) {
+    const displayName = authUser.user_metadata?.full_name ?? null;
+    const avatarUrl = authUser.user_metadata?.avatar_url ?? null;
+
+    return [
+      {
+        id: authUser.id,
+        full_name: displayName,
+        email: authUser.email ?? "",
+        avatar_url: avatarUrl,
+        twitter_handle: null,
+        discord_tag: null,
+        instagram_handle: null,
+        community_score: 0,
+        role: "member",
+      },
+    ];
+  }
+}
+
+return sortedMembers;
   } catch (err) {
     console.error("Erreur inattendue lors de la récupération des membres:", err);
     return [];

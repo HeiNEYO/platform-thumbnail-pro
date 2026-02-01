@@ -3,16 +3,16 @@
 @tailwind utilities;
 
 :root {
-  /* Palette Design Épuré - Fonds gris foncé similaires à la sidebar */
+  /* Palette design épuré - fonds gris foncé similaires à la sidebar */
   --background: #0a0a0a;
   --background-secondary: #0a0a0a;
   --foreground: #ffffff;
   --foreground-muted: #a1a1aa;
   
   /* Cards & Surfaces - Gris foncé */
-  --card: #000000;
+  --card: #0a0a0a;
   --card-hover: #141414;
-  --card-border: #1a1a1a;
+  --card-border: #1f1f1f;
   
   /* Bleu Premium Principal */
   --primary: #0013F5;
@@ -54,6 +54,14 @@ body {
 #__next,
 [data-nextjs-scroll-focus-boundary] {
   background: var(--background);
+}
+
+.bg-black {
+  background-color: var(--background) !important;
+}
+
+.bg-black\/50 {
+  background-color: rgba(10, 10, 10, 0.5) !important;
 }
 
 /* Scrollbar */

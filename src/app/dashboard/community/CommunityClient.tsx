@@ -138,7 +138,26 @@ export function CommunityClient({ initialMembers }: { initialMembers: CommunityM
           })));
         }
         
-        setMembers(mappedMembers);
+        let finalMembers = mappedMembers;
+        if (finalMembers.length === 0 && authUser) {
+          const displayName = authUser.user_metadata?.full_name ?? null;
+          const avatarUrl = authUser.user_metadata?.avatar_url ?? null;
+          finalMembers = [
+            {
+              id: authUser.id,
+              full_name: displayName,
+              email: authUser.email ?? "",
+              avatar_url: avatarUrl,
+              twitter_handle: null,
+              discord_tag: null,
+              instagram_handle: null,
+              community_score: 0,
+              role: "member" as const,
+            },
+          ];
+        }
+
+        setMembers(finalMembers);
       } catch (err: any) {
         console.error("❌ Erreur lors du chargement des membres:", err);
         setError(err.message || "Erreur lors du chargement des membres");
