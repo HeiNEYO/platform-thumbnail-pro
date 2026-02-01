@@ -269,14 +269,23 @@ export default function ProfilePage() {
       
       if (handlesError) {
         console.error("Erreur lors de la sauvegarde des handles:", handlesError);
-        // Si les colonnes n'existent pas, afficher un message mais ne pas bloquer
-        if (handlesError.message?.includes("column") || handlesError.message?.includes("schema") || handlesError.code === "PGRST116") {
-          console.warn("Les colonnes Discord/X n'existent peut-être pas encore dans Supabase");
+        // Si les colonnes n'existent pas, afficher un message clair
+        const errorMessage = handlesError.message || "";
+        const errorCode = handlesError.code || "";
+        
+        if (
+          errorMessage.includes("column") || 
+          errorMessage.includes("schema") || 
+          errorMessage.includes("does not exist") ||
+          errorCode === "PGRST116" ||
+          errorCode === "42703"
+        ) {
+          console.warn("Les colonnes Discord/X n'existent pas encore dans Supabase");
           setSaveMessage({ 
             type: "error", 
-            text: "Les colonnes Discord/X n'existent pas encore. Veuillez exécuter le script SQL dans Supabase (voir supabase-add-social-handles.sql)" 
+            text: "⚠️ Les colonnes Discord/X n'existent pas encore. Exécutez le script SQL dans Supabase : supabase-add-handles-simple.sql" 
           });
-          setTimeout(() => setSaveMessage(null), 10000);
+          setTimeout(() => setSaveMessage(null), 12000);
           return;
         } else {
           throw handlesError;
