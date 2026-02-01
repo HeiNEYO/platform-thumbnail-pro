@@ -107,8 +107,8 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
 
         {/* Actions Right */}
         <div className="flex items-center gap-[15.4px]">
-          <button className="px-[15.4px] py-[6.6px] rounded-lg bg-black border border-card-border text-white text-[13.2px] font-medium hover:bg-card-hover transition-colors">
-            Parraine un ami et gagne jusqu&apos;à 600€
+          <button className="px-[15.4px] py-[6.6px] rounded-lg bg-gradient-to-r from-[#5C6FFF] via-[#7F85FF] to-[#92A1FF] border border-transparent text-white text-[13.2px] font-medium shadow-lg shadow-[#5C6FFF]/40 hover:shadow-[#7F85FF]/50 transition-all duration-200">
+            Parraine un ami et gagne 200€
           </button>
           <button className="p-[6.6px] text-white/70 hover:text-white transition-colors">
             <Bell className="h-[19.8px] w-[19.8px]" />
