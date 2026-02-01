@@ -1,63 +1,74 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { ResourceCard } from "@/components/ui/ResourceCard";
 import type { ResourceRow } from "@/lib/supabase/database.types";
+import { Filter } from "lucide-react";
 
 interface ResourcesPageClientProps {
   resources: ResourceRow[];
   categories: string[];
+  types: string[];
 }
 
 export function ResourcesPageClient({
   resources,
   categories,
+  types,
 }: ResourcesPageClientProps) {
-  const [tab, setTab] = useState<string>(categories[0] ?? "all");
+  const [category, setCategory] = useState<string>("all");
+  const [typeFilter, setTypeFilter] = useState<string>("all");
 
-  const filtered =
-    tab === "all" || !tab
-      ? resources
-      : resources.filter((r) => r.category === tab);
+  const filtered = useMemo(() => {
+    let list = resources;
+    if (category !== "all") list = list.filter((r) => r.category === category);
+    if (typeFilter !== "all") list = list.filter((r) => r.type === typeFilter);
+    return list;
+  }, [resources, category, typeFilter]);
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 animate-fade-in">
       <div>
-        <h1 className="text-2xl font-bold text-white">Ressources</h1>
-        <p className="text-gray-400 mt-1">
+        <h1 className="text-[27px] font-bold text-white mb-2">Ressources</h1>
+        <p className="text-white/70 text-sm">
           Templates, polices, palettes et outils pour vos thumbnails.
         </p>
       </div>
 
-      {(categories.length > 0 || resources.length > 0) && (
-        <div className="border-b border-[#2a2a2a]">
-          <nav className="flex gap-1 overflow-x-auto pb-px">
-            {categories.length > 0 && (
-              <button
-                onClick={() => setTab("all")}
-                className={`shrink-0 rounded-t-lg px-4 py-2.5 text-sm font-medium transition-colors ${
-                  tab === "all"
-                    ? "bg-[#2a2a2a] text-white border border-[#2a2a2a] border-b-transparent"
-                    : "text-gray-400 hover:text-white"
-                }`}
+      {(categories.length > 0 || types.length > 0 || resources.length > 0) && (
+        <div className="rounded-lg border border-card-border bg-black p-4">
+          <div className="flex items-center gap-2 mb-3">
+            <Filter className="h-4 w-4 text-primary" />
+            <span className="text-sm font-semibold text-white">Filtres</span>
+          </div>
+          <div className="flex flex-wrap gap-3">
+            <div className="flex items-center gap-2">
+              <label className="text-xs text-white/70">Catégorie</label>
+              <select
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+                className="rounded-lg border border-card-border bg-black px-3 py-2 text-sm text-white focus:border-primary focus:outline-none"
               >
-                Toutes
-              </button>
-            )}
-            {categories.map((c) => (
-              <button
-                key={c}
-                onClick={() => setTab(c)}
-                className={`shrink-0 rounded-t-lg px-4 py-2.5 text-sm font-medium transition-colors capitalize ${
-                  tab === c
-                    ? "bg-[#2a2a2a] text-white border border-[#2a2a2a] border-b-transparent"
-                    : "text-gray-400 hover:text-white"
-                }`}
+                <option value="all">Toutes</option>
+                {categories.map((c) => (
+                  <option key={c} value={c}>{c}</option>
+                ))}
+              </select>
+            </div>
+            <div className="flex items-center gap-2">
+              <label className="text-xs text-white/70">Type</label>
+              <select
+                value={typeFilter}
+                onChange={(e) => setTypeFilter(e.target.value)}
+                className="rounded-lg border border-card-border bg-black px-3 py-2 text-sm text-white focus:border-primary focus:outline-none"
               >
-                {c}
-              </button>
-            ))}
-          </nav>
+                <option value="all">Tous</option>
+                {types.map((t) => (
+                  <option key={t} value={t}>{t}</option>
+                ))}
+              </select>
+            </div>
+          </div>
         </div>
       )}
 
@@ -77,8 +88,8 @@ export function ResourcesPageClient({
         ))}
       </div>
       {filtered.length === 0 && (
-        <p className="text-gray-500 text-center py-8">
-          Aucune ressource dans cette catégorie.
+        <p className="text-white/50 text-center py-8 text-sm">
+          Aucune ressource avec ces filtres.
         </p>
       )}
     </div>

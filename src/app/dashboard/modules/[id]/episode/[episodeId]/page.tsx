@@ -5,8 +5,12 @@ import { getModuleById } from "@/lib/db/modules";
 import { getEpisodeById, isEpisodeCompleted } from "@/lib/db/episodes";
 import { getEpisodesByModule } from "@/lib/db/episodes";
 import { getModuleProgress } from "@/lib/db/modules";
+import { getNoteForEpisode } from "@/lib/db/notes";
 import { EpisodeViewer } from "@/components/EpisodeViewer";
 import { ProgressBar } from "@/components/ui/ProgressBar";
+
+// Force le rendu dynamique car on utilise cookies() pour l'authentification
+export const dynamic = 'force-dynamic';
 
 export default async function EpisodePage({
   params,
@@ -20,13 +24,14 @@ export default async function EpisodePage({
   } = await supabase.auth.getUser();
   if (!authUser) redirect("/login");
 
-  const [module, episode, episodes, progressPercent, completed] =
+  const [module, episode, episodes, progressPercent, completed, note] =
     await Promise.all([
       getModuleById(moduleId),
       getEpisodeById(episodeId),
       getEpisodesByModule(moduleId),
       getModuleProgress(authUser.id, moduleId),
       isEpisodeCompleted(authUser.id, episodeId),
+      getNoteForEpisode(authUser.id, episodeId),
     ]);
 
   if (!module || !episode || episode.module_id !== moduleId) notFound();
@@ -56,6 +61,7 @@ export default async function EpisodePage({
         completed={completed}
         userId={authUser.id}
         nextEpisode={nextEpisode}
+        initialNoteContent={note?.content ?? ""}
       />
     </div>
   );

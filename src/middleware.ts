@@ -5,9 +5,9 @@ import type { Database } from "@/lib/supabase/database.types";
 export async function middleware(request: NextRequest) {
   const res = NextResponse.next({ request });
 
-  // Mode dev : bypasser complètement l'authentification
-  const isDevMode = process.env.NEXT_PUBLIC_DEV_MODE === 'true';
-  if (isDevMode) {
+  // Mode dev / démo : bypasser l'authentification pour afficher la plateforme quoi qu'il arrive
+  const isDevOrDemo = process.env.NEXT_PUBLIC_DEV_MODE === 'true' || process.env.NEXT_PUBLIC_DEMO_MODE === 'true';
+  if (isDevOrDemo) {
     return res;
   }
 
@@ -37,6 +37,11 @@ export async function middleware(request: NextRequest) {
     } = await supabase.auth.getSession();
 
     const pathname = request.nextUrl.pathname;
+
+    // Racine : rediriger vers login
+    if (pathname === "/") {
+      return NextResponse.redirect(new URL("/login", request.url));
+    }
 
     // Protéger les routes dashboard
     if (pathname.startsWith("/dashboard")) {
@@ -76,5 +81,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/admin/:path*", "/login", "/register"],
+  matcher: ["/", "/dashboard/:path*", "/admin/:path*", "/login", "/register"],
 };

@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { createClient } from "@/lib/supabase/client";
 import { UserAvatar } from "@/components/ui/UserAvatar";
-import { Camera, Save, Loader2 } from "lucide-react";
+import { Save, Loader2 } from "lucide-react";
 import type { UserRow } from "@/lib/supabase/database.types";
 
 export default function ProfilePage() {
@@ -14,11 +14,8 @@ export default function ProfilePage() {
   const [accountNumber, setAccountNumber] = useState("");
   const [xp, setXp] = useState(0);
   const [completedEvaluations, setCompletedEvaluations] = useState(0);
-  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
-  const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const isDevMode = process.env.NEXT_PUBLIC_DEV_MODE === "true";
+  const isDevMode = process.env.NEXT_PUBLIC_DEV_MODE === "true" || process.env.NEXT_PUBLIC_DEMO_MODE === "true";
 
   const loadProfileData = useCallback(async () => {
     if (!user || isDevMode) return;
@@ -69,7 +66,6 @@ export default function ProfilePage() {
       const nameParts = user.full_name?.split(" ") || [];
       setFirstName(nameParts[0] || "");
       setEmail(user.email || "");
-      setAvatarUrl(user.avatar_url);
       if (isDevMode) {
         setAccountNumber("TP-001234");
         setXp(1250);
@@ -79,71 +75,6 @@ export default function ProfilePage() {
       loadProfileData();
     }
   }, [user, isDevMode, loadProfileData]);
-
-  const handleAvatarClick = () => {
-    fileInputRef.current?.click();
-  };
-
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file || !user) return;
-
-    // Vérifier le type de fichier
-    if (!file.type.startsWith("image/")) {
-      alert("Veuillez sélectionner une image");
-      return;
-    }
-
-    // Vérifier la taille (max 5MB)
-    if (file.size > 5 * 1024 * 1024) {
-      alert("L'image ne doit pas dépasser 5MB");
-      return;
-    }
-
-    setUploading(true);
-
-    try {
-      const supabase = createClient();
-      
-      // Upload vers Supabase Storage
-      const fileExt = file.name.split(".").pop();
-      const fileName = `${user.id}-${Date.now()}.${fileExt}`;
-      const filePath = `avatars/${fileName}`;
-
-      const { error: uploadError } = await supabase.storage
-        .from("avatars")
-        .upload(filePath, file, {
-          cacheControl: "3600",
-          upsert: false,
-        });
-
-      if (uploadError) {
-        throw uploadError;
-      }
-
-      // Récupérer l'URL publique
-      const { data: { publicUrl } } = supabase.storage
-        .from("avatars")
-        .getPublicUrl(filePath);
-
-      // Mettre à jour le profil (assertion pour contourner le typage .update(never) du client Supabase)
-      const { error: updateError } = await supabase
-        .from("users")
-        .update({ avatar_url: publicUrl } as never)
-        .eq("id", user.id);
-
-      if (updateError) {
-        throw updateError;
-      }
-
-      setAvatarUrl(publicUrl);
-    } catch (err) {
-      console.error("Erreur lors de l'upload:", err);
-      alert("Erreur lors de l'upload de l'image");
-    } finally {
-      setUploading(false);
-    }
-  };
 
   const handleSave = async () => {
     if (!user || isDevMode) {
@@ -186,40 +117,20 @@ export default function ProfilePage() {
       </div>
 
       <div className="grid gap-6 md:grid-cols-2 flex-1 min-h-0">
-        {/* Colonne gauche - Photo et Stats */}
+        {/* Colonne gauche - Identité et Stats */}
         <div className="flex flex-col gap-6 min-h-0">
-          {/* Photo de profil */}
           <div className="rounded-lg border border-card-border bg-black p-8 overflow-hidden flex-shrink-0">
             <div className="flex flex-col items-center text-center">
-              <div className="relative mb-5">
+              <div className="mb-5">
                 <UserAvatar
                   name={firstName || user?.email || ""}
-                  photo={avatarUrl}
+                  photo={null}
                   size="lg"
-                />
-                <button
-                  onClick={handleAvatarClick}
-                  disabled={uploading}
-                  className="absolute bottom-0 right-0 p-2 bg-primary rounded-full border-2 border-black hover:opacity-90 transition-opacity disabled:opacity-50"
-                >
-                  {uploading ? (
-                    <Loader2 className="h-4 w-4 text-white animate-spin" />
-                  ) : (
-                    <Camera className="h-4 w-4 text-white" />
-                  )}
-                </button>
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="image/*"
-                  onChange={handleFileChange}
-                  className="hidden"
                 />
               </div>
               <h2 className="text-xl font-bold text-white break-words mb-2">
                 {firstName || "Utilisateur"}
               </h2>
-              <p className="text-xs text-white/70">Cliquez sur l&apos;icône pour changer votre photo</p>
             </div>
           </div>
 

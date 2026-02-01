@@ -4,6 +4,19 @@ Ce tutoriel est l’**unique référence** pour mettre la plateforme en ligne et
 
 ---
 
+## Dépannage : la plateforme n’affiche rien (écran noir)
+
+Si après déploiement tu as un écran noir ou « rien ne s’affiche » :
+
+0. **Vérifier le déploiement** : as-tu bien poussé le code sur GitHub (ou fait un Redeploy sur Vercel) après tes derniers changements ? Sans redéploiement, le site affiche l'ancienne version. Voir **`DEPLOIEMENT_CHAQUE_FOIS.md`** à la racine du projet.
+1. Va sur **Vercel** → ton projet → **Settings** → **Environment Variables**.
+2. Ajoute une variable : **`NEXT_PUBLIC_DEMO_MODE`** = **`true`** (pour toutes les env : Production, Preview, Development).
+3. **Redeploy** (Deployments → … sur le dernier déploiement → Redeploy).
+
+La plateforme s’affichera en **mode démo** : page de connexion visible, et un clic sur « Se connecter » ouvre le dashboard sans vraie auth (pas de Supabase). Tu pourras naviguer partout et vérifier que l’interface fonctionne. Quand Supabase et l’auth seront OK, enlève `NEXT_PUBLIC_DEMO_MODE` (ou mets `false`) et redéploie pour repasser en mode normal.
+
+---
+
 ## Vue d’ensemble
 
 | Étape | Où | Quoi faire |
@@ -172,6 +185,51 @@ Ensuite, Vercel redéploiera automatiquement avec le nouveau commit.
 
 - Attends 4–5 secondes : un timeout permet d’afficher le dashboard même si le chargement du profil est lent.
 - Vérifie la console du navigateur (F12 → Console) : s’il y a des erreurs Supabase (ex. RLS), exécute à nouveau **`fix-recursion-connexion.sql`** dans Supabase (étape 1.2).
+
+### Erreurs console : Phantom et CSP
+
+**1. Erreurs `[PHANTOM]` / `Could not establish connection. Receiving end does not exist`**  
+- Elles viennent de l'**extension de navigateur Phantom** (portefeuille Solana), pas de ton app.  
+- **À faire :** les ignorer, ou désactiver l'extension sur ton site pour une console plus propre. Aucune modification de code nécessaire.
+
+**2. Erreur « Content Security Policy of your site blocks the use of 'eval' in JavaScript »**  
+- Une CSP stricte (site ou hébergeur) bloquait `eval()`, utilisé par Next.js ou des libs (ex. Supabase), ce qui peut provoquer un écran noir.  
+- **Correction appliquée :** dans **`next.config.ts`** une politique CSP a été ajoutée avec `script-src 'self' 'unsafe-inline' 'unsafe-eval'` (et règles pour styles, fonts, images, Supabase).  
+- Après redéploiement, cette erreur ne devrait plus bloquer l'affichage.
+
+---
+
+## Analyse des fonctionnalités (Ressources, Stats, Favoris, Notes, Community)
+
+Ces fonctionnalités ont été **conservées** et **renforcées** pour éviter tout écran noir ou crash en production.
+
+### Problème identifié
+L’écran noir pouvait survenir si une des **pages serveur** (dashboard, ressources, stats, favoris, notes) levait une exception : tables Supabase absentes, erreur réseau, etc. Une erreur non gérée dans un composant serveur peut empêcher le rendu de toute la page.
+
+### Modifications effectuées (aucune suppression)
+
+1. **Ressources** (`/dashboard/resources`)
+   - Appels à `getResources()`, `getResourceCategories()`, `getResourceTypes()` entourés d’un **try/catch**. En cas d’erreur (table `resources` absente ou autre), la page affiche une liste vide au lieu de planter.
+
+2. **Stats** (`/dashboard/stats`)
+   - Récupération de la progression et des stats par module dans un **try/catch**. En cas d’erreur, KPIs à 0 et liste de modules vide.
+
+3. **Favoris** (`/dashboard/favorites`)
+   - `getFavoritesWithDetails(user.id)` dans un **try/catch**. En cas d’erreur (table `favorites` absente), liste vide.
+
+4. **Notes** (`/dashboard/notes`)
+   - `getNotesWithEpisodes(user.id)` dans un **try/catch**. En cas d’erreur (table `notes` absente), liste vide.
+
+5. **Page d’accueil dashboard** (`/dashboard`)
+   - Toute la logique de chargement (profil, modules, progression, compteurs) est dans un **try/catch**. En cas d’erreur, affichage d’un dashboard minimal (nom utilisateur, 0 module, 0 %).
+
+6. **Communauté / Discord**
+   - Pages statiques (liens, texte, icônes). Aucune dépendance à des tables. **Aucune modification** nécessaire.
+
+### Résultat
+- Les fonctionnalités restent **toutes en place**.
+- Si une table ou un service Supabase manque ou échoue, la page **s’affiche quand même** avec des données vides ou des zéros, au lieu de provoquer un écran noir.
+- Une fois les tables `resources`, `favorites`, `notes` (et les politiques RLS) créées dans Supabase (voir `supabase-complet.sql` ou scripts dédiés), tout fonctionne normalement.
 
 ---
 

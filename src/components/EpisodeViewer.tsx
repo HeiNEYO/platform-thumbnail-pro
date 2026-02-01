@@ -1,9 +1,12 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Check, ChevronRight } from "lucide-react";
+import { Check, ChevronRight, Heart, FileText, Loader2 } from "lucide-react";
 import { markEpisodeComplete } from "@/lib/db/progress.client";
+import { upsertNote } from "@/lib/db/notes.client";
+import { addFavoriteEpisode, removeFavoriteByItem, isFavoriteEpisode } from "@/lib/db/favorites.client";
 import type { EpisodeRow } from "@/lib/supabase/database.types";
 
 interface EpisodeViewerProps {
@@ -12,6 +15,7 @@ interface EpisodeViewerProps {
   completed: boolean;
   userId: string;
   nextEpisode: EpisodeRow | null;
+  initialNoteContent?: string;
 }
 
 export function EpisodeViewer({
@@ -20,12 +24,57 @@ export function EpisodeViewer({
   completed,
   userId,
   nextEpisode,
+  initialNoteContent = "",
 }: EpisodeViewerProps) {
   const router = useRouter();
+  const [noteContent, setNoteContent] = useState(initialNoteContent);
+  const [noteSaving, setNoteSaving] = useState(false);
+  const [isFavorite, setIsFavorite] = useState(false);
+  const [favoriteLoading, setFavoriteLoading] = useState(false);
+
+  useEffect(() => {
+    setNoteContent(initialNoteContent);
+  }, [initialNoteContent]);
+
+  useEffect(() => {
+    isFavoriteEpisode(userId, episode.id).then(setIsFavorite);
+  }, [userId, episode.id]);
 
   const handleMarkComplete = async () => {
     await markEpisodeComplete(userId, episode.id);
     router.refresh();
+  };
+
+  const handleSaveNote = async () => {
+    setNoteSaving(true);
+    await upsertNote(userId, episode.id, noteContent);
+    setNoteSaving(false);
+    router.refresh();
+  };
+
+  const handleToggleFavorite = async () => {
+    setFavoriteLoading(true);
+    try {
+      if (isFavorite) {
+        const { error } = await removeFavoriteByItem(userId, "episode", episode.id);
+        if (error) {
+          alert("Impossible de retirer des favoris. Réessayez.");
+          return;
+        }
+        setIsFavorite(false);
+      } else {
+        const { error } = await addFavoriteEpisode(userId, episode.id);
+        if (error) {
+          // Doublon ou table absente : on considère comme déjà favori pour éviter état incohérent
+          setIsFavorite(true);
+        } else {
+          setIsFavorite(true);
+        }
+      }
+      router.refresh();
+    } finally {
+      setFavoriteLoading(false);
+    }
   };
 
   return (
@@ -62,6 +111,23 @@ export function EpisodeViewer({
             <Check className="h-4 w-4 mr-2" />
             {completed ? "Terminé" : "Marquer comme terminé"}
           </button>
+          <button
+            type="button"
+            onClick={handleToggleFavorite}
+            disabled={favoriteLoading}
+            className={`inline-flex items-center justify-center rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
+              isFavorite
+                ? "bg-primary/20 text-primary"
+                : "bg-[#3a3a3a] text-white hover:bg-[#4a4a4a]"
+            }`}
+          >
+            {favoriteLoading ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Heart className={`h-4 w-4 mr-2 ${isFavorite ? "fill-current" : ""}`} />
+            )}
+            {isFavorite ? "Favori" : "Ajouter aux favoris"}
+          </button>
           {nextEpisode && (
             <Link
               href={`/dashboard/modules/${moduleId}/episode/${nextEpisode.id}`}
@@ -71,6 +137,28 @@ export function EpisodeViewer({
               <ChevronRight className="h-4 w-4 ml-2" />
             </Link>
           )}
+        </div>
+
+        <div className="mt-6 pt-6 border-t border-[#2a2a2a]">
+          <div className="flex items-center gap-2 mb-2">
+            <FileText className="h-4 w-4 text-gray-400" />
+            <span className="text-sm font-medium text-white">Mes notes</span>
+          </div>
+          <textarea
+            value={noteContent}
+            onChange={(e) => setNoteContent(e.target.value)}
+            placeholder="Vos notes pour cet épisode..."
+            className="w-full rounded-lg border border-[#2a2a2a] bg-black px-4 py-3 text-sm text-white placeholder-gray-500 focus:border-indigo-500 focus:outline-none min-h-[100px]"
+          />
+          <button
+            type="button"
+            onClick={handleSaveNote}
+            disabled={noteSaving}
+            className="mt-2 inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-500 disabled:opacity-50"
+          >
+            {noteSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+            Enregistrer les notes
+          </button>
         </div>
       </div>
     </div>

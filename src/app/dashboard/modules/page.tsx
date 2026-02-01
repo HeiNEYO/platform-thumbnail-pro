@@ -7,9 +7,12 @@ import { getEpisodesByModule } from "@/lib/db/episodes";
 import { ProgressBar } from "@/components/ui/ProgressBar";
 import { BookOpen, Clock, ArrowRight, Play } from "lucide-react";
 
+// Force le rendu dynamique car on utilise cookies() pour l'authentification
+export const dynamic = 'force-dynamic';
+
 export default async function ModulesPage() {
   // Mode dev : bypasser Supabase
-  const isDevMode = process.env.NEXT_PUBLIC_DEV_MODE === 'true';
+  const isDevMode = process.env.NEXT_PUBLIC_DEV_MODE === 'true' || process.env.NEXT_PUBLIC_DEMO_MODE === 'true';
   
   if (isDevMode) {
     return (

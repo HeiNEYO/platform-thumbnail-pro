@@ -176,6 +176,58 @@ export interface Database {
           updated_at?: string;
         };
       };
+      favorites: {
+        Row: {
+          id: string;
+          user_id: string;
+          item_type: "episode" | "resource";
+          episode_id: string | null;
+          resource_id: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          item_type: "episode" | "resource";
+          episode_id?: string | null;
+          resource_id?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          item_type?: "episode" | "resource";
+          episode_id?: string | null;
+          resource_id?: string | null;
+          created_at?: string;
+        };
+      };
+      notes: {
+        Row: {
+          id: string;
+          user_id: string;
+          episode_id: string;
+          content: string;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          episode_id: string;
+          content?: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          episode_id?: string;
+          content?: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+      };
     };
   };
 }
@@ -187,3 +239,5 @@ export type EpisodeRow = Database["public"]["Tables"]["episodes"]["Row"];
 export type ProgressRow = Database["public"]["Tables"]["progress"]["Row"];
 export type ResourceRow = Database["public"]["Tables"]["resources"]["Row"];
 export type AnnouncementRow = Database["public"]["Tables"]["announcements"]["Row"];
+export type FavoriteRow = Database["public"]["Tables"]["favorites"]["Row"];
+export type NoteRow = Database["public"]["Tables"]["notes"]["Row"];

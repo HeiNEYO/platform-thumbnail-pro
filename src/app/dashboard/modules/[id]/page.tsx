@@ -8,6 +8,9 @@ import { isEpisodeCompleted } from "@/lib/db/episodes";
 import { ProgressBar } from "@/components/ui/ProgressBar";
 import { EpisodeList } from "@/components/EpisodeList";
 
+// Force le rendu dynamique car on utilise cookies() pour l'authentification
+export const dynamic = 'force-dynamic';
+
 export default async function ModuleDetailPage({
   params,
 }: {

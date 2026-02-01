@@ -24,7 +24,7 @@ export default function LoginPage() {
     e.preventDefault();
     setError("");
 
-    const isDevMode = process.env.NEXT_PUBLIC_DEV_MODE === "true";
+    const isDevMode = process.env.NEXT_PUBLIC_DEV_MODE === "true" || process.env.NEXT_PUBLIC_DEMO_MODE === "true";
     if (isDevMode) {
       setSubmitting(true);
       await new Promise((r) => setTimeout(r, 300));
@@ -51,18 +51,34 @@ export default function LoginPage() {
         setSubmitting(false);
         return;
       }
-      // Rechargement complet pour que les cookies de session soient bien envoyés au serveur (middleware)
       window.location.href = "/dashboard";
     } catch (err) {
       setError(err instanceof Error ? err.message : "Une erreur inattendue s'est produite.");
+    } finally {
       setSubmitting(false);
     }
   };
 
+  const isDemoMode = process.env.NEXT_PUBLIC_DEV_MODE === "true" || process.env.NEXT_PUBLIC_DEMO_MODE === "true";
+
   return (
-    <main className="min-h-screen flex items-center justify-center p-6 bg-black relative">
+    <main
+      className="min-h-screen flex items-center justify-center p-6 bg-black relative"
+      style={{ minHeight: "100vh", background: "#000", color: "#fff" }}
+    >
       <div className="w-full max-w-md z-10 animate-fade-in">
-        <div className="rounded-2xl border border-card-border bg-card p-10 shadow-2xl">
+        {isDemoMode && (
+          <div
+            className="rounded-lg border border-primary/50 bg-primary/10 text-primary text-center text-xs font-medium px-4 py-3 mb-4"
+            style={{ borderColor: "rgba(0,19,245,0.5)", background: "rgba(0,19,245,0.1)", color: "#0013F5" }}
+          >
+            Mode démo : cliquez sur « Se connecter » pour accéder au dashboard (sans Supabase).
+          </div>
+        )}
+        <div
+          className="rounded-2xl border border-card-border bg-card p-10 shadow-2xl"
+          style={{ background: "#0a0a0a", borderColor: "#1a1a1a", color: "#fff" }}
+        >
           {/* Header */}
           <div className="text-center mb-8">
             <h1 className="text-[19.6px] font-bold text-white mb-2">Bon retour</h1>

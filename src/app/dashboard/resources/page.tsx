@@ -1,8 +1,27 @@
-export default function ResourcesPage() {
+import { getResources, getResourceCategories, getResourceTypes } from "@/lib/db/resources";
+import { ResourcesPageClient } from "@/components/ResourcesPageClient";
+
+export default async function ResourcesPage() {
+  let resources: Awaited<ReturnType<typeof getResources>> = [];
+  let categories: string[] = [];
+  let types: string[] = [];
+  try {
+    const result = await Promise.all([
+      getResources(),
+      getResourceCategories(),
+      getResourceTypes(),
+    ]);
+    resources = result[0];
+    categories = result[1];
+    types = result[2];
+  } catch {
+    // Tables absentes ou erreur Supabase : afficher une liste vide
+  }
   return (
-    <div className="animate-fade-in">
-      <h1 className="text-3xl font-bold text-white mb-2">Ressources</h1>
-      <p className="text-white/70">Page des ressources</p>
-    </div>
+    <ResourcesPageClient
+      resources={resources}
+      categories={categories}
+      types={types}
+    />
   );
 }
