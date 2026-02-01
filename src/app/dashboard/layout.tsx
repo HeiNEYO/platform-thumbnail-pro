@@ -120,7 +120,7 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
               height={28}
               className="shrink-0"
             />
-            <span className="text-[17.6px] font-bold text-white">
+            <span className="hidden md:inline text-[17.6px] font-bold text-white">
               Thumbnail Pro
             </span>
           </Link>
