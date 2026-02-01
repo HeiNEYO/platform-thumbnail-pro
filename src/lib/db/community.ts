@@ -16,53 +16,55 @@ export async function getAllCommunityMembers(): Promise<CommunityMember[]> {
   const supabase = await createClient();
   
   try {
-    // Essayer d'abord avec les nouveaux champs
-    let query = supabase
+    // Charger d'abord les données de base (toujours présentes)
+    const { data: baseData, error: baseError } = await supabase
       .from("users")
-      .select("id, email, full_name, avatar_url, twitter_handle, discord_tag, community_score, role");
+      .select("id, email, full_name, avatar_url, role")
+      .order("created_at", { ascending: false });
+
+    if (baseError || !baseData) {
+      console.error("Erreur lors de la récupération des membres:", baseError);
+      return [];
+    }
+
+    // Essayer de charger les handles et scores en une seule requête (ignorer l'erreur si les colonnes n'existent pas)
+    let handlesMap: Record<string, { twitter_handle?: string | null; discord_tag?: string | null; community_score?: number }> = {};
     
-    const { data, error } = await query.order("community_score", { ascending: false });
-
-    if (error) {
-      // Si erreur (colonnes manquantes), essayer sans les nouveaux champs
-      console.warn("Erreur avec nouveaux champs, tentative sans:", error.message);
-      
-      const { data: fallbackData, error: fallbackError } = await supabase
+    try {
+      const { data: handlesData } = await supabase
         .from("users")
-        .select("id, email, full_name, avatar_url")
-        .order("created_at", { ascending: false });
+        .select("id, twitter_handle, discord_tag, community_score");
 
-      if (fallbackError) {
-        console.error("Erreur lors de la récupération des membres:", fallbackError);
-        return [];
+      if (handlesData) {
+        handlesData.forEach((row: any) => {
+          handlesMap[row.id] = {
+            twitter_handle: row.twitter_handle,
+            discord_tag: row.discord_tag,
+            community_score: row.community_score || 0,
+          };
+        });
       }
+    } catch {
+      // Les colonnes n'existent peut-être pas encore, ce n'est pas grave
+    }
 
-      if (!fallbackData) return [];
-
-      return fallbackData.map((row: UserRow) => ({
+    // Mapper les données avec les handles
+    const members = baseData.map((row: UserRow) => {
+      const handles = handlesMap[row.id] || {};
+      return {
         id: row.id,
         full_name: row.full_name,
         email: row.email,
         avatar_url: row.avatar_url,
-        twitter_handle: null,
-        discord_tag: null,
-        community_score: 0,
+        twitter_handle: handles.twitter_handle || null,
+        discord_tag: handles.discord_tag || null,
+        community_score: handles.community_score || 0,
         role: (row.role || "member") as "member" | "admin" | "intervenant",
-      }));
-    }
+      };
+    });
 
-    if (!data) return [];
-
-    return data.map((row: UserRow & { twitter_handle?: string | null; discord_tag?: string | null; community_score?: number | null }) => ({
-      id: row.id,
-      full_name: row.full_name,
-      email: row.email,
-      avatar_url: row.avatar_url,
-      twitter_handle: row.twitter_handle || null,
-      discord_tag: row.discord_tag || null,
-      community_score: row.community_score || 0,
-      role: (row.role || "member") as "member" | "admin" | "intervenant",
-    }));
+    // Trier par score communautaire (décroissant)
+    return members.sort((a, b) => b.community_score - a.community_score);
   } catch (err) {
     console.error("Erreur inattendue lors de la récupération des membres:", err);
     return [];

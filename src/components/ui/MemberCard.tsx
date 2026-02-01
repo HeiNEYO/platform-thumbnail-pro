@@ -80,7 +80,7 @@ export function MemberCard({ member }: MemberCardProps) {
         {member.twitter_handle ? (
           <div className="flex items-center gap-2">
             <Twitter className="h-4 w-4 shrink-0" />
-            <span className="truncate">{member.twitter_handle}</span>
+            <span className="truncate">@{member.twitter_handle}</span>
           </div>
         ) : (
           <div className="flex items-center gap-2 text-white/30">
@@ -93,7 +93,7 @@ export function MemberCard({ member }: MemberCardProps) {
         {member.discord_tag ? (
           <div className="flex items-center gap-2">
             <DiscordIcon className="h-4 w-4 shrink-0" />
-            <span className="truncate">{member.discord_tag}</span>
+            <span className="truncate">@{member.discord_tag}</span>
           </div>
         ) : (
           <div className="flex items-center gap-2 text-white/30">
