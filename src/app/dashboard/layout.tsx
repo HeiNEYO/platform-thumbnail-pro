@@ -10,11 +10,13 @@ import {
   Heart, FileText, BarChart3, GraduationCap,
   Compass
 } from "lucide-react";
+import { Suspense } from "react";
 import { RequireAuth } from "@/components/RequireAuth";
 import { useAuth } from "@/contexts/AuthContext";
 import { UserAvatar } from "@/components/ui/UserAvatar";
 import { DiscountCodeModal } from "@/components/ui/DiscountCodeModal";
 import { DiscordIcon } from "@/components/ui/DiscordIcon";
+import { SiteSkeleton } from "@/components/ui/SiteSkeleton";
 
 // Sections toujours ouvertes (organisées par catégorie)
 const navSections = [
@@ -60,9 +62,11 @@ const navSections = [
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
-    <RequireAuth>
-      <DashboardShell>{children}</DashboardShell>
-    </RequireAuth>
+    <Suspense fallback={<SiteSkeleton />}>
+      <RequireAuth>
+        <DashboardShell>{children}</DashboardShell>
+      </RequireAuth>
+    </Suspense>
   );
 }
 
