@@ -6,10 +6,9 @@ import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { 
   Home, BookOpen, FolderOpen, User, LogOut, 
-  HelpCircle, ShoppingBag, Bell, Plus, Minus,
+  HelpCircle, ShoppingBag, Bell,
   Heart, FileText, BarChart3, GraduationCap,
-  ChevronUp, ChevronDown, Compass, Headphones,
-  CheckSquare, Settings, Calendar
+  Compass
 } from "lucide-react";
 import { RequireAuth } from "@/components/RequireAuth";
 import { useAuth } from "@/contexts/AuthContext";
@@ -17,19 +16,17 @@ import { UserAvatar } from "@/components/ui/UserAvatar";
 import { DiscountCodeModal } from "@/components/ui/DiscountCodeModal";
 import { DiscordIcon } from "@/components/ui/DiscordIcon";
 
-// Liens directs (toujours visibles en haut)
+// Liens directs principaux (toujours visibles en haut)
 const directLinks = [
   { href: "/dashboard", label: "Accueil", icon: Home },
-  { href: "/dashboard/modules", label: "Formation", icon: BookOpen },
   { href: "/dashboard/favorites", label: "Mes favoris", icon: Heart },
   { href: "/dashboard/stats", label: "Statistiques", icon: BarChart3 },
   { href: "/dashboard/notes", label: "Mes notes", icon: FileText },
-  { href: "/dashboard/resources", label: "Ressources", icon: FolderOpen },
   { href: "/dashboard/profile", label: "Profil", icon: User },
 ];
 
-// Sections collapsibles (en bas)
-const collapsibleSections = [
+// Sections toujours ouvertes (organisées par catégorie)
+const navSections = [
   {
     id: "academy",
     label: "Academy",
@@ -62,24 +59,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 function DashboardShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const { user, signOut } = useAuth();
-  const [expandedSections, setExpandedSections] = useState<Set<string>>(
-    new Set(["overview", "academy", "tools"])
-  );
   const [showDiscountModal, setShowDiscountModal] = useState(false);
 
   const displayName = user?.full_name ?? user?.email ?? "";
-
-  const toggleSection = (sectionId: string) => {
-    setExpandedSections((prev) => {
-      const next = new Set(prev);
-      if (next.has(sectionId)) {
-        next.delete(sectionId);
-      } else {
-        next.add(sectionId);
-      }
-      return next;
-    });
-  };
 
   // Fonction pour générer les breadcrumbs
   const getBreadcrumbs = () => {
@@ -164,58 +146,46 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
             {/* Séparateur */}
             <div className="h-px bg-sidebar-border my-4" />
 
-            {/* Sections collapsibles */}
-            <div className="space-y-1">
-              {collapsibleSections.map((section) => {
-                const isExpanded = expandedSections.has(section.id);
-                
-                return (
-                  <div key={section.id} className="mb-2">
-                    <button
-                      onClick={() => toggleSection(section.id)}
-                      className="w-full flex items-center justify-between px-3 py-2.5 text-sm font-medium text-white/70 hover:text-white hover:bg-[#141414] rounded-md transition-all duration-150 group"
-                    >
-                      <div className="flex items-center gap-3">
-                        <section.icon className="h-5 w-5 shrink-0 text-white/60 group-hover:text-white/80" />
-                        <span>{section.label}</span>
-                      </div>
-                      {isExpanded ? (
-                        <ChevronUp className="h-4 w-4 text-white/50 shrink-0" />
-                      ) : (
-                        <ChevronDown className="h-4 w-4 text-white/50 shrink-0" />
-                      )}
-                    </button>
-                    
-                    {isExpanded && (
-                      <div className="mt-1 ml-4 pl-7 border-l border-sidebar-border space-y-0.5">
-                        {section.items.map((item) => {
-                          const active =
-                            pathname === item.href ||
-                            (item.href !== "/dashboard" && pathname.startsWith(item.href));
-                          return (
-                            <Link
-                              key={item.href}
-                              href={item.href}
-                              className={`flex items-center gap-3 px-3 py-2 text-sm transition-all duration-150 rounded-md ${
-                                active
-                                  ? "text-white font-medium"
-                                  : "text-white/60 hover:text-white/90"
-                              }`}
-                            >
-                              {item.customIcon ? (
-                                <item.customIcon className="h-4 w-4 shrink-0" />
-                              ) : item.icon ? (
-                                <item.icon className="h-4 w-4 shrink-0" />
-                              ) : null}
-                              <span>{item.label}</span>
-                            </Link>
-                          );
-                        })}
-                      </div>
-                    )}
+            {/* Sections toujours ouvertes */}
+            <div className="space-y-4">
+              {navSections.map((section) => (
+                <div key={section.id} className="mb-3">
+                  {/* En-tête de section */}
+                  <div className="flex items-center gap-3 px-3 py-2 mb-1">
+                    <section.icon className="h-5 w-5 shrink-0 text-white/60" />
+                    <span className="text-sm font-semibold text-white/70 uppercase tracking-wider">
+                      {section.label}
+                    </span>
                   </div>
-                );
-              })}
+                  
+                  {/* Items de la section */}
+                  <div className="ml-4 pl-7 border-l border-sidebar-border space-y-0.5">
+                    {section.items.map((item) => {
+                      const active =
+                        pathname === item.href ||
+                        (item.href !== "/dashboard" && pathname.startsWith(item.href));
+                      return (
+                        <Link
+                          key={item.href}
+                          href={item.href}
+                          className={`flex items-center gap-3 px-3 py-2 text-sm transition-all duration-150 rounded-md ${
+                            active
+                              ? "text-white font-medium bg-[#141414]"
+                              : "text-white/60 hover:text-white/90 hover:bg-[#141414]/50"
+                          }`}
+                        >
+                          {item.customIcon ? (
+                            <item.customIcon className="h-4 w-4 shrink-0" />
+                          ) : item.icon ? (
+                            <item.icon className="h-4 w-4 shrink-0" />
+                          ) : null}
+                          <span>{item.label}</span>
+                        </Link>
+                      );
+                    })}
+                  </div>
+                </div>
+              ))}
             </div>
           </nav>
 
