@@ -8,7 +8,7 @@ import {
   Home, BookOpen, FolderOpen, User, LogOut, 
   HelpCircle, ShoppingBag, Bell,
   Heart, FileText, BarChart3, GraduationCap,
-  Compass
+  Compass, Menu, X
 } from "lucide-react";
 import { Suspense } from "react";
 import { RequireAuth } from "@/components/RequireAuth";
@@ -74,6 +74,7 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const { user, signOut } = useAuth();
   const [showDiscountModal, setShowDiscountModal] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const displayName = user?.full_name ?? user?.email ?? "";
 
@@ -101,6 +102,13 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
       <header className="h-[61.6px] shrink-0 border-b border-sidebar-border bg-[#0a0a0a] flex items-center justify-between px-[22px]">
         {/* Logo + Breadcrumbs */}
         <div className="flex items-center gap-[22px]">
+          <button
+            className="lg:hidden inline-flex items-center justify-center rounded-full bg-white/5 p-2 text-white/70 hover:text-white hover:bg-white/10 transition-colors"
+            aria-label="Ouvrir le menu"
+            onClick={() => setMobileMenuOpen(true)}
+          >
+            <Menu className="h-5 w-5" />
+          </button>
           <Link href="/dashboard" className="flex items-center gap-[11px]">
             <Image
               src="/images/logo.png"
@@ -128,6 +136,62 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
           </button>
         </div>
       </header>
+
+      {mobileMenuOpen && (
+        <div className="lg:hidden fixed inset-0 z-50 flex">
+          <div className="w-64 bg-[#0a0a0a] border-r border-sidebar-border p-4 space-y-5 shadow-2xl">
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-semibold text-white">Menu</span>
+              <button
+                className="text-white/60 hover:text-white"
+                onClick={() => setMobileMenuOpen(false)}
+                aria-label="Fermer le menu"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            {navSections.map((section) => (
+              <div key={`mobile-${section.id}`} className="space-y-3">
+                <div className="text-xs uppercase tracking-[0.2em] text-white/50">{section.label}</div>
+                <div className="space-y-2">
+                  {section.items.map((item) => (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      className="flex items-center gap-3 text-sm text-white/70 hover:text-white hover:bg-white/5 rounded-md px-3 py-2 transition-colors"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      {item.icon && <item.icon className="h-4 w-4" />}
+                      {item.label}
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            ))}
+            <div className="pt-4 border-t border-[#1a1a1a]">
+              <Link
+                href="#"
+                className="flex items-center gap-3 text-sm text-white/70 hover:text-white"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                <HelpCircle className="h-4 w-4" />
+                Support
+              </Link>
+              <button
+                onClick={() => {
+                  setShowDiscountModal(true);
+                  setMobileMenuOpen(false);
+                }}
+                className="mt-2 flex items-center gap-3 text-sm text-white/70 hover:text-white"
+              >
+                <ShoppingBag className="h-4 w-4" />
+                Réduction Legal Place
+              </button>
+            </div>
+          </div>
+          <div className="flex-1" onClick={() => setMobileMenuOpen(false)} />
+        </div>
+      )}
 
       <div className="flex flex-1 overflow-hidden">
         {/* Sidebar - Design inspiré de l'image */}
