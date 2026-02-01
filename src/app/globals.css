@@ -36,12 +36,18 @@
   @apply border-border;
 }
 
+html {
+  background: #000000;
+  color: #ffffff;
+}
+
 body {
   color: var(--foreground);
-  background: var(--background);
+  background: #000000;
   font-family: var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  min-height: 100vh;
 }
 
 /* Scrollbar */

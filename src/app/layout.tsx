@@ -24,10 +24,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="fr" className="dark" style={{ background: "#000", color: "#fff" }}>
+    <html lang="fr" className="dark bg-black" style={{ background: "#000", color: "#fff" }}>
       <body
-        className={`${inter.variable} font-sans antialiased bg-background text-foreground`}
-        style={{ background: "#000000", color: "#ffffff" }}
+        className={`${inter.variable} font-sans antialiased bg-black text-white`}
+        style={{ background: "#000000", color: "#ffffff", minHeight: "100vh" }}
       >
         <noscript>
           <div

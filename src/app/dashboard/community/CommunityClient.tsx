@@ -47,16 +47,30 @@ export function CommunityClient({ initialMembers }: { initialMembers: CommunityM
           .from("users")
           .select("id, twitter_handle, discord_tag, community_score");
 
+        console.log("🔍 Chargement handles - handlesData:", handlesData);
+        console.log("🔍 Chargement handles - handlesError:", handlesError);
+
         if (handlesError) {
-          console.warn("⚠️ Erreur lors du chargement des handles:", handlesError.message);
+          console.error("❌ Erreur lors du chargement des handles:", handlesError);
         } else if (handlesData) {
+          console.log("✅ Handles chargés avec succès, nombre:", handlesData.length);
           handlesData.forEach((row: any) => {
+            const twitterHandle = row.twitter_handle && row.twitter_handle.trim() !== "" ? row.twitter_handle.trim() : null;
+            const discordTag = row.discord_tag && row.discord_tag.trim() !== "" ? row.discord_tag.trim() : null;
+            
+            if (twitterHandle || discordTag) {
+              console.log(`  → User ${row.id}: twitter="${twitterHandle}", discord="${discordTag}"`);
+            }
+            
             handlesMap[row.id] = {
-              twitter_handle: row.twitter_handle || null,
-              discord_tag: row.discord_tag || null,
+              twitter_handle: twitterHandle,
+              discord_tag: discordTag,
               community_score: row.community_score || 0,
             };
           });
+          console.log("📋 HandlesMap créé avec", Object.keys(handlesMap).length, "entrées");
+        } else {
+          console.warn("⚠️ Aucune donnée handlesData retournée");
         }
 
         // Mapper les membres avec leurs handles

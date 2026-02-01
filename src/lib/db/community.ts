@@ -35,15 +35,30 @@ export async function getAllCommunityMembers(): Promise<CommunityMember[]> {
       .select("id, twitter_handle, discord_tag, community_score");
 
     if (handlesError) {
-      console.warn("Erreur lors du chargement des handles (colonnes peuvent ne pas exister):", handlesError.message);
+      console.warn("⚠️ Erreur lors du chargement des handles:", handlesError.message);
     } else if (handlesData) {
+      console.log("✅ Handles chargés (serveur):", handlesData.length, "utilisateurs");
       handlesData.forEach((row: any) => {
+        // Nettoyer les handles : retirer les espaces et vérifier qu'ils ne sont pas vides
+        const twitterHandle = row.twitter_handle && row.twitter_handle.trim() !== "" 
+          ? row.twitter_handle.trim() 
+          : null;
+        const discordTag = row.discord_tag && row.discord_tag.trim() !== "" 
+          ? row.discord_tag.trim() 
+          : null;
+        
+        if (twitterHandle || discordTag) {
+          console.log(`  → User ${row.id}: twitter="${twitterHandle}", discord="${discordTag}"`);
+        }
+        
         handlesMap[row.id] = {
-          twitter_handle: row.twitter_handle || null,
-          discord_tag: row.discord_tag || null,
+          twitter_handle: twitterHandle,
+          discord_tag: discordTag,
           community_score: row.community_score || 0,
         };
       });
+    } else {
+      console.warn("⚠️ Aucune donnée handlesData (serveur)");
     }
 
     // Mapper les données avec les handles
