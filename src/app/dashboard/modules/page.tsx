@@ -5,7 +5,7 @@ import { getEpisodesByModule } from "@/lib/db/episodes";
 import { isEpisodeCompleted } from "@/lib/db/episodes";
 import { getModuleProgress } from "@/lib/db/modules";
 import { BookOpen } from "lucide-react";
-import { ModulesAccordionClient } from "@/components/ModulesAccordionClient";
+import { NetflixStyleModules } from "@/components/NetflixStyleModules";
 
 // Force le rendu dynamique car on utilise cookies() pour l'authentification
 export const dynamic = 'force-dynamic';
@@ -154,14 +154,11 @@ export default async function ModulesPage() {
           </div>
         )}
 
-        {/* Modules organisés en accordéon */}
-        <div>
-          <h2 className="text-lg font-semibold text-white mb-4">Modules de la formation</h2>
-          <ModulesAccordionClient
-            modules={modulesWithEpisodes}
-            userId={authUser.id}
-          />
-        </div>
+        {/* Modules style Netflix - sections horizontales scrollables */}
+        <NetflixStyleModules
+          modules={modulesWithEpisodes}
+          userId={authUser.id}
+        />
       </div>
     );
   } catch (error) {
