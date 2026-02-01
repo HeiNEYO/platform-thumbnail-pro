@@ -5,7 +5,7 @@ import { getEpisodesByModule } from "@/lib/db/episodes";
 import { isEpisodeCompleted } from "@/lib/db/episodes";
 import { getModuleProgress } from "@/lib/db/modules";
 import { BookOpen } from "lucide-react";
-import { NetflixStyleModules } from "@/components/NetflixStyleModules";
+import { NetflixStyleModuleCards } from "@/components/NetflixStyleModuleCards";
 
 // Force le rendu dynamique car on utilise cookies() pour l'authentification
 export const dynamic = 'force-dynamic';
@@ -63,37 +63,39 @@ export default async function ModulesPage() {
       );
     }
 
-    // Récupérer les épisodes et la progression pour chaque module
-    const modulesWithEpisodes = await Promise.all(
+    // Récupérer les statistiques pour chaque module (épisodes, progression)
+    const modulesWithStats = await Promise.all(
       modules.map(async (module) => {
         try {
           const episodes = await getEpisodesByModule(module.id);
           const completedFlags = await Promise.all(
             episodes.map((ep) => isEpisodeCompleted(authUser.id, ep.id))
           );
+          const completedCount = completedFlags.filter(Boolean).length;
+          
           return {
             ...module,
-            episodes,
-            completedFlags,
+            episodeCount: episodes.length,
+            completedCount,
           };
         } catch (err) {
           console.error(`Erreur pour le module ${module.id}:`, err);
-          return { ...module, episodes: [], completedFlags: [] };
+          return {
+            ...module,
+            episodeCount: 0,
+            completedCount: 0,
+          };
         }
       })
     );
 
     // Calculer les statistiques globales de la formation
-    const totalEpisodes = modulesWithEpisodes.reduce((sum, m) => sum + m.episodes.length, 0);
-    const totalCompleted = modulesWithEpisodes.reduce(
-      (sum, m) => sum + m.completedFlags.filter(Boolean).length,
-      0
-    );
+    const totalEpisodes = modulesWithStats.reduce((sum, m) => sum + m.episodeCount, 0);
+    const totalCompleted = modulesWithStats.reduce((sum, m) => sum + m.completedCount, 0);
     const globalProgress = totalEpisodes > 0 ? Math.round((totalCompleted / totalEpisodes) * 100) : 0;
 
     // Trouver le module principal (celui avec l'image, généralement le premier)
-    const mainModule = modulesWithEpisodes.find((m) => m.image_url) || modulesWithEpisodes[0];
-    const otherModules = modulesWithEpisodes.filter((m) => m.id !== mainModule?.id);
+    const mainModule = modulesWithStats.find((m) => m.image_url) || modulesWithStats[0];
 
     return (
       <div className="space-y-7 animate-fade-in">
@@ -154,11 +156,11 @@ export default async function ModulesPage() {
           </div>
         )}
 
-        {/* Modules style Netflix - sections horizontales scrollables */}
-        <NetflixStyleModules
-          modules={modulesWithEpisodes}
-          userId={authUser.id}
-        />
+        {/* Modules style Netflix - cartes scrollables */}
+        <div>
+          <h2 className="text-xl font-bold text-white mb-4">Modules de la formation</h2>
+          <NetflixStyleModuleCards modules={modulesWithStats} />
+        </div>
       </div>
     );
   } catch (error) {
