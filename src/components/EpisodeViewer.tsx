@@ -69,6 +69,8 @@ export function EpisodeViewer({
           setIsFavorite(true);
         } else {
           setIsFavorite(true);
+          router.push("/dashboard/favorites");
+          return;
         }
       }
       router.refresh();
