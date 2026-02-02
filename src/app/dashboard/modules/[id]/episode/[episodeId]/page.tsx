@@ -32,6 +32,14 @@ export default async function EpisodePage({
 
   if (!module || !episode || episode.module_id !== moduleId) notFound();
 
+  // Récupérer les informations de Corentin (instructeur pour tous les modules)
+  const { data: corentinProfile } = await supabase
+    .from("users")
+    .select("full_name, avatar_url")
+    .or("full_name.ilike.%Corentin%,email.ilike.%corentin%")
+    .limit(1)
+    .single();
+
   const currentIndex = episodes.findIndex((e) => e.id === episodeId);
   const nextEpisode =
     currentIndex >= 0 && currentIndex < episodes.length - 1
@@ -52,6 +60,9 @@ export default async function EpisodePage({
         nextEpisode={nextEpisode}
         previousEpisode={previousEpisode}
         initialNoteContent={note?.content ?? ""}
+        instructorName={corentinProfile?.full_name || "Corentin"}
+        instructorTitle="Formateur"
+        instructorAvatar={corentinProfile?.avatar_url || undefined}
       />
     </div>
   );

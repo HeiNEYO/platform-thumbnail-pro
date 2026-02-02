@@ -35,8 +35,8 @@ export function EpisodeViewer({
   nextEpisode,
   previousEpisode,
   initialNoteContent = "",
-  instructorName = "Clément | Lemiento",
-  instructorTitle = "CEO 8lab & Ecom Brands",
+  instructorName = "Corentin",
+  instructorTitle = "Formateur",
   instructorAvatar,
   complementaryResource,
 }: EpisodeViewerProps) {
