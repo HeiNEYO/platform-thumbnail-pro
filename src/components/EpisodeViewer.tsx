@@ -89,13 +89,13 @@ export function EpisodeViewer({
       {/* Zone principale - Lecteur vidéo et contenu */}
       <div className="flex-1 space-y-6">
         {/* Lecteur vidéo principal avec picture-in-picture */}
-        <div className="relative aspect-video bg-[#0A0A0A] rounded-xl overflow-hidden border border-white/10 shadow-2xl">
+        <div className="relative aspect-video bg-[#0A0A0A] overflow-hidden">
           {/* Vidéo principale */}
           {episode.video_url ? (
             <video
               src={episode.video_url}
               controls
-              className="w-full h-full object-contain"
+              className="w-full h-full object-cover"
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#0A0A0A] via-[#1A1A1A] to-[#0A0A0A]">
