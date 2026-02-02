@@ -88,34 +88,16 @@ export function EpisodeViewer({
     <div className="flex flex-col lg:flex-row gap-6">
       {/* Zone principale - Lecteur vidéo et contenu */}
       <div className="flex-1 space-y-6">
-        {/* Lecteur vidéo principal avec picture-in-picture */}
+        {/* Lecteur vidéo principal */}
         <div className="relative w-full h-[600px] md:h-[700px] lg:h-[800px] bg-[#0A0A0A] overflow-hidden">
-          {/* Vidéo principale */}
-          {episode.video_url ? (
-            <video
-              src={episode.video_url}
-              controls
-              className="w-full h-full object-cover"
-            />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#0A0A0A] via-[#1A1A1A] to-[#0A0A0A]">
-              <div className="text-center text-white/50">
-                <p className="text-lg font-medium mb-2">{episode.title}</p>
-                <p className="text-sm">Vidéo à intégrer</p>
-              </div>
-            </div>
-          )}
-
-          {/* Picture-in-picture (vidéo instructeur) - En bas à droite */}
-          <div className="absolute bottom-4 right-4 w-64 h-40 rounded-lg overflow-hidden border-2 border-white/40 bg-[#0A0A0A] shadow-2xl z-10">
-            <iframe
-              src="https://player.vimeo.com/video/1104426446?autoplay=0&controls=1&title=0&byline=0&portrait=0"
-              className="w-full h-full"
-              allow="autoplay; fullscreen; picture-in-picture"
-              allowFullScreen
-              title="Instructeur"
-            />
-          </div>
+          {/* Vidéo Vimeo principale - remplit toute la zone */}
+          <iframe
+            src="https://player.vimeo.com/video/1104426446?autoplay=0&controls=1&title=0&byline=0&portrait=0"
+            className="w-full h-full"
+            allow="autoplay; fullscreen; picture-in-picture"
+            allowFullScreen
+            title="Instructeur"
+          />
         </div>
 
         {/* Section informations sous la vidéo */}
