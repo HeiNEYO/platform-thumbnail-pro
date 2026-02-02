@@ -15,7 +15,7 @@ export function FolderCard({ folderName, resources, icon }: FolderCardProps) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <div className="rounded-lg border border-white/10 bg-[#0A0A0A] overflow-hidden">
+    <div className="rounded-lg border border-white/10 bg-[#0A0A0A] overflow-hidden hover:border-white/20 transition-colors">
       {/* En-tête du dossier */}
       <button
         onClick={() => setIsOpen(!isOpen)}
@@ -27,7 +27,7 @@ export function FolderCard({ folderName, resources, icon }: FolderCardProps) {
             <h3 className="text-white font-semibold text-base truncate">
               {folderName}
             </h3>
-            <p className="text-white/50 text-xs mt-0.5">
+            <p className="text-white/50 text-xs mt-0.5 font-normal">
               {resources.length} {resources.length === 1 ? "ressource" : "ressources"}
             </p>
           </div>
