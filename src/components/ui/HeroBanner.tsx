@@ -77,38 +77,13 @@ export function HeroBanner({ images, interval = 5000 }: HeroBannerProps) {
 
   return (
     <div className="relative w-full h-[350px] md:h-[420px] lg:h-[490px] rounded-[16px] overflow-hidden border border-white/10">
-      {/* Container principal avec effet panoramique continu */}
-      <div className="relative w-full h-full">
+      {/* Container principal */}
+      <div className="relative w-full h-full overflow-hidden">
         
-        {/* Image précédente (gauche) - bande floue et assombrie */}
-        {images.length > 1 && (
-          <div
-            className={`absolute left-0 top-0 h-full w-[15%] z-[1] transition-transform duration-1000 ease-in-out ${
-              isTransitioning ? "-translate-x-full" : "translate-x-0"
-            }`}
-          >
-            <div className="relative w-full h-full">
-              {!imageErrors.has(prevIndex) ? (
-                <Image
-                  src={images[prevIndex].src}
-                  alt={images[prevIndex].alt}
-                  fill
-                  className="object-cover blur-md"
-                  sizes="15vw"
-                  onError={() => setImageErrors((prev) => new Set(prev).add(prevIndex))}
-                />
-              ) : (
-                <div className="absolute inset-0 bg-gradient-to-br from-[#0A0A0A] via-[#1A1A1A] to-[#0A0A0A]"></div>
-              )}
-              <div className="absolute inset-0 bg-black/70"></div>
-            </div>
-          </div>
-        )}
-
-        {/* Image actuelle (centre) - nette et complète */}
+        {/* BANDEAU CENTRAL - Image actuelle à 100% */}
         <div
-          className={`absolute left-1/2 top-0 h-full w-[70%] z-[2] transition-transform duration-1000 ease-in-out ${
-            isTransitioning ? "-translate-x-[calc(50%+15%)]" : "-translate-x-1/2"
+          className={`absolute left-0 top-0 h-full w-full z-[2] transition-transform duration-1000 ease-in-out ${
+            isTransitioning ? "-translate-x-full" : "translate-x-0"
           }`}
         >
           <div className="relative w-full h-full">
@@ -119,7 +94,7 @@ export function HeroBanner({ images, interval = 5000 }: HeroBannerProps) {
                 fill
                 className="object-cover"
                 priority={currentIndex === 0}
-                sizes="70vw"
+                sizes="100vw"
                 onError={() => setImageErrors((prev) => new Set(prev).add(currentIndex))}
               />
             ) : (
@@ -148,10 +123,35 @@ export function HeroBanner({ images, interval = 5000 }: HeroBannerProps) {
           </div>
         </div>
 
-        {/* Image suivante (droite) - bande floue et assombrie */}
+        {/* BANDEAU GAUCHE - Petit aperçu de l'image précédente, coupé */}
         {images.length > 1 && (
           <div
-            className={`absolute right-0 top-0 h-full w-[15%] z-[1] transition-transform duration-1000 ease-in-out ${
+            className={`absolute -left-[8%] top-0 h-full w-[12%] z-[1] transition-transform duration-1000 ease-in-out overflow-hidden ${
+              isTransitioning ? "-translate-x-full" : "translate-x-0"
+            }`}
+          >
+            <div className="relative w-full h-full">
+              {!imageErrors.has(prevIndex) ? (
+                <Image
+                  src={images[prevIndex].src}
+                  alt={images[prevIndex].alt}
+                  fill
+                  className="object-cover blur-sm opacity-60"
+                  sizes="12vw"
+                  onError={() => setImageErrors((prev) => new Set(prev).add(prevIndex))}
+                />
+              ) : (
+                <div className="absolute inset-0 bg-gradient-to-br from-[#0A0A0A] via-[#1A1A1A] to-[#0A0A0A] opacity-60"></div>
+              )}
+              <div className="absolute inset-0 bg-black/60"></div>
+            </div>
+          </div>
+        )}
+
+        {/* BANDEAU DROITE - Petit aperçu de l'image suivante, coupé */}
+        {images.length > 1 && (
+          <div
+            className={`absolute -right-[8%] top-0 h-full w-[12%] z-[1] transition-transform duration-1000 ease-in-out overflow-hidden ${
               isTransitioning ? "translate-x-full" : "translate-x-0"
             }`}
           >
@@ -161,14 +161,14 @@ export function HeroBanner({ images, interval = 5000 }: HeroBannerProps) {
                   src={images[nextIndex].src}
                   alt={images[nextIndex].alt}
                   fill
-                  className="object-cover blur-md"
-                  sizes="15vw"
+                  className="object-cover blur-sm opacity-60"
+                  sizes="12vw"
                   onError={() => setImageErrors((prev) => new Set(prev).add(nextIndex))}
                 />
               ) : (
-                <div className="absolute inset-0 bg-gradient-to-br from-[#0A0A0A] via-[#1A1A1A] to-[#0A0A0A]"></div>
+                <div className="absolute inset-0 bg-gradient-to-br from-[#0A0A0A] via-[#1A1A1A] to-[#0A0A0A] opacity-60"></div>
               )}
-              <div className="absolute inset-0 bg-black/70"></div>
+              <div className="absolute inset-0 bg-black/60"></div>
             </div>
           </div>
         )}
