@@ -12,29 +12,40 @@ Cette fonctionnalité vérifie si les mots de passe des utilisateurs ont été c
 
 ## 📝 Comment Activer la Protection
 
+### ⚠️ IMPORTANT : Disponibilité selon le Plan
+
+**Cette fonctionnalité n'est disponible que sur le Pro Plan et au-dessus.**
+
+Si vous êtes sur le **plan gratuit (Free Plan)**, cette option ne sera pas visible dans votre interface. Vous devrez passer au plan Pro pour l'activer.
+
 ### Méthode 1 : Via le Dashboard Supabase (Recommandé)
 
-**Étape 1 : Accéder à Authentication**
-1. Connectez-vous à votre projet Supabase sur [supabase.com](https://supabase.com)
-2. Dans le menu de gauche, cliquez sur **Authentication** (icône de cadenas)
+**Emplacement exact :**
 
-**Étape 2 : Ouvrir les Paramètres**
-1. Une fois dans Authentication, cliquez sur l'onglet **Settings** (ou **Paramètres** en français)
-2. Vous verrez plusieurs sections de configuration
+1. **Connectez-vous à votre projet Supabase**
+   - Allez sur [supabase.com](https://supabase.com)
+   - Sélectionnez votre projet
 
-**Étape 3 : Activer la Protection**
-1. Faites défiler jusqu'à la section **"Password Protection"** ou **"Security"**
-2. Cherchez l'option **"Enable leaked password protection"** ou **"Check for leaked passwords"**
-3. Activez le toggle (bascule) à côté de cette option
-4. Cliquez sur **Save** (ou **Sauvegarder**) en bas de la page
+2. **Accédez aux paramètres Auth**
+   - Dans le menu de gauche, cliquez sur **Authentication**
+   - Cliquez sur l'onglet **Providers** (ou **Fournisseurs**)
+   - Cliquez sur **Email** dans la liste des providers
+   - OU allez directement à : `https://supabase.com/dashboard/project/[VOTRE_PROJECT_ID]/auth/providers?provider=Email`
 
-**Emplacement exact dans l'interface :**
-- **Authentication** → **Settings** → Section **"Password Protection"** ou **"Security"**
-- L'option peut aussi être dans la section **"Password Requirements"**
+3. **Trouvez l'option de protection**
+   - Dans la page de configuration Email, cherchez la section **"Password Security"** ou **"Password Requirements"**
+   - Vous devriez voir une option **"Enable leaked password protection"** ou **"Check for leaked passwords"**
+   - Activez le toggle à côté de cette option
+   - Sauvegardez les modifications
 
-**Si vous ne trouvez pas l'option :**
-- Vérifiez que vous êtes sur la bonne version de Supabase (certaines fonctionnalités peuvent varier selon la version)
-- L'option peut être dans **Project Settings** → **Auth** → **Password Protection**
+**Autres emplacements possibles :**
+- **Authentication** → **Settings** → Section **"Password"** ou **"Security"**
+- **Project Settings** → **Auth** → **Password Protection**
+
+**Si vous ne trouvez toujours pas l'option :**
+1. Vérifiez votre plan Supabase (doit être Pro ou supérieur)
+2. L'option peut être dans **Authentication** → **Policies** → **Password Policies**
+3. Essayez de chercher "leaked" ou "pwned" dans la barre de recherche du dashboard
 
 ### Méthode 2 : Via l'API Supabase (Avancé)
 
@@ -70,6 +81,17 @@ Après activation :
 - [Documentation Supabase - Password Protection](https://supabase.com/docs/guides/auth/password-protection)
 - [Have I Been Pwned](https://haveibeenpwned.com/) - Base de données des mots de passe compromis
 
-## ⚡ Note Importante
+## ⚡ Notes Importantes
 
-Cette fonctionnalité ne peut pas être activée via SQL. Elle doit être activée via le dashboard Supabase ou l'API de configuration du projet.
+1. **Cette fonctionnalité ne peut pas être activée via SQL.** Elle doit être activée via le dashboard Supabase ou l'API de configuration du projet.
+
+2. **Disponibilité selon le plan :** Cette fonctionnalité n'est disponible que sur le **Pro Plan et au-dessus**. Si vous êtes sur le plan gratuit, vous ne verrez pas cette option.
+
+3. **Alternative si vous êtes sur le plan gratuit :** Vous pouvez ignorer ce warning si vous êtes sur le plan gratuit, ou considérer passer au plan Pro pour bénéficier de cette protection supplémentaire.
+
+## 🔄 Vérifier votre Plan
+
+Pour vérifier votre plan actuel :
+1. Allez dans **Settings** → **Billing** (ou **Facturation**)
+2. Vérifiez votre plan actuel
+3. Si vous êtes sur Free Plan, vous devrez passer à Pro pour activer cette fonctionnalité
