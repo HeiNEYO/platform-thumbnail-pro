@@ -22,79 +22,155 @@ export function HeroBanner({ images, interval = 5000 }: HeroBannerProps) {
   const [imageErrors, setImageErrors] = useState<Set<number>>(new Set());
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const isTransitioningRef = useRef(false);
+  const imagesRef = useRef(images);
+  const intervalRef = useRef(interval);
+
+  // Mettre à jour les refs
+  useEffect(() => {
+    imagesRef.current = images;
+    intervalRef.current = interval;
+  }, [images, interval]);
+
+  // Fonction pour réinitialiser le timer
+  const resetTimer = useCallback(() => {
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+    }
+
+    const nextSlide = () => {
+      if (!isTransitioningRef.current) {
+        setIsTransitioning(true);
+        isTransitioningRef.current = true;
+        
+        setTimeout(() => {
+          setCurrentIndex((prev) => (prev + 1) % imagesRef.current.length);
+          setIsTransitioning(false);
+          isTransitioningRef.current = false;
+        }, 1000);
+      }
+    };
+
+    timerRef.current = setInterval(nextSlide, intervalRef.current);
+  }, []);
 
   // Fonction pour passer à la slide suivante
   const goToNext = useCallback(() => {
-    if (isTransitioningRef.current || images.length <= 1) return;
+    if (isTransitioningRef.current || imagesRef.current.length <= 1) return;
     
     setIsTransitioning(true);
     isTransitioningRef.current = true;
     
+    // Réinitialiser le timer
+    resetTimer();
+    
     setTimeout(() => {
-      setCurrentIndex((prev) => (prev + 1) % images.length);
+      setCurrentIndex((prev) => (prev + 1) % imagesRef.current.length);
       setIsTransitioning(false);
       isTransitioningRef.current = false;
-      
-      // Réinitialiser le timer après la transition
-      if (timerRef.current) {
-        clearInterval(timerRef.current);
-      }
-      timerRef.current = setInterval(goToNext, interval);
     }, 1000);
-  }, [images.length, interval]);
+  }, [resetTimer]);
 
   // Fonction pour passer à la slide précédente
   const goToPrevious = useCallback(() => {
-    if (isTransitioningRef.current || images.length <= 1) return;
+    if (isTransitioningRef.current || imagesRef.current.length <= 1) return;
     
     setIsTransitioning(true);
     isTransitioningRef.current = true;
     
+    // Réinitialiser le timer
+    resetTimer();
+    
     setTimeout(() => {
-      setCurrentIndex((prev) => (prev - 1 + images.length) % images.length);
+      setCurrentIndex((prev) => (prev - 1 + imagesRef.current.length) % imagesRef.current.length);
       setIsTransitioning(false);
       isTransitioningRef.current = false;
-      
-      // Réinitialiser le timer après la transition
-      if (timerRef.current) {
-        clearInterval(timerRef.current);
-      }
-      timerRef.current = setInterval(goToNext, interval);
     }, 1000);
-  }, [images.length, interval, goToNext]);
+  }, [resetTimer]);
 
   // Fonction pour aller à une slide spécifique
   const goToSlide = useCallback((index: number) => {
-    if (index === currentIndex || isTransitioningRef.current || images.length <= 1) return;
+    if (index === currentIndex || isTransitioningRef.current || imagesRef.current.length <= 1) return;
     
     setIsTransitioning(true);
     isTransitioningRef.current = true;
+    
+    // Réinitialiser le timer
+    resetTimer();
     
     setTimeout(() => {
       setCurrentIndex(index);
       setIsTransitioning(false);
       isTransitioningRef.current = false;
-      
-      // Réinitialiser le timer après la transition
-      if (timerRef.current) {
-        clearInterval(timerRef.current);
-      }
-      timerRef.current = setInterval(goToNext, interval);
     }, 1000);
-  }, [currentIndex, images.length, interval, goToNext]);
+  }, [currentIndex, resetTimer]);
 
-  // Initialiser le timer automatique
+  // Initialiser et gérer le timer automatique
   useEffect(() => {
     if (images.length <= 1) return;
 
-    timerRef.current = setInterval(goToNext, interval);
+    // Fonction pour passer à la suivante
+    const nextSlide = () => {
+      if (!isTransitioningRef.current) {
+        setIsTransitioning(true);
+        isTransitioningRef.current = true;
+        
+        setTimeout(() => {
+          setCurrentIndex((prev) => (prev + 1) % imagesRef.current.length);
+          setIsTransitioning(false);
+          isTransitioningRef.current = false;
+        }, 1000);
+      }
+    };
+
+    // Nettoyer le timer existant
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+    }
+
+    // Créer un nouveau timer
+    timerRef.current = setInterval(nextSlide, intervalRef.current);
 
     return () => {
       if (timerRef.current) {
         clearInterval(timerRef.current);
       }
     };
-  }, [images.length, interval, goToNext]);
+  }, [images.length, interval]);
+
+  // Réinitialiser le timer après chaque transition
+  useEffect(() => {
+    if (images.length <= 1 || isTransitioning) return;
+
+    // Nettoyer le timer existant
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+    }
+
+    // Créer un nouveau timer après la transition
+    const timeoutId = setTimeout(() => {
+      const nextSlide = () => {
+        if (!isTransitioningRef.current) {
+          setIsTransitioning(true);
+          isTransitioningRef.current = true;
+          
+          setTimeout(() => {
+            setCurrentIndex((prev) => (prev + 1) % imagesRef.current.length);
+            setIsTransitioning(false);
+            isTransitioningRef.current = false;
+          }, 1000);
+        }
+      };
+
+      timerRef.current = setInterval(nextSlide, intervalRef.current);
+    }, 1000); // Attendre la fin de la transition
+
+    return () => {
+      clearTimeout(timeoutId);
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+      }
+    };
+  }, [currentIndex, images.length, isTransitioning]);
 
   const getSlideIndex = (offset: number) => {
     return (currentIndex + offset + images.length) % images.length;
@@ -184,10 +260,10 @@ export function HeroBanner({ images, interval = 5000 }: HeroBannerProps) {
           </div>
         </div>
 
-        {/* BANDEAU SUIVANT - Image suivante qui arrive par la droite pendant la transition */}
+        {/* BANDEAU SUIVANT - Image suivante qui glisse depuis la droite */}
         {images.length > 1 && (
           <div
-            className={`absolute left-full top-0 h-full w-full z-[3] transition-transform duration-1000 ease-in-out ${
+            className={`absolute left-full top-0 h-full w-full z-[2] transition-transform duration-1000 ease-in-out ${
               isTransitioning ? "-translate-x-full" : "translate-x-0"
             }`}
           >
