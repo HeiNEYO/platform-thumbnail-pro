@@ -85,7 +85,7 @@ export function EpisodeGridCard({
       {/* SECTION 1 : LA MINIATURE */}
       <Link
         href={`/dashboard/modules/${moduleId}/episode/${episode.id}`}
-        className="group relative block aspect-video overflow-hidden hover:scale-[1.02] transition-transform duration-300"
+        className="relative block aspect-video overflow-hidden"
       >
         {/* Image de preview de la vidéo */}
         <div className="relative w-full h-full bg-gradient-to-br from-[#1D4ED8]/20 to-[#0a0a0a]">
@@ -101,27 +101,6 @@ export function EpisodeGridCard({
               <div className="text-white/30 text-sm">Miniature à ajouter</div>
             </div>
           )}
-
-          {/* Overlay PiP du formateur dans le coin inférieur droit */}
-          <div className="absolute bottom-2 right-2 w-[25%] aspect-video rounded-lg overflow-hidden border-2 border-white/20 shadow-xl">
-            {instructorAvatar ? (
-              <Image
-                src={instructorAvatar}
-                alt={instructorName}
-                fill
-                className="object-cover"
-              />
-            ) : (
-              <div className="w-full h-full bg-gradient-to-br from-[#1D4ED8]/30 to-[#0a0a0a] flex items-center justify-center">
-                <UserAvatar name={instructorName} size="sm" />
-              </div>
-            )}
-
-            {/* Badge de durée superposé sur la PiP */}
-            <div className="absolute bottom-1 right-1 bg-black/70 backdrop-blur-sm px-1.5 py-0.5 rounded text-white text-xs font-semibold">
-              {duration}
-            </div>
-          </div>
         </div>
       </Link>
 
@@ -135,26 +114,7 @@ export function EpisodeGridCard({
           {episode.title}
         </h3>
 
-      {/* SECTION 3 : INFORMATIONS VIDÉO (Stats) */}
-      <div className="flex justify-around">
-        {/* Colonne 1 : Durée */}
-        <div className="text-center">
-          <div className="text-xl font-bold text-white leading-tight mb-0.5">
-            {duration}
-          </div>
-          <div className="text-xs text-[#999999] font-normal">Durée</div>
-        </div>
-
-        {/* Colonne 2 : Progrès */}
-        <div className="text-center">
-          <div className="text-xl font-bold text-white leading-tight mb-0.5">
-            {completed ? "100%" : `${progressPercent}%`}
-          </div>
-          <div className="text-xs text-[#999999] font-normal">Progrès</div>
-        </div>
-      </div>
-
-        {/* SECTION 4 : CTA ET AVATAR */}
+        {/* SECTION 3 : CTA ET AVATAR */}
         <div className="flex items-center justify-between">
           {/* Bouton CTA */}
           <Link
