@@ -3,11 +3,12 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Check, ChevronRight, Heart, FileText, Loader2 } from "lucide-react";
+import { ChevronLeft, ChevronRight, Heart, ExternalLink, ArrowRight } from "lucide-react";
 import { markEpisodeComplete } from "@/lib/db/progress.client";
 import { upsertNote } from "@/lib/db/notes.client";
 import { addFavoriteEpisode, removeFavoriteByItem, isFavoriteEpisode } from "@/lib/db/favorites.client";
 import type { EpisodeRow } from "@/lib/supabase/database.types";
+import { UserAvatar } from "./ui/UserAvatar";
 
 interface EpisodeViewerProps {
   episode: EpisodeRow;
@@ -15,7 +16,15 @@ interface EpisodeViewerProps {
   completed: boolean;
   userId: string;
   nextEpisode: EpisodeRow | null;
+  previousEpisode: EpisodeRow | null;
   initialNoteContent?: string;
+  instructorName?: string;
+  instructorTitle?: string;
+  instructorAvatar?: string;
+  complementaryResource?: {
+    title: string;
+    url: string;
+  };
 }
 
 export function EpisodeViewer({
@@ -24,7 +33,12 @@ export function EpisodeViewer({
   completed,
   userId,
   nextEpisode,
+  previousEpisode,
   initialNoteContent = "",
+  instructorName = "Clément | Lemiento",
+  instructorTitle = "CEO 8lab & Ecom Brands",
+  instructorAvatar,
+  complementaryResource,
 }: EpisodeViewerProps) {
   const router = useRouter();
   const [noteContent, setNoteContent] = useState(initialNoteContent);
@@ -40,11 +54,6 @@ export function EpisodeViewer({
     isFavoriteEpisode(userId, episode.id).then(setIsFavorite);
   }, [userId, episode.id]);
 
-  const handleMarkComplete = async () => {
-    await markEpisodeComplete(userId, episode.id);
-    router.refresh();
-  };
-
   const handleSaveNote = async () => {
     setNoteSaving(true);
     await upsertNote(userId, episode.id, noteContent);
@@ -58,19 +67,15 @@ export function EpisodeViewer({
       if (isFavorite) {
         const { error } = await removeFavoriteByItem(userId, "episode", episode.id);
         if (error) {
-          alert("Impossible de retirer des favoris. Réessayez.");
           return;
         }
         setIsFavorite(false);
       } else {
         const { error } = await addFavoriteEpisode(userId, episode.id);
         if (error) {
-          // Doublon ou table absente : on considère comme déjà favori pour éviter état incohérent
           setIsFavorite(true);
         } else {
           setIsFavorite(true);
-          router.push("/dashboard/favorites");
-          return;
         }
       }
       router.refresh();
@@ -80,87 +85,160 @@ export function EpisodeViewer({
   };
 
   return (
-    <div className="rounded-lg border border-[#2a2a2a] bg-[#2a2a2a] overflow-hidden">
-      <div className="aspect-video bg-[#0f0f0f] flex items-center justify-center">
-        {episode.video_url ? (
-          <video
-            src={episode.video_url}
-            controls
-            className="w-full h-full object-contain"
-          />
-        ) : (
-          <div className="text-center text-gray-500 p-8">
-            <p className="text-lg font-medium text-white mb-2">{episode.title}</p>
-            <p className="text-sm">Contenu vidéo à intégrer (video_url)</p>
-            <p className="text-xs mt-4">Durée : {episode.duration ?? "—"}</p>
-          </div>
-        )}
-      </div>
-      <div className="p-6">
-        <h1 className="text-xl font-bold text-white">{episode.title}</h1>
-        <p className="text-gray-400 mt-1">Durée : {episode.duration ?? "—"}</p>
-        <div className="flex flex-wrap gap-3 mt-6">
-          <button
-            type="button"
-            onClick={handleMarkComplete}
-            disabled={completed}
-            className={`inline-flex items-center justify-center rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
-              completed
-                ? "bg-emerald-500/20 text-emerald-400 cursor-default"
-                : "bg-indigo-600 text-white hover:bg-indigo-500"
-            }`}
-          >
-            <Check className="h-4 w-4 mr-2" />
-            {completed ? "Terminé" : "Marquer comme terminé"}
-          </button>
-          <button
-            type="button"
-            onClick={handleToggleFavorite}
-            disabled={favoriteLoading}
-            className={`inline-flex items-center justify-center rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
-              isFavorite
-                ? "bg-primary/20 text-primary"
-                : "bg-[#3a3a3a] text-white hover:bg-[#4a4a4a]"
-            }`}
-          >
-            {favoriteLoading ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <Heart className={`h-4 w-4 mr-2 ${isFavorite ? "fill-current" : ""}`} />
-            )}
-            {isFavorite ? "Favori" : "Ajouter aux favoris"}
-          </button>
-          {nextEpisode && (
-            <Link
-              href={`/dashboard/modules/${moduleId}/episode/${nextEpisode.id}`}
-              className="inline-flex items-center justify-center rounded-lg bg-[#3a3a3a] px-4 py-2 text-sm font-medium text-white hover:bg-[#4a4a4a] transition-colors"
-            >
-              Épisode suivant
-              <ChevronRight className="h-4 w-4 ml-2" />
-            </Link>
+    <div className="flex flex-col lg:flex-row gap-6">
+      {/* Zone principale - Lecteur vidéo et contenu */}
+      <div className="flex-1 space-y-6">
+        {/* Lecteur vidéo principal avec picture-in-picture */}
+        <div className="relative aspect-video bg-[#0A0A0A] rounded-lg overflow-hidden border border-white/10">
+          {/* Vidéo principale */}
+          {episode.video_url ? (
+            <video
+              src={episode.video_url}
+              controls
+              className="w-full h-full object-contain"
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center">
+              <div className="text-center text-white/50">
+                <p className="text-lg font-medium mb-2">{episode.title}</p>
+                <p className="text-sm">Vidéo à intégrer</p>
+              </div>
+            </div>
           )}
+
+          {/* Picture-in-picture (vidéo instructeur) - En bas à droite */}
+          <div className="absolute bottom-4 right-4 w-48 h-32 rounded-lg overflow-hidden border-2 border-white/20 bg-[#0A0A0A]">
+            {/* Placeholder pour la vidéo picture-in-picture */}
+            <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#1A1A1A] to-[#0A0A0A]">
+              <div className="text-center text-white/40 text-xs">
+                <p>Instructeur</p>
+                <p className="text-[10px] mt-1">Video PiP</p>
+              </div>
+            </div>
+          </div>
         </div>
 
-        <div className="mt-6 pt-6 border-t border-[#2a2a2a]">
-          <div className="flex items-center gap-2 mb-2">
-            <FileText className="h-4 w-4 text-gray-400" />
-            <span className="text-sm font-medium text-white">Mes notes</span>
+        {/* Section informations sous la vidéo */}
+        <div className="space-y-6">
+          {/* Bouton favoris et titre */}
+          <div className="flex items-start justify-between gap-4">
+            <div className="flex-1">
+              <button
+                type="button"
+                onClick={handleToggleFavorite}
+                disabled={favoriteLoading}
+                className={`inline-flex items-center gap-2 mb-3 transition-colors ${
+                  isFavorite
+                    ? "text-[#5C6FFF]"
+                    : "text-white/60 hover:text-white"
+                }`}
+              >
+                <Heart className={`h-5 w-5 ${isFavorite ? "fill-current" : ""}`} />
+                <span className="text-sm font-normal">Favoris</span>
+              </button>
+              <h1 className="text-2xl md:text-3xl font-bold text-white">
+                {episode.title}
+              </h1>
+            </div>
           </div>
-          <textarea
-            value={noteContent}
-            onChange={(e) => setNoteContent(e.target.value)}
-            placeholder="Vos notes pour cet épisode..."
-            className="w-full rounded-lg border border-[#2a2a2a] bg-black px-4 py-3 text-sm text-white placeholder-gray-500 focus:border-indigo-500 focus:outline-none min-h-[100px]"
-          />
-          <button
-            type="button"
-            onClick={handleSaveNote}
-            disabled={noteSaving}
-            className="mt-2 inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-500 disabled:opacity-50"
-          >
-            {noteSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
-            Enregistrer les notes
-          </button>
+
+          {/* Ressources complémentaires */}
+          {complementaryResource && (
+            <div>
+              <h3 className="text-sm font-semibold text-white/70 mb-3">
+                Ressources complémentaires utilisées dans ce cours
+              </h3>
+              <a
+                href={complementaryResource.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 text-sm text-white/80 hover:text-white transition-colors"
+              >
+                <span>{complementaryResource.title}</span>
+                <ExternalLink className="h-4 w-4" />
+              </a>
+            </div>
+          )}
+
+          {/* Informations instructeur et navigation */}
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pt-4 border-t border-white/10">
+            {/* Informations instructeur */}
+            <div className="flex items-center gap-3">
+              <UserAvatar 
+                name={instructorName} 
+                photo={instructorAvatar} 
+                size="md" 
+              />
+              <div>
+                <p className="text-sm font-semibold text-white">{instructorName}</p>
+                <p className="text-xs text-white/60">{instructorTitle}</p>
+              </div>
+            </div>
+
+            {/* Navigation précédent/suivant */}
+            <div className="flex items-center gap-2 w-full sm:w-auto">
+              {previousEpisode && (
+                <Link
+                  href={`/dashboard/modules/${moduleId}/episode/${previousEpisode.id}`}
+                  className="flex items-center gap-2 px-4 py-2 rounded-lg border border-white/10 bg-[#0A0A0A] hover:bg-[#141414] transition-colors text-sm text-white flex-1 sm:flex-initial justify-center"
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                  <span>Précédent</span>
+                </Link>
+              )}
+              {nextEpisode && (
+                <Link
+                  href={`/dashboard/modules/${moduleId}/episode/${nextEpisode.id}`}
+                  className="flex items-center gap-2 px-4 py-2 rounded-lg bg-[#5C6FFF] hover:bg-[#4C5FEF] transition-colors text-sm text-white font-medium flex-1 sm:flex-initial justify-center"
+                >
+                  <span>Suivant</span>
+                  <ChevronRight className="h-4 w-4" />
+                </Link>
+              )}
+            </div>
+          </div>
+
+          {/* Section "Continuer le module" */}
+          <div className="pt-4 border-t border-white/10">
+            <h3 className="text-sm font-semibold text-white/70 mb-3">
+              Continuer le module
+            </h3>
+            <Link
+              href={`/dashboard/modules/${moduleId}`}
+              className="inline-flex items-center gap-2 text-sm text-white/80 hover:text-white transition-colors"
+            >
+              <span>Voir tous les épisodes</span>
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+          </div>
+        </div>
+      </div>
+
+      {/* Panneau de notes à droite */}
+      <div className="w-full lg:w-80 shrink-0">
+        <div className="sticky top-6 rounded-lg border border-white/10 bg-[#0A0A0A] overflow-hidden">
+          {/* En-tête du panneau */}
+          <div className="p-4 border-b border-white/10 flex items-center justify-between">
+            <h2 className="text-base font-semibold text-white">Notes</h2>
+            <button
+              type="button"
+              onClick={handleSaveNote}
+              disabled={noteSaving}
+              className="px-3 py-1.5 rounded-lg bg-[#5C6FFF] hover:bg-[#4C5FEF] text-white text-xs font-medium transition-colors disabled:opacity-50"
+            >
+              {noteSaving ? "Sauvegarde..." : "Sauvegarder"}
+            </button>
+          </div>
+
+          {/* Zone de texte */}
+          <div className="p-4">
+            <textarea
+              value={noteContent}
+              onChange={(e) => setNoteContent(e.target.value)}
+              placeholder="Commencez à écrire votre note ici..."
+              className="w-full h-[400px] rounded-lg border border-white/10 bg-[#141414] px-4 py-3 text-sm text-white placeholder-white/40 focus:border-[#5C6FFF] focus:outline-none resize-none"
+            />
+          </div>
         </div>
       </div>
     </div>
