@@ -85,19 +85,50 @@ export function EpisodeViewer({
   };
 
   return (
-    <div className="flex flex-col lg:flex-row gap-6">
+    <div className="flex flex-col lg:flex-row gap-0">
       {/* Zone principale - Lecteur vidéo et contenu */}
       <div className="flex-1 space-y-6">
-        {/* Lecteur vidéo principal */}
-        <div className="relative w-full h-[600px] md:h-[700px] lg:h-[800px] bg-[#0A0A0A] overflow-hidden">
-          {/* Vidéo Vimeo principale - remplit toute la zone */}
-          <iframe
-            src="https://player.vimeo.com/video/1104426446?autoplay=0&controls=1&title=0&byline=0&portrait=0"
-            className="w-full h-full"
-            allow="autoplay; fullscreen; picture-in-picture"
-            allowFullScreen
-            title="Instructeur"
-          />
+        {/* Conteneur unifié pour vidéo et notes */}
+        <div className="flex flex-col lg:flex-row border border-white/10 rounded-xl overflow-hidden bg-[#0A0A0A]">
+          {/* Lecteur vidéo principal */}
+          <div className="relative w-full lg:flex-1 h-[600px] md:h-[700px] lg:h-[800px] bg-[#0A0A0A] overflow-hidden border-r-0 lg:border-r border-white/10">
+            {/* Vidéo Vimeo principale - remplit toute la zone */}
+            <iframe
+              src="https://player.vimeo.com/video/1104426446?autoplay=0&controls=1&title=0&byline=0&portrait=0"
+              className="w-full h-full"
+              allow="autoplay; fullscreen; picture-in-picture"
+              allowFullScreen
+              title="Instructeur"
+            />
+          </div>
+
+          {/* Panneau de notes à droite */}
+          <div className="w-full lg:w-80 shrink-0 border-t lg:border-t-0 border-white/10">
+            <div className="h-full flex flex-col">
+              {/* En-tête du panneau */}
+              <div className="p-4 border-b border-white/10 flex items-center justify-between bg-[#0F0F0F]">
+                <h2 className="text-base font-semibold text-white">Notes</h2>
+                <button
+                  type="button"
+                  onClick={handleSaveNote}
+                  disabled={noteSaving}
+                  className="px-4 py-2 rounded-lg bg-[#5C6FFF] hover:bg-[#4C5FEF] hover:shadow-lg text-white text-xs font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {noteSaving ? "Sauvegarde..." : "Sauvegarder"}
+                </button>
+              </div>
+
+              {/* Zone de texte */}
+              <div className="p-4 flex-1">
+                <textarea
+                  value={noteContent}
+                  onChange={(e) => setNoteContent(e.target.value)}
+                  placeholder="Commencez à écrire votre note ici..."
+                  className="w-full h-full min-h-[400px] rounded-lg border border-white/10 bg-[#141414] px-4 py-3 text-sm text-white placeholder-white/30 focus:border-[#5C6FFF] focus:outline-none focus:ring-1 focus:ring-[#5C6FFF]/20 resize-none transition-all"
+                />
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Section informations sous la vidéo */}
@@ -192,34 +223,6 @@ export function EpisodeViewer({
               <span>Voir tous les épisodes</span>
               <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
             </Link>
-          </div>
-        </div>
-      </div>
-
-      {/* Panneau de notes à droite */}
-      <div className="w-full lg:w-80 shrink-0">
-        <div className="sticky top-6 rounded-xl border border-white/10 bg-[#0A0A0A] overflow-hidden shadow-xl">
-          {/* En-tête du panneau */}
-          <div className="p-4 border-b border-white/10 flex items-center justify-between bg-[#0F0F0F]">
-            <h2 className="text-base font-semibold text-white">Notes</h2>
-            <button
-              type="button"
-              onClick={handleSaveNote}
-              disabled={noteSaving}
-              className="px-4 py-2 rounded-lg bg-[#5C6FFF] hover:bg-[#4C5FEF] hover:shadow-lg text-white text-xs font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {noteSaving ? "Sauvegarde..." : "Sauvegarder"}
-            </button>
-          </div>
-
-          {/* Zone de texte */}
-          <div className="p-4">
-            <textarea
-              value={noteContent}
-              onChange={(e) => setNoteContent(e.target.value)}
-              placeholder="Commencez à écrire votre note ici..."
-              className="w-full h-[400px] rounded-lg border border-white/10 bg-[#141414] px-4 py-3 text-sm text-white placeholder-white/30 focus:border-[#5C6FFF] focus:outline-none focus:ring-1 focus:ring-[#5C6FFF]/20 resize-none transition-all"
-            />
           </div>
         </div>
       </div>
