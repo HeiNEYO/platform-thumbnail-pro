@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { BookOpen, Play, FileText, ArrowRight } from "lucide-react";
+import { BookOpen, Play, FileText } from "lucide-react";
 
 interface FormationCardProps {
   type: "formation" | "plateforme" | "communaute";
@@ -53,8 +53,8 @@ export function FormationCard({
       href={ctaHref}
       className="group block bg-[#0A0A0A] border border-white/10 rounded-[16px] overflow-hidden transition-all duration-300 hover:transform hover:-translate-y-2 hover:border-white/20"
     >
-      {/* Zone visuelle en haut - Image en plein écran */}
-      <div className="relative h-[280px] md:h-[320px] overflow-hidden">
+      {/* Zone visuelle en haut - Image en plein écran avec ratio adaptatif */}
+      <div className="relative w-full aspect-video overflow-hidden">
         <Image
           src={config.imagePath}
           alt={title}
@@ -125,14 +125,13 @@ export function FormationCard({
 
         {/* Bouton CTA */}
         <div
-          className={`w-full py-3 px-4 rounded-xl font-semibold text-xs md:text-sm text-center transition-all duration-300 flex items-center justify-center gap-2 ${
+          className={`w-full py-2 px-4 rounded-xl font-semibold text-xs md:text-sm text-center transition-all duration-300 flex items-center justify-center ${
             ctaStyle === "blue"
               ? "bg-gradient-to-r from-[#5C6FFF] to-[#4C5FEF] text-white group-hover:from-[#4C5FEF] group-hover:to-[#3C4FDF] group-hover:shadow-[0_8px_20px_rgba(92,111,255,0.4)]"
               : "bg-white text-[#0A0A0A] group-hover:bg-gray-50 group-hover:shadow-lg"
           } group-hover:transform group-hover:translate-y-[-2px]`}
         >
           <span>{ctaText}</span>
-          <ArrowRight className="h-3.5 w-3.5" />
         </div>
       </div>
     </Link>

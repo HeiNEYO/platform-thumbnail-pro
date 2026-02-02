@@ -1,8 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
-import { ArrowRight } from "lucide-react";
 
 export function DiscordBanner() {
   return (
@@ -34,10 +32,9 @@ export function DiscordBanner() {
       {/* Bouton à droite */}
       <Link
         href="/dashboard/discord"
-        className="bg-white text-[#0A0A0A] px-6 py-3 rounded-full font-semibold text-sm md:text-base flex items-center gap-2 hover:bg-gray-50 transition-colors shrink-0"
+        className="bg-white text-[#0A0A0A] px-6 py-2 rounded-full font-semibold text-sm md:text-base flex items-center hover:bg-gray-50 transition-colors shrink-0"
       >
         <span>Rejoindre Discord</span>
-        <ArrowRight className="h-4 w-4" />
       </Link>
     </div>
   );

@@ -160,10 +160,9 @@ export default async function DashboardHomePage() {
         <div className="flex justify-center mt-6">
           <Link
             href="/dashboard/modules"
-            className="bg-white text-[#0A0A0A] px-8 py-4 rounded-xl font-semibold text-sm md:text-base flex items-center gap-2 hover:bg-gray-50 transition-all duration-300 hover:shadow-lg hover:transform hover:-translate-y-1"
+            className="bg-white text-[#0A0A0A] px-8 py-2 rounded-xl font-semibold text-sm md:text-base flex items-center hover:bg-gray-50 transition-all duration-300 hover:shadow-lg hover:transform hover:-translate-y-1"
           >
             <span>Explorer la formation</span>
-            <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
       </section>
