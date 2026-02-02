@@ -146,18 +146,18 @@ export async function getModulesWithStats(userId: string): Promise<Array<ModuleR
     // Combiner les données
     const result: Array<ModuleRow & { episodeCount: number; completedCount: number }> = [];
     
-    for (const module of modules) {
+    for (const mod of modules) {
       result.push({
-        id: module.id,
-        title: module.title,
-        description: module.description,
-        order_index: module.order_index,
-        duration_estimate: module.duration_estimate,
-        image_url: module.image_url,
-        created_at: module.created_at,
-        updated_at: module.updated_at,
-        episodeCount: episodeCountByModule.get(module.id) || 0,
-        completedCount: completedCountByModule.get(module.id) || 0,
+        id: mod.id,
+        title: mod.title,
+        description: mod.description,
+        order_index: mod.order_index,
+        duration_estimate: mod.duration_estimate,
+        image_url: mod.image_url,
+        created_at: mod.created_at,
+        updated_at: mod.updated_at,
+        episodeCount: episodeCountByModule.get(mod.id) || 0,
+        completedCount: completedCountByModule.get(mod.id) || 0,
       });
     }
     
