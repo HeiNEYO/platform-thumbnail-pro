@@ -125,10 +125,10 @@ export function FormationCard({
 
         {/* Bouton CTA */}
         <div
-          className={`w-full py-2 px-4 rounded-xl font-semibold text-xs md:text-sm text-center transition-all duration-300 flex items-center justify-center ${
+          className={`w-full py-2 px-4 rounded-xl font-semibold text-xs md:text-sm text-center transition-all duration-300 flex items-center justify-center hover:brightness-75 hover:scale-[0.98] ${
             ctaStyle === "blue"
-              ? "bg-gradient-to-r from-[#5C6FFF] to-[#4C5FEF] text-white group-hover:brightness-75"
-              : "bg-white text-[#0A0A0A] group-hover:brightness-75"
+              ? "bg-gradient-to-r from-[#5C6FFF] to-[#4C5FEF] text-white"
+              : "bg-white text-[#0A0A0A]"
           }`}
         >
           <span>{ctaText}</span>
