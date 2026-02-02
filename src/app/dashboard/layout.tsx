@@ -162,17 +162,30 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
                     {section.label}
                   </div>
                   <div className="space-y-1">
-                    {section.items.map((item) => (
-                      <Link
-                        key={item.href}
-                        href={item.href}
-                        className="flex items-center gap-3 rounded-md px-3 py-2 text-sm text-white/70 transition-colors hover:bg-white/5 hover:text-white"
-                        onClick={() => setMobileMenuOpen(false)}
-                      >
-                        {item.icon ? <item.icon className="h-4 w-4" /> : item.customIcon ? <item.customIcon className="h-4 w-4" /> : null}
-                        {item.label}
-                      </Link>
-                    ))}
+                    {section.items.map((item) => {
+                      const active =
+                        pathname === item.href ||
+                        (item.href !== "/dashboard" && pathname.startsWith(item.href));
+                      return (
+                        <Link
+                          key={item.href}
+                          href={item.href}
+                          className={`flex items-center gap-3 rounded-md py-2 text-sm transition-all duration-200 ${
+                            active
+                              ? "text-white font-medium bg-[#2563EB]/15 border-l-4 border-[#2563EB] pl-[9px] pr-3"
+                              : "text-white/70 hover:bg-white/5 hover:text-white px-3"
+                          }`}
+                          onClick={() => setMobileMenuOpen(false)}
+                        >
+                          {item.icon ? (
+                            <item.icon className={`h-4 w-4 ${active ? "text-[#3B82F6]" : ""}`} />
+                          ) : item.customIcon ? (
+                            <item.customIcon className={`h-4 w-4 ${active ? "text-[#3B82F6]" : ""}`} />
+                          ) : null}
+                          {item.label}
+                        </Link>
+                      );
+                    })}
                   </div>
                 </div>
               ))}
@@ -228,18 +241,18 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
                         <Link
                           key={item.href}
                           href={item.href}
-                          className={`flex items-center gap-3 px-3 py-2 text-sm transition-all duration-150 rounded-md ${
+                          className={`relative flex items-center gap-3 py-2 text-sm transition-all duration-200 rounded-md ${
                             active
-                              ? "text-white font-medium bg-[#141414]"
-                              : "text-white/60 hover:text-white/90 hover:bg-[#141414]/50"
+                              ? "text-white font-medium bg-[#2563EB]/15 border-l-4 border-[#2563EB] pl-[9px] pr-3"
+                              : "text-white/60 hover:text-white/90 hover:bg-[#141414]/50 px-3"
                           }`}
                         >
                           {item.customIcon ? (
-                            <item.customIcon className="h-4 w-4 shrink-0" />
+                            <item.customIcon className={`h-4 w-4 shrink-0 ${active ? "text-[#3B82F6]" : ""}`} />
                           ) : item.icon ? (
-                            <item.icon className="h-4 w-4 shrink-0" />
+                            <item.icon className={`h-4 w-4 shrink-0 ${active ? "text-[#3B82F6]" : ""}`} />
                           ) : null}
-                          <span>{item.label}</span>
+                          <span className={active ? "text-white" : ""}>{item.label}</span>
                         </Link>
                       );
                     })}
