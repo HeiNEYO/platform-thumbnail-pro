@@ -91,7 +91,7 @@ export function EpisodeViewer({
         {/* Conteneur unifié pour vidéo et notes */}
         <div className="flex flex-col lg:flex-row border border-white/10 rounded-xl overflow-hidden bg-[#0A0A0A]">
           {/* Lecteur vidéo principal */}
-          <div className="relative w-full lg:flex-1 h-[600px] md:h-[700px] lg:h-[800px] bg-[#0A0A0A] overflow-hidden border-r-0 lg:border-r border-white/10">
+          <div className="relative w-full lg:flex-1 aspect-video bg-[#0A0A0A] overflow-hidden border-r-0 lg:border-r border-white/10">
             {/* Vidéo Vimeo principale - remplit toute la zone */}
             <iframe
               src="https://player.vimeo.com/video/1104426446?autoplay=0&controls=1&title=0&byline=0&portrait=0"
