@@ -154,14 +154,14 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
                 <X className="h-5 w-5" />
               </button>
             </div>
-            <nav className="flex flex-1 flex-col space-y-2">
+            <nav className="flex flex-1 flex-col space-y-3">
               {navSections.map((section) => (
-                <div key={`mobile-${section.id}`} className="space-y-1.5">
+                <div key={`mobile-${section.id}`} className="space-y-2">
                   <div className="flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-white/50">
                     <section.icon className="h-4 w-4 text-white/50" />
                     {section.label}
                   </div>
-                  <div>
+                  <div className="space-y-0.5">
                     {section.items.map((item) => {
                       const active =
                         pathname === item.href ||
@@ -171,7 +171,7 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
                           key={item.href}
                           href={item.href}
                           prefetch={true}
-                          className={`flex items-center gap-3 rounded-md py-1 text-sm font-normal ${
+                          className={`flex items-center gap-3 rounded-md py-1.5 text-sm font-normal ${
                             active
                               ? "text-white bg-[#2563EB]/15 border-l-4 border-[#2563EB] pl-[9px] pr-3"
                               : "text-white/70 hover:bg-white/5 hover:text-white px-3 transition-colors"
@@ -221,11 +221,11 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
           {/* Navigation principale - Toutes les sections */}
           <nav className="flex-1 p-3">
             {/* Sections toujours ouvertes */}
-            <div className="space-y-2">
+            <div className="space-y-3">
               {navSections.map((section) => (
-                <div key={section.id} className="mb-1.5">
+                <div key={section.id} className="mb-2">
                   {/* En-tête de section */}
-                  <div className="flex items-center gap-3 px-3 py-1.5 mb-0.5">
+                  <div className="flex items-center gap-3 px-3 py-2 mb-1">
                     <section.icon className="h-5 w-5 shrink-0 text-white/60" />
                     <span className="text-sm font-semibold text-white/70 uppercase tracking-wider">
                       {section.label}
@@ -233,7 +233,7 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
                   </div>
                   
                   {/* Items de la section */}
-                  <div className="ml-4 pl-7 border-l border-sidebar-border">
+                  <div className="ml-4 pl-7 border-l border-sidebar-border space-y-0.5">
                     {section.items.map((item) => {
                       const active =
                         pathname === item.href ||
@@ -243,7 +243,7 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
                           key={item.href}
                           href={item.href}
                           prefetch={true}
-                          className={`relative flex items-center gap-3 py-1 text-sm rounded-md font-normal ${
+                          className={`relative flex items-center gap-3 py-1.5 text-sm rounded-md font-normal ${
                             active
                               ? "text-white bg-[#2563EB]/15 border-l-4 border-[#2563EB] pl-[9px] pr-3"
                               : "text-white/60 hover:text-white/90 hover:bg-[#141414]/50 px-3 transition-colors"
