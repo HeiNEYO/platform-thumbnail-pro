@@ -6,13 +6,6 @@ import { FormationCard } from "@/components/ui/FormationCard";
 // Force le rendu dynamique car on utilise cookies() pour l'authentification
 export const dynamic = 'force-dynamic';
 
-function getLevel(progress: number): string {
-  if (progress <= 25) return "Débutant";
-  if (progress <= 50) return "Intermédiaire";
-  if (progress <= 75) return "Avancé";
-  return "Expert";
-}
-
 export default async function DashboardHomePage() {
   // Mode dev : bypasser Supabase
   const isDevMode = process.env.NEXT_PUBLIC_DEV_MODE === 'true' || process.env.NEXT_PUBLIC_DEMO_MODE === 'true';
@@ -44,37 +37,6 @@ export default async function DashboardHomePage() {
   if (!authUser) {
     redirect("/login");
   }
-
-  type ProfileRow = { full_name: string | null; role: string };
-  let profile: ProfileRow | null = null;
-  let modules: Awaited<ReturnType<typeof getModules>> = [];
-  let progressPercent = 0;
-  let completedEpisodes = 0;
-  let totalEpisodes = 0;
-
-  try {
-    const [{ data: profileData }, modulesList, percent] = await Promise.all([
-      supabase.from("users").select("full_name, role").eq("id", authUser.id).single(),
-      getModules(),
-      getGlobalProgress(authUser.id),
-    ]);
-    profile = profileData as ProfileRow | null;
-    modules = modulesList;
-    progressPercent = percent;
-
-    const [{ count: completedCount }, { count: totalCount }] = await Promise.all([
-      supabase.from("progress").select("episode_id", { count: "exact", head: true }).eq("user_id", authUser.id),
-      supabase.from("episodes").select("*", { count: "exact", head: true }),
-    ]);
-    completedEpisodes = completedCount ?? 0;
-    totalEpisodes = totalCount ?? 0;
-  } catch {
-    // Tables manquantes ou erreur : afficher un dashboard minimal
-  }
-
-  const displayName =
-    profile?.full_name ?? authUser.email ?? "Membre";
-  const level = getLevel(progressPercent);
 
   // Images du carrousel (placeholder - à remplacer par les vraies images)
   const carouselImages = [
