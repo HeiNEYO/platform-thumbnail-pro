@@ -189,11 +189,11 @@ export function HeroBanner({ images, interval = 5000 }: HeroBannerProps) {
 
       {/* Barres de progression (timer) - Positionnées à droite */}
       {images.length > 1 && (
-        <div className="absolute bottom-6 right-6 z-40 flex flex-col gap-1.5">
+        <div className="absolute bottom-6 right-6 z-40 flex flex-col gap-1.5 items-end">
           {images.map((_, index) => (
             <div
               key={index}
-              className="relative w-20 h-0.5 bg-white/20 rounded-full overflow-hidden"
+              className="relative w-8 h-0.5 bg-white/20 rounded-full overflow-hidden"
             >
               {index === currentIndex ? (
                 <div
