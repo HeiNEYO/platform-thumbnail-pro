@@ -134,7 +134,7 @@ export default async function DashboardHomePage() {
           {/* Carte 3 : Ateliers */}
           <FormationCard
             type="ateliers"
-            title="Ateliers"
+            title="Ateliers interactifs"
             description="Participez à des ateliers interactifs pour apprendre à utiliser les outils de VKStudio."
             ctaText="Obtenir les clefs du succès →"
             ctaHref="/dashboard/modules"
