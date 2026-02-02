@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { BookOpen, Play, FileText, ArrowRight } from "lucide-react";
 
 interface FormationCardProps {
@@ -24,14 +25,17 @@ const cardConfig = {
   formation: {
     icon: BookOpen,
     imageTitle: "FORMATION",
+    imagePath: "/images/formations/polaris.png",
   },
   plateforme: {
     icon: Play,
     imageTitle: "PLATEFORME",
+    imagePath: "/images/formations/cours-videos.png",
   },
   communaute: {
     icon: FileText,
     imageTitle: "COMMUNAUTÉ",
+    imagePath: "/images/formations/ateliers.png",
   },
 };
 
@@ -186,6 +190,17 @@ export function FormationCard({
           <h3 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white/60 drop-shadow-2xl">
             {config.imageTitle}
           </h3>
+        </div>
+        
+        {/* Image en haut à droite - 6% de la taille */}
+        <div className="absolute top-4 right-4 z-10 w-[6%] aspect-square">
+          <Image
+            src={config.imagePath}
+            alt={config.imageTitle}
+            fill
+            className="object-contain opacity-80"
+            sizes="6vw"
+          />
         </div>
         
         {/* Écran d'ordinateur au centre */}
