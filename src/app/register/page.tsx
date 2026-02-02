@@ -1,16 +1,21 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { Mail, Lock, User } from "lucide-react";
+import { Mail, Lock, User, Eye, EyeOff } from "lucide-react";
+import { AuthFormWrapper } from "@/components/auth/AuthFormWrapper";
+import { AuthIllustration } from "@/components/auth/AuthIllustration";
+import { AuthInput } from "@/components/auth/AuthInput";
+import { AuthButton } from "@/components/auth/AuthButton";
 
 export default function RegisterPage() {
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const router = useRouter();
@@ -75,106 +80,105 @@ export default function RegisterPage() {
   };
 
   return (
-    <main className="min-h-screen flex items-center justify-center p-6 bg-black relative">
-      <div className="w-full max-w-md z-10 animate-fade-in">
-        <div className="rounded-2xl border border-card-border bg-card p-10 shadow-2xl">
-          {/* Header */}
-          <div className="text-center mb-8">
-            <h1 className="text-[19.6px] font-bold text-white mb-2">Créer un compte</h1>
-            <p className="text-[12.74px] text-white/70">
-              Vous avez déjà un compte ?{" "}
-              <Link href="/login" className="text-primary font-semibold hover:opacity-80 transition-opacity">
-                Se connecter
-              </Link>
-            </p>
+    <main className="min-h-screen flex flex-col lg:flex-row bg-[#0A0A0A]">
+      {/* Colonne gauche - Formulaire */}
+      <AuthFormWrapper
+        title="Holla, Bienvenue"
+        subtitle="Créez votre compte et rejoignez-nous"
+        switchText="Déjà un compte ?"
+        switchLink="/login"
+        switchLinkText="Connectez-vous"
+      >
+        <form onSubmit={handleSubmit}>
+          {error && (
+            <div className="rounded-lg border border-red-500/30 bg-red-500/10 text-red-200 text-sm px-4 py-3 mb-6">
+              <p className="font-medium">{error}</p>
+            </div>
+          )}
+
+          {/* Full Name Input */}
+          <AuthInput
+            id="fullName"
+            type="text"
+            value={fullName}
+            onChange={(e) => setFullName(e.target.value)}
+            placeholder="Nom complet"
+            icon={<User className="h-5 w-5" />}
+            autoComplete="name"
+            required
+          />
+
+          {/* Email Input */}
+          <AuthInput
+            id="email"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="votre@email.com"
+            icon={<Mail className="h-5 w-5" />}
+            autoComplete="email"
+            required
+          />
+
+          {/* Password Input */}
+          <div className="relative mb-6">
+            <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-[#999999] z-10">
+              <Lock className="h-5 w-5" />
+            </div>
+            <input
+              id="password"
+              type={showPassword ? "text" : "password"}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="••••••••••••"
+              autoComplete="new-password"
+              required
+              className="w-full pl-12 pr-12 py-4 rounded-lg border border-[#2A2A2A] bg-[#1A1A1A] text-white placeholder-[#999999] focus:border-[#3B82F6] focus:outline-none focus:ring-2 focus:ring-[#3B82F6]/20 transition-all duration-300 text-base"
+              suppressHydrationWarning
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-4 top-1/2 transform -translate-y-1/2 text-[#999999] hover:text-white transition-colors"
+            >
+              {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+            </button>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-5">
-            {error && (
-              <div className="rounded-lg border border-error/30 bg-error/10 text-red-200 text-[12.74px] px-4 py-3 animate-fade-in">
-                <p className="font-medium">{error}</p>
-              </div>
-            )}
-
-            {/* Full Name Input */}
-            <div>
-              <div className="relative">
-                <User className="absolute left-4 top-1/2 transform -translate-y-1/2 h-[19.6px] w-[19.6px] text-white/50" />
-                <input
-                  id="fullName"
-                  type="text"
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
-                  className="w-full pl-12 pr-4 py-3.5 rounded-xl border border-card-border bg-black text-white placeholder-white/50 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all duration-200 text-[13.72px]"
-                  placeholder="Nom complet"
-                  autoComplete="name"
-                  suppressHydrationWarning
-                />
-              </div>
+          {/* Confirm Password Input */}
+          <div className="relative mb-8">
+            <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-[#999999] z-10">
+              <Lock className="h-5 w-5" />
             </div>
-
-            {/* Email Input */}
-            <div>
-              <div className="relative">
-                <Mail className="absolute left-4 top-1/2 transform -translate-y-1/2 h-[19.6px] w-[19.6px] text-white/50" />
-                <input
-                  id="email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full pl-12 pr-4 py-3.5 rounded-xl border border-card-border bg-black text-white placeholder-white/50 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all duration-200 text-[13.72px]"
-                  placeholder="Adresse email"
-                  autoComplete="email"
-                  suppressHydrationWarning
-                />
-              </div>
-            </div>
-
-            {/* Password Input */}
-            <div>
-              <div className="relative">
-                <Lock className="absolute left-4 top-1/2 transform -translate-y-1/2 h-[19.6px] w-[19.6px] text-white/50" />
-                <input
-                  id="password"
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="w-full pl-12 pr-4 py-3.5 rounded-xl border border-card-border bg-black text-white placeholder-white/50 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all duration-200 text-[13.72px]"
-                  placeholder="Mot de passe"
-                  autoComplete="new-password"
-                  suppressHydrationWarning
-                />
-              </div>
-            </div>
-
-            {/* Confirm Password Input */}
-            <div>
-              <div className="relative">
-                <Lock className="absolute left-4 top-1/2 transform -translate-y-1/2 h-[19.6px] w-[19.6px] text-white/50" />
-                <input
-                  id="confirmPassword"
-                  type="password"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="w-full pl-12 pr-4 py-3.5 rounded-xl border border-card-border bg-black text-white placeholder-white/50 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all duration-200 text-[13.72px]"
-                  placeholder="Confirmer le mot de passe"
-                  autoComplete="new-password"
-                  suppressHydrationWarning
-                />
-              </div>
-            </div>
-
-            {/* Sign Up Button */}
+            <input
+              id="confirmPassword"
+              type={showConfirmPassword ? "text" : "password"}
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              placeholder="Confirmer le mot de passe"
+              autoComplete="new-password"
+              required
+              className="w-full pl-12 pr-12 py-4 rounded-lg border border-[#2A2A2A] bg-[#1A1A1A] text-white placeholder-[#999999] focus:border-[#3B82F6] focus:outline-none focus:ring-2 focus:ring-[#3B82F6]/20 transition-all duration-300 text-base"
+              suppressHydrationWarning
+            />
             <button
-              type="submit"
-              disabled={submitting}
-              className="w-full rounded-xl bg-primary hover:bg-primary-hover disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold py-3.5 transition-all duration-200 text-[13.72px]"
+              type="button"
+              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+              className="absolute right-4 top-1/2 transform -translate-y-1/2 text-[#999999] hover:text-white transition-colors"
             >
-              {submitting ? "Création..." : "S\u2019inscrire"}
+              {showConfirmPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
             </button>
-          </form>
-        </div>
-      </div>
+          </div>
+
+          {/* Sign Up Button */}
+          <AuthButton type="submit" disabled={submitting}>
+            {submitting ? "Création..." : "S'inscrire"}
+          </AuthButton>
+        </form>
+      </AuthFormWrapper>
+
+      {/* Colonne droite - Illustration */}
+      <AuthIllustration />
     </main>
   );
 }
