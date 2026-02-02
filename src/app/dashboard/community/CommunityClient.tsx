@@ -182,6 +182,7 @@ export function CommunityClient({ initialMembers }: { initialMembers: CommunityM
     if (initialMembers.length === 0 && currentUser) {
       loadMembers();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentUser?.id, initialMembers.length]); // Dépendances minimales pour éviter les re-renders
 
   if (loading) {

@@ -99,6 +99,7 @@ export default async function ModulesPage() {
               {/* Image de fond - 80% */}
               <div className="absolute inset-0 w-full h-[80%]">
                 {mainModule.image_url ? (
+                  // eslint-disable-next-line @next/next/no-img-element
                   <img
                     src={mainModule.image_url}
                     alt="Thumbnail Pro"

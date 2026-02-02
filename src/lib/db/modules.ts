@@ -94,7 +94,7 @@ export async function getModulesWithStats(userId: string): Promise<Array<ModuleR
     }
 
     // 2. Récupérer tous les épisodes avec leur module_id en une seule requête
-    const { data: episodes, error: episodesError } = await supabase
+    const { data: episodesData, error: episodesError } = await supabase
       .from("episodes")
       .select("id, module_id")
       .order("order_index", { ascending: true });
@@ -103,8 +103,10 @@ export async function getModulesWithStats(userId: string): Promise<Array<ModuleR
       console.error("Erreur lors de la récupération des épisodes:", episodesError);
     }
 
+    const episodes = (episodesData || []) as Array<{ id: string; module_id: string }>;
+
     // 3. Récupérer toutes les progressions de l'utilisateur en une seule requête
-    const episodeIds = episodes?.map(e => e.id) || [];
+    const episodeIds = episodes.map(e => e.id);
     const { data: progressData, error: progressError } = episodeIds.length > 0
       ? await supabase
           .from("progress")
@@ -118,13 +120,14 @@ export async function getModulesWithStats(userId: string): Promise<Array<ModuleR
     }
 
     // Créer un Set pour une recherche rapide O(1)
-    const completedEpisodeIds = new Set((progressData || []).map(p => p.episode_id));
+    const progressArray = (progressData || []) as Array<{ episode_id: string }>;
+    const completedEpisodeIds = new Set(progressArray.map(p => p.episode_id));
 
     // Compter les épisodes et complétions par module
     const episodeCountByModule = new Map<string, number>();
     const completedCountByModule = new Map<string, number>();
 
-    episodes?.forEach(episode => {
+    episodes.forEach(episode => {
       const moduleId = episode.module_id;
       episodeCountByModule.set(moduleId, (episodeCountByModule.get(moduleId) || 0) + 1);
       if (completedEpisodeIds.has(episode.id)) {

@@ -39,19 +39,20 @@ export function NetflixStyleModuleCards({
             className="group/module bg-[#141414] rounded-lg overflow-hidden border border-white/10 hover:border-primary/50 transition-all duration-300 hover:scale-[1.02]"
           >
             {/* Image du module */}
-            <div className="relative h-[200px] bg-gradient-to-br from-primary/20 to-[#0a0a0a] flex items-center justify-center">
-              {module.image_url ? (
-                <img
-                  src={module.image_url}
-                  alt={module.title}
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <Play className="h-16 w-16 text-white/30 group-hover/module:text-primary transition-colors" />
-              )}
-              {/* Overlay au survol */}
-              <div className="absolute inset-0 bg-black/0 group-hover/module:bg-black/30 transition-colors" />
-            </div>
+                    <div className="relative h-[200px] bg-gradient-to-br from-primary/20 to-[#0a0a0a] flex items-center justify-center">
+                      {module.image_url ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={module.image_url}
+                          alt={module.title}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <Play className="h-16 w-16 text-white/30 group-hover/module:text-primary transition-colors" />
+                      )}
+                      {/* Overlay au survol */}
+                      <div className="absolute inset-0 bg-black/0 group-hover/module:bg-black/30 transition-colors" />
+                    </div>
 
             {/* Contenu de la carte */}
             <div className="p-5">
