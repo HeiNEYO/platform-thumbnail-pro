@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { HeroCarousel } from "@/components/ui/HeroCarousel";
+import { HeroBanner } from "@/components/ui/HeroBanner";
 import { FormationCard } from "@/components/ui/FormationCard";
 
 // Force le rendu dynamique car on utilise cookies() pour l'authentification
@@ -38,63 +38,52 @@ export default async function DashboardHomePage() {
     redirect("/login");
   }
 
-  // Images du carrousel (placeholder - à remplacer par les vraies images)
-  const carouselImages = [
+  // Récupérer le nom de l'utilisateur
+  const { data: profileData } = await supabase
+    .from("users")
+    .select("full_name")
+    .eq("id", authUser.id)
+    .single();
+
+  const displayName = profileData?.full_name || authUser.email?.split("@")[0] || "Membre";
+
+  // Images du bandeau avec titres et sous-titres
+  const bannerImages = [
     {
       src: "/images/carousel/polaris.jpg",
       alt: "Polaris - Système solaire",
-      title: "Polaris",
+      title: "DÉCOUVREZ LE 8LAB ECOSYSTEM : THE INFINITE",
+      subtitle: "Le début d'une nouvelle ère pour le e-commerce francophone.",
     },
     {
       src: "/images/carousel/cours-videos.jpg",
       alt: "Interface de cours vidéos",
-      title: "Cours vidéos",
+      title: "COURS VIDÉOS PREMIUM",
+      subtitle: "Maîtrisez les outils de VKStudio à travers des formations complètes.",
     },
     {
       src: "/images/carousel/ateliers.jpg",
       alt: "Interface d'atelier",
-      title: "Ateliers",
+      title: "ATELIERS INTERACTIFS",
+      subtitle: "Participez à des sessions pratiques et développez vos compétences.",
     },
   ];
 
   return (
-    <div className="space-y-16 animate-fade-in">
-      {/* SECTION 1 : HERO / BANNIÈRE PRINCIPALE */}
-      <section className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
-        {/* BLOC GAUCHE - Texte de bienvenue */}
-        <div className="relative min-h-[500px] lg:min-h-[600px] rounded-[20px] p-12 md:p-16 lg:p-20 bg-gradient-to-br from-[#0A0A0A] via-[#111111] to-[#0A0A0A] border border-[#2A2A2A] overflow-hidden">
-          {/* Effet glow bleu en arrière-plan */}
-          <div className="absolute inset-0 bg-gradient-to-br from-[#3B82F6]/10 via-transparent to-transparent pointer-events-none" />
-          <div className="absolute top-0 right-0 w-96 h-96 bg-[#3B82F6]/5 rounded-full blur-3xl pointer-events-none" />
+    <div className="space-y-12 animate-fade-in">
+      {/* Message de bienvenue */}
+      <div>
+        <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">
+          Bonjour {displayName}
+        </h1>
+        <p className="text-base md:text-lg text-[#999999]">
+          Bienvenue dans le laboratoire. Chaque connexion vous rapproche du prochain palier. Let's grind.
+        </p>
+      </div>
 
-          <div className="relative z-10">
-            {/* Badge/Tag */}
-            <div className="inline-flex items-center px-3 py-1.5 mb-6 rounded-full border border-white/30 bg-transparent">
-              <span className="text-xs md:text-sm font-medium text-white">Polaris</span>
-            </div>
-
-            {/* Titre principal */}
-            <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-4 leading-tight">
-              Polaris
-            </h1>
-
-            {/* Sous-titre */}
-            <p className="text-lg md:text-xl lg:text-2xl text-[#A0A0A0] mb-10">
-              Prend une nouvelle dimension
-            </p>
-
-            {/* Description principale */}
-            <p className="text-2xl md:text-3xl lg:text-4xl font-medium text-white leading-relaxed">
-              Découvrez la refonte{" "}
-              <span className="text-[#3B82F6]">complète</span> de la plateforme
-            </p>
-          </div>
-        </div>
-
-        {/* BLOC DROITE - Carrousel d'images automatique */}
-        <div className="min-h-[500px] lg:min-h-[600px]">
-          <HeroCarousel images={carouselImages} interval={5000} />
-        </div>
+      {/* SECTION 1 : BANDEAU PRINCIPAL */}
+      <section>
+        <HeroBanner images={bannerImages} interval={5000} />
       </section>
 
       {/* SECTION 2 : CARTES DE FORMATIONS */}
