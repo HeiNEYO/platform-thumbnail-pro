@@ -6,7 +6,7 @@ import { getEpisodesByModule } from "@/lib/db/episodes";
 import { getModuleProgress } from "@/lib/db/modules";
 import { isEpisodeCompleted } from "@/lib/db/episodes";
 import { ProgressBar } from "@/components/ui/ProgressBar";
-import { NetflixStyleEpisodes } from "@/components/NetflixStyleEpisodes";
+import { EpisodeGrid } from "@/components/EpisodeGrid";
 
 // Force le rendu dynamique car on utilise cookies() pour l'authentification
 export const dynamic = 'force-dynamic';
@@ -34,6 +34,16 @@ export default async function ModuleDetailPage({
   const completedFlags = await Promise.all(
     episodes.map((ep) => isEpisodeCompleted(authUser.id, ep.id))
   );
+
+  // Récupérer les informations de Corentin (instructeur pour tous les modules)
+  const { data: corentinProfile } = await supabase
+    .from("users")
+    .select("full_name, avatar_url")
+    .or("full_name.ilike.%Corentin%,email.ilike.%corentin%")
+    .limit(1)
+    .maybeSingle();
+
+  const corentinData = corentinProfile as { full_name: string | null; avatar_url: string | null } | null;
 
   return (
     <div className="space-y-7 animate-fade-in">
@@ -70,13 +80,16 @@ export default async function ModuleDetailPage({
         </div>
       </div>
 
-      {/* Épisodes style Netflix - cartes scrollables */}
+      {/* Épisodes en grille verticale */}
       <div>
-        <h2 className="text-lg font-semibold text-white mb-4">Épisodes</h2>
-        <NetflixStyleEpisodes
+        <h2 className="text-lg font-semibold text-white mb-6">Épisodes</h2>
+        <EpisodeGrid
           episodes={episodes}
           moduleId={moduleId}
           completedFlags={completedFlags}
+          userId={authUser.id}
+          instructorName={corentinData?.full_name || "Corentin"}
+          instructorAvatar={corentinData?.avatar_url || undefined}
         />
       </div>
     </div>
