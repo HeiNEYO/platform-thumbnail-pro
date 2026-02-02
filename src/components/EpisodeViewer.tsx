@@ -112,7 +112,7 @@ export function EpisodeViewer({
                   type="button"
                   onClick={handleSaveNote}
                   disabled={noteSaving}
-                  className="px-4 py-2 rounded-lg bg-[#5C6FFF] hover:bg-[#4C5FEF] hover:shadow-lg text-white text-xs font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="px-4 py-2 rounded-lg border border-white/10 hover:border-white/20 text-white text-xs font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {noteSaving ? "Sauvegarde..." : "Sauvegarder"}
                 </button>
@@ -193,7 +193,7 @@ export function EpisodeViewer({
               {previousEpisode && (
                 <Link
                   href={`/dashboard/modules/${moduleId}/episode/${previousEpisode.id}`}
-                  className="flex items-center gap-2 px-5 py-2.5 rounded-lg border border-white/10 bg-[#0A0A0A] hover:bg-[#141414] hover:border-white/20 transition-all text-sm text-white font-normal flex-1 sm:flex-initial justify-center"
+                  className="flex items-center gap-2 px-5 py-2.5 rounded-lg border border-white/10 hover:border-white/20 transition-all text-sm text-white font-normal flex-1 sm:flex-initial justify-center"
                 >
                   <ChevronLeft className="h-4 w-4" />
                   <span>Précédent</span>
@@ -202,7 +202,7 @@ export function EpisodeViewer({
               {nextEpisode && (
                 <Link
                   href={`/dashboard/modules/${moduleId}/episode/${nextEpisode.id}`}
-                  className="flex items-center gap-2 px-5 py-2.5 rounded-lg bg-[#5C6FFF] hover:bg-[#4C5FEF] hover:shadow-lg transition-all text-sm text-white font-medium flex-1 sm:flex-initial justify-center"
+                  className="flex items-center gap-2 px-5 py-2.5 rounded-lg border border-white/10 hover:border-white/20 transition-all text-sm text-white font-medium flex-1 sm:flex-initial justify-center"
                 >
                   <span>Suivant</span>
                   <ChevronRight className="h-4 w-4" />
