@@ -72,13 +72,13 @@ export default async function DashboardHomePage() {
   ];
 
   return (
-    <div className="space-y-12 animate-fade-in">
+    <div className="space-y-16 animate-fade-in">
       {/* Message de bienvenue */}
       <div>
-        <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">
+        <h1 className="text-2xl md:text-3xl font-bold text-white mb-3">
           Bonjour {displayName}
         </h1>
-        <p className="text-base md:text-lg text-[#999999]">
+        <p className="text-sm md:text-base text-[#999999]">
           Bienvenue dans le laboratoire. Chaque connexion vous rapproche du prochain palier. Let's grind.
         </p>
       </div>
@@ -91,11 +91,11 @@ export default async function DashboardHomePage() {
       {/* SECTION 2 : CARTES DE FORMATIONS */}
       <section>
         {/* Titre de section */}
-        <div className="mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+        <div className="mb-10">
+          <h2 className="text-2xl md:text-3xl font-bold text-white mb-3">
             Formations
           </h2>
-          <p className="text-base md:text-lg text-[#999999]">
+          <p className="text-sm md:text-base text-[#999999]">
             Continuez à vous former à travers notre contenu : Polaris, cours vidéos et ateliers interactifs
           </p>
         </div>

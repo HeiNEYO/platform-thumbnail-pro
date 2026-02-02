@@ -49,14 +49,14 @@ export function HeroBanner({ images, interval = 5000 }: HeroBannerProps) {
 
   if (images.length === 0) {
     return (
-      <div className="relative w-full h-[500px] md:h-[600px] rounded-[16px] bg-[#0A0A0A] border border-white/10 flex items-center justify-center">
-        <p className="text-white/50">Aucune image disponible</p>
+      <div className="relative w-full h-[350px] md:h-[420px] rounded-[16px] bg-[#0A0A0A] border border-white/10 flex items-center justify-center">
+        <p className="text-white/50 text-sm">Aucune image disponible</p>
       </div>
     );
   }
 
   return (
-    <div className="relative w-full h-[500px] md:h-[600px] lg:h-[700px] rounded-[16px] overflow-hidden border border-white/10">
+    <div className="relative w-full h-[350px] md:h-[420px] lg:h-[490px] rounded-[16px] overflow-hidden border border-white/10">
       {/* Container principal avec images visibles */}
       <div className="relative w-full h-full flex items-center">
         {/* Image précédente (gauche) */}
@@ -97,19 +97,19 @@ export function HeroBanner({ images, interval = 5000 }: HeroBannerProps) {
             <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/50 to-black/30"></div>
 
             {/* Contenu texte en bas à gauche */}
-            <div className="absolute bottom-0 left-0 p-8 md:p-12 lg:p-16 z-30 max-w-2xl">
-              <h2 className="text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold text-white mb-3 uppercase tracking-tight leading-tight">
+            <div className="absolute bottom-0 left-0 p-6 md:p-8 lg:p-10 z-30 max-w-2xl">
+              <h2 className="text-xl md:text-2xl lg:text-3xl font-bold text-white mb-2 uppercase tracking-tight leading-tight">
                 {images[currentIndex].title}
               </h2>
-              <p className="text-sm md:text-base lg:text-lg text-white/90 leading-relaxed">
+              <p className="text-xs md:text-sm lg:text-base text-white/90 leading-relaxed">
                 {images[currentIndex].subtitle}
               </p>
             </div>
 
             {/* Tag "What's new" en haut à droite */}
-            <div className="absolute top-6 right-6 z-30">
-              <div className="px-4 py-2 bg-white rounded-lg shadow-lg">
-                <span className="text-sm font-semibold text-[#0A0A0A]">What's new</span>
+            <div className="absolute top-4 right-4 z-30">
+              <div className="px-3 py-1.5 bg-white rounded-lg shadow-lg">
+                <span className="text-xs font-semibold text-[#0A0A0A]">What's new</span>
               </div>
             </div>
           </div>
@@ -138,32 +138,32 @@ export function HeroBanner({ images, interval = 5000 }: HeroBannerProps) {
         <>
           <button
             onClick={goToPrevious}
-            className="absolute left-6 top-1/2 -translate-y-1/2 z-40 w-12 h-12 rounded-full bg-black/60 hover:bg-black/80 backdrop-blur-md border border-white/30 flex items-center justify-center transition-all duration-300 hover:scale-110 hover:border-white/50 group"
+            className="absolute left-4 top-1/2 -translate-y-1/2 z-40 w-10 h-10 rounded-full bg-black/60 hover:bg-black/80 backdrop-blur-md border border-white/30 flex items-center justify-center transition-all duration-300 hover:scale-110 hover:border-white/50 group"
             aria-label="Image précédente"
           >
-            <ChevronLeft className="w-6 h-6 text-white group-hover:text-white/90" />
+            <ChevronLeft className="w-5 h-5 text-white group-hover:text-white/90" />
           </button>
           <button
             onClick={goToNext}
-            className="absolute right-6 top-1/2 -translate-y-1/2 z-40 w-12 h-12 rounded-full bg-black/60 hover:bg-black/80 backdrop-blur-md border border-white/30 flex items-center justify-center transition-all duration-300 hover:scale-110 hover:border-white/50 group"
+            className="absolute right-4 top-1/2 -translate-y-1/2 z-40 w-10 h-10 rounded-full bg-black/60 hover:bg-black/80 backdrop-blur-md border border-white/30 flex items-center justify-center transition-all duration-300 hover:scale-110 hover:border-white/50 group"
             aria-label="Image suivante"
           >
-            <ChevronRight className="w-6 h-6 text-white group-hover:text-white/90" />
+            <ChevronRight className="w-5 h-5 text-white group-hover:text-white/90" />
           </button>
         </>
       )}
 
       {/* Indicateurs dots */}
       {images.length > 1 && (
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-40 flex gap-2.5">
+        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-40 flex gap-2">
           {images.map((_, index) => (
             <button
               key={index}
               onClick={() => goToSlide(index)}
               className={`transition-all duration-500 rounded-full ${
                 index === currentIndex
-                  ? "w-10 h-2.5 bg-white shadow-lg"
-                  : "w-2.5 h-2.5 bg-white/50 hover:bg-white/70"
+                  ? "w-8 h-2 bg-white shadow-lg"
+                  : "w-2 h-2 bg-white/50 hover:bg-white/70"
               }`}
               aria-label={`Aller à l'image ${index + 1}`}
             />

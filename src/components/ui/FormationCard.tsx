@@ -173,8 +173,8 @@ export function FormationCard({
         <div className="absolute inset-0 bg-gradient-to-t from-[#1A0F3A]/60 via-[#1A0F3A]/20 to-transparent"></div>
         
         {/* Titre grand en haut à gauche - semi-transparent */}
-        <div className="absolute top-6 left-6 z-10">
-          <h3 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white/60 drop-shadow-2xl">
+        <div className="absolute top-4 left-4 z-10">
+          <h3 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white/60 drop-shadow-2xl">
             {config.imageTitle}
           </h3>
         </div>
@@ -189,32 +189,32 @@ export function FormationCard({
       </div>
 
       {/* Zone de contenu en bas (30-40% de la hauteur) */}
-      <div className="p-6 md:p-8 bg-[#0A0A0A]">
+      <div className="p-5 md:p-6 bg-[#0A0A0A]">
         {/* Icône + Titre */}
-        <div className="flex items-center gap-3 mb-3">
-          <div className="p-2 bg-[#1A1A1A] rounded-lg border border-[#2A2A2A]">
-            <Icon className="h-4 w-4 md:h-5 md:w-5 text-white" />
+        <div className="flex items-center gap-2.5 mb-2.5">
+          <div className="p-1.5 bg-[#1A1A1A] rounded-lg border border-[#2A2A2A]">
+            <Icon className="h-3.5 w-3.5 md:h-4 md:w-4 text-white" />
           </div>
-          <h3 className="text-lg md:text-xl font-bold text-white">
+          <h3 className="text-base md:text-lg font-bold text-white">
             {title}
           </h3>
         </div>
 
         {/* Description */}
-        <p className="text-[#999999] text-sm md:text-base leading-relaxed mb-6">
+        <p className="text-[#999999] text-xs md:text-sm leading-relaxed mb-5">
           {description}
         </p>
 
         {/* Bouton CTA */}
         <div
-          className={`w-full py-3.5 px-4 rounded-xl font-semibold text-sm md:text-base text-center transition-all duration-300 flex items-center justify-center gap-2 ${
+          className={`w-full py-3 px-4 rounded-xl font-semibold text-xs md:text-sm text-center transition-all duration-300 flex items-center justify-center gap-2 ${
             ctaStyle === "blue"
               ? "bg-gradient-to-r from-[#5C6FFF] to-[#4C5FEF] text-white group-hover:from-[#4C5FEF] group-hover:to-[#3C4FDF] group-hover:shadow-[0_8px_20px_rgba(92,111,255,0.4)]"
               : "bg-white text-[#0A0A0A] group-hover:bg-gray-50 group-hover:shadow-lg"
           } group-hover:transform group-hover:translate-y-[-2px]`}
         >
           <span>{ctaText}</span>
-          <ArrowRight className="h-4 w-4" />
+          <ArrowRight className="h-3.5 w-3.5" />
         </div>
       </div>
     </Link>
