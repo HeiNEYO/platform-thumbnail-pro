@@ -26,16 +26,9 @@ export function HeroBanner({ images, interval = 5000 }: HeroBannerProps) {
 
     const timer = setInterval(() => {
       setIsTransitioning(true);
-      // Après 1 seconde de transition, changer l'index et réinitialiser immédiatement
       setTimeout(() => {
-        setCurrentIndex((prev) => {
-          const newIndex = (prev + 1) % images.length;
-          // Réinitialiser la transition après un court délai pour éviter le saut
-          setTimeout(() => {
-            setIsTransitioning(false);
-          }, 50);
-          return newIndex;
-        });
+        setCurrentIndex((prev) => (prev + 1) % images.length);
+        setIsTransitioning(false);
       }, 1000);
     }, interval);
 
@@ -47,35 +40,23 @@ export function HeroBanner({ images, interval = 5000 }: HeroBannerProps) {
     setIsTransitioning(true);
     setTimeout(() => {
       setCurrentIndex(index);
-      setTimeout(() => {
-        setIsTransitioning(false);
-      }, 50);
+      setIsTransitioning(false);
     }, 1000);
   };
 
   const goToPrevious = () => {
     setIsTransitioning(true);
     setTimeout(() => {
-      setCurrentIndex((prev) => {
-        const newIndex = (prev - 1 + images.length) % images.length;
-        setTimeout(() => {
-          setIsTransitioning(false);
-        }, 50);
-        return newIndex;
-      });
+      setCurrentIndex((prev) => (prev - 1 + images.length) % images.length);
+      setIsTransitioning(false);
     }, 1000);
   };
 
   const goToNext = () => {
     setIsTransitioning(true);
     setTimeout(() => {
-      setCurrentIndex((prev) => {
-        const newIndex = (prev + 1) % images.length;
-        setTimeout(() => {
-          setIsTransitioning(false);
-        }, 50);
-        return newIndex;
-      });
+      setCurrentIndex((prev) => (prev + 1) % images.length);
+      setIsTransitioning(false);
     }, 1000);
   };
 
@@ -91,50 +72,46 @@ export function HeroBanner({ images, interval = 5000 }: HeroBannerProps) {
     );
   }
 
-  // Calcul des positions et largeurs pour les 3 bandeaux
-  const leftBandWidth = "12%"; // Bandeau 1 (gauche)
-  const centerBandWidth = "76%"; // Bandeau 2 (centre)
-  const rightBandWidth = "12%"; // Bandeau 3 (droite)
+  const prevIndex = getSlideIndex(-1);
+  const nextIndex = getSlideIndex(1);
 
   return (
     <div className="relative w-full h-[350px] md:h-[420px] lg:h-[490px] rounded-[16px] overflow-hidden border border-white/10">
-      {/* Container principal */}
-      <div className="relative w-full h-full overflow-hidden">
+      {/* Container principal avec effet panoramique continu */}
+      <div className="relative w-full h-full">
         
-        {/* BANDEAU 1 : GAUCHE (Image précédente) */}
+        {/* Image précédente (gauche) - bande floue et assombrie */}
         {images.length > 1 && (
           <div
-            className={`absolute left-0 h-full z-[1] transition-transform duration-1000 ease-in-out ${
+            className={`absolute left-0 top-0 h-full w-[15%] z-[1] transition-transform duration-1000 ease-in-out ${
               isTransitioning ? "-translate-x-full" : "translate-x-0"
             }`}
-            style={{ width: leftBandWidth }}
           >
-            <div className="relative w-full h-full overflow-hidden">
-              {!imageErrors.has(getSlideIndex(-1)) ? (
+            <div className="relative w-full h-full">
+              {!imageErrors.has(prevIndex) ? (
                 <Image
-                  src={images[getSlideIndex(-1)].src}
-                  alt={images[getSlideIndex(-1)].alt}
+                  src={images[prevIndex].src}
+                  alt={images[prevIndex].alt}
                   fill
-                  className="object-cover opacity-40 blur-[1px]"
-                  sizes="12vw"
-                  onError={() => setImageErrors((prev) => new Set(prev).add(getSlideIndex(-1)))}
+                  className="object-cover blur-md"
+                  sizes="15vw"
+                  onError={() => setImageErrors((prev) => new Set(prev).add(prevIndex))}
                 />
               ) : (
-                <div className="absolute inset-0 bg-gradient-to-br from-[#0A0A0A] via-[#1A1A1A] to-[#0A0A0A] opacity-40"></div>
+                <div className="absolute inset-0 bg-gradient-to-br from-[#0A0A0A] via-[#1A1A1A] to-[#0A0A0A]"></div>
               )}
-              <div className="absolute inset-0 bg-black/60"></div>
+              <div className="absolute inset-0 bg-black/70"></div>
             </div>
           </div>
         )}
 
-        {/* BANDEAU 2 : CENTRE (Image actuelle) */}
+        {/* Image actuelle (centre) - nette et complète */}
         <div
-          className={`absolute left-1/2 h-full z-[2] transition-transform duration-1000 ease-in-out ${
-            isTransitioning ? "-translate-x-[calc(50%+12%)]" : "-translate-x-1/2"
+          className={`absolute left-1/2 top-0 h-full w-[70%] z-[2] transition-transform duration-1000 ease-in-out ${
+            isTransitioning ? "-translate-x-[calc(50%+15%)]" : "-translate-x-1/2"
           }`}
-          style={{ width: centerBandWidth }}
         >
-          <div className="relative w-full h-full rounded-[12px] overflow-hidden shadow-2xl">
+          <div className="relative w-full h-full">
             {!imageErrors.has(currentIndex) ? (
               <Image
                 src={images[currentIndex].src}
@@ -142,7 +119,7 @@ export function HeroBanner({ images, interval = 5000 }: HeroBannerProps) {
                 fill
                 className="object-cover"
                 priority={currentIndex === 0}
-                sizes="76vw"
+                sizes="70vw"
                 onError={() => setImageErrors((prev) => new Set(prev).add(currentIndex))}
               />
             ) : (
@@ -171,28 +148,27 @@ export function HeroBanner({ images, interval = 5000 }: HeroBannerProps) {
           </div>
         </div>
 
-        {/* BANDEAU 3 : DROITE (Image suivante) */}
+        {/* Image suivante (droite) - bande floue et assombrie */}
         {images.length > 1 && (
           <div
-            className={`absolute right-0 h-full z-[1] transition-transform duration-1000 ease-in-out ${
+            className={`absolute right-0 top-0 h-full w-[15%] z-[1] transition-transform duration-1000 ease-in-out ${
               isTransitioning ? "translate-x-full" : "translate-x-0"
             }`}
-            style={{ width: rightBandWidth }}
           >
-            <div className="relative w-full h-full overflow-hidden">
-              {!imageErrors.has(getSlideIndex(1)) ? (
+            <div className="relative w-full h-full">
+              {!imageErrors.has(nextIndex) ? (
                 <Image
-                  src={images[getSlideIndex(1)].src}
-                  alt={images[getSlideIndex(1)].alt}
+                  src={images[nextIndex].src}
+                  alt={images[nextIndex].alt}
                   fill
-                  className="object-cover opacity-40 blur-[1px]"
-                  sizes="12vw"
-                  onError={() => setImageErrors((prev) => new Set(prev).add(getSlideIndex(1)))}
+                  className="object-cover blur-md"
+                  sizes="15vw"
+                  onError={() => setImageErrors((prev) => new Set(prev).add(nextIndex))}
                 />
               ) : (
-                <div className="absolute inset-0 bg-gradient-to-br from-[#0A0A0A] via-[#1A1A1A] to-[#0A0A0A] opacity-40"></div>
+                <div className="absolute inset-0 bg-gradient-to-br from-[#0A0A0A] via-[#1A1A1A] to-[#0A0A0A]"></div>
               )}
-              <div className="absolute inset-0 bg-black/60"></div>
+              <div className="absolute inset-0 bg-black/70"></div>
             </div>
           </div>
         )}
