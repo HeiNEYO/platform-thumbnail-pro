@@ -22,7 +22,7 @@ export function HeroBanner({ images, interval = 5000 }: HeroBannerProps) {
   
   // Refs pour gérer le timer
   const timerRef = useRef<NodeJS.Timeout | null>(null);
-  const progressTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const animationFrameRef = useRef<number | null>(null);
   const imagesRef = useRef(images);
   const intervalRef = useRef(interval);
   const startTimeRef = useRef<number>(Date.now());
@@ -46,6 +46,17 @@ export function HeroBanner({ images, interval = 5000 }: HeroBannerProps) {
     startTimeRef.current = Date.now();
   };
 
+  // Fonction pour animer la progression avec requestAnimationFrame (fluide)
+  const animateProgress = () => {
+    const elapsed = Date.now() - startTimeRef.current;
+    const newProgress = Math.min((elapsed / intervalRef.current) * 100, 100);
+    setProgress(newProgress);
+
+    if (newProgress < 100) {
+      animationFrameRef.current = requestAnimationFrame(animateProgress);
+    }
+  };
+
   // Gérer le timer automatique et la progression
   useEffect(() => {
     if (images.length <= 1) return;
@@ -58,16 +69,12 @@ export function HeroBanner({ images, interval = 5000 }: HeroBannerProps) {
     if (timerRef.current) {
       clearInterval(timerRef.current);
     }
-    if (progressTimerRef.current) {
-      clearInterval(progressTimerRef.current);
+    if (animationFrameRef.current) {
+      cancelAnimationFrame(animationFrameRef.current);
     }
 
-    // Timer pour la progression (mise à jour toutes les 50ms pour fluidité)
-    progressTimerRef.current = setInterval(() => {
-      const elapsed = Date.now() - startTimeRef.current;
-      const newProgress = Math.min((elapsed / intervalRef.current) * 100, 100);
-      setProgress(newProgress);
-    }, 50);
+    // Démarrer l'animation fluide avec requestAnimationFrame
+    animationFrameRef.current = requestAnimationFrame(animateProgress);
 
     // Timer pour changer d'image
     timerRef.current = setInterval(() => {
@@ -78,8 +85,8 @@ export function HeroBanner({ images, interval = 5000 }: HeroBannerProps) {
       if (timerRef.current) {
         clearInterval(timerRef.current);
       }
-      if (progressTimerRef.current) {
-        clearInterval(progressTimerRef.current);
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
       }
     };
   }, [images.length, interval, currentIndex]);
@@ -201,8 +208,8 @@ export function HeroBanner({ images, interval = 5000 }: HeroBannerProps) {
             >
               {index === currentIndex ? (
                 <div
-                  className="absolute left-0 top-0 h-full bg-white rounded-full transition-all duration-75 ease-linear"
-                  style={{ width: `${progress}%` }}
+                  className="absolute left-0 top-0 h-full bg-white rounded-full"
+                  style={{ width: `${progress}%`, transition: "none" }}
                 />
               ) : (
                 <div
