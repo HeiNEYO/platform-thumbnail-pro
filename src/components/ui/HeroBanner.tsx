@@ -18,11 +18,14 @@ interface HeroBannerProps {
 export function HeroBanner({ images, interval = 5000 }: HeroBannerProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [imageErrors, setImageErrors] = useState<Set<number>>(new Set());
+  const [progress, setProgress] = useState(0);
   
   // Refs pour gérer le timer
   const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const progressTimerRef = useRef<NodeJS.Timeout | null>(null);
   const imagesRef = useRef(images);
   const intervalRef = useRef(interval);
+  const startTimeRef = useRef<number>(Date.now());
 
   // Mettre à jour les refs
   useEffect(() => {
@@ -39,18 +42,34 @@ export function HeroBanner({ images, interval = 5000 }: HeroBannerProps) {
   const goToNext = () => {
     if (imagesRef.current.length <= 1) return;
     setCurrentIndex((prev) => (prev + 1) % imagesRef.current.length);
+    setProgress(0);
+    startTimeRef.current = Date.now();
   };
 
-  // Gérer le timer automatique
+  // Gérer le timer automatique et la progression
   useEffect(() => {
     if (images.length <= 1) return;
 
-    // Nettoyer le timer existant
+    // Réinitialiser la progression
+    setProgress(0);
+    startTimeRef.current = Date.now();
+
+    // Nettoyer les timers existants
     if (timerRef.current) {
       clearInterval(timerRef.current);
     }
+    if (progressTimerRef.current) {
+      clearInterval(progressTimerRef.current);
+    }
 
-    // Créer un nouveau timer
+    // Timer pour la progression (mise à jour toutes les 50ms pour fluidité)
+    progressTimerRef.current = setInterval(() => {
+      const elapsed = Date.now() - startTimeRef.current;
+      const newProgress = Math.min((elapsed / intervalRef.current) * 100, 100);
+      setProgress(newProgress);
+    }, 50);
+
+    // Timer pour changer d'image
     timerRef.current = setInterval(() => {
       goToNext();
     }, intervalRef.current);
@@ -59,8 +78,11 @@ export function HeroBanner({ images, interval = 5000 }: HeroBannerProps) {
       if (timerRef.current) {
         clearInterval(timerRef.current);
       }
+      if (progressTimerRef.current) {
+        clearInterval(progressTimerRef.current);
+      }
     };
-  }, [images.length, interval]);
+  }, [images.length, interval, currentIndex]);
 
   if (images.length === 0) {
     return (
@@ -90,6 +112,7 @@ export function HeroBanner({ images, interval = 5000 }: HeroBannerProps) {
                   fill
                   className="object-cover blur-sm opacity-60"
                   sizes="12vw"
+                  quality={90}
                   onError={() => setImageErrors((prev) => new Set(prev).add(prevIndex))}
                 />
               ) : (
@@ -111,6 +134,8 @@ export function HeroBanner({ images, interval = 5000 }: HeroBannerProps) {
                 className="object-cover"
                 priority={currentIndex === 0}
                 sizes="100vw"
+                quality={100}
+                unoptimized={false}
                 onError={() => setImageErrors((prev) => new Set(prev).add(currentIndex))}
               />
             ) : (
@@ -150,6 +175,7 @@ export function HeroBanner({ images, interval = 5000 }: HeroBannerProps) {
                   fill
                   className="object-cover blur-sm opacity-60"
                   sizes="12vw"
+                  quality={90}
                   onError={() => setImageErrors((prev) => new Set(prev).add(nextIndex))}
                 />
               ) : (
@@ -161,18 +187,27 @@ export function HeroBanner({ images, interval = 5000 }: HeroBannerProps) {
         )}
       </div>
 
-      {/* Indicateurs dots */}
+      {/* Barres de progression (timer) - Positionnées à droite */}
       {images.length > 1 && (
-        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-40 flex gap-2">
+        <div className="absolute bottom-6 right-6 z-40 flex flex-col gap-1.5">
           {images.map((_, index) => (
             <div
               key={index}
-              className={`rounded-full ${
-                index === currentIndex
-                  ? "w-8 h-2 bg-white shadow-lg"
-                  : "w-2 h-2 bg-white/50"
-              }`}
-            />
+              className="relative w-20 h-0.5 bg-white/20 rounded-full overflow-hidden"
+            >
+              {index === currentIndex ? (
+                <div
+                  className="absolute left-0 top-0 h-full bg-white rounded-full transition-all duration-75 ease-linear"
+                  style={{ width: `${progress}%` }}
+                />
+              ) : (
+                <div
+                  className={`absolute left-0 top-0 h-full bg-white rounded-full ${
+                    index < currentIndex ? "w-full" : "w-0"
+                  }`}
+                />
+              )}
+            </div>
           ))}
         </div>
       )}
