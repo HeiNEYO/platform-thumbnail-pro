@@ -109,9 +109,9 @@ export function EpisodeViewer({
           {/* Picture-in-picture (vidéo instructeur) - En bas à droite */}
           <div className="absolute bottom-4 right-4 w-64 h-40 rounded-lg overflow-hidden border-2 border-white/40 bg-[#0A0A0A] shadow-2xl z-10">
             <iframe
-              src="https://www.youtube.com/embed/RB5dsc7Dqy4?autoplay=0&controls=1&modestbranding=1&rel=0"
+              src="https://player.vimeo.com/video/1104426446?autoplay=0&controls=1&title=0&byline=0&portrait=0"
               className="w-full h-full"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allow="autoplay; fullscreen; picture-in-picture"
               allowFullScreen
               title="Instructeur"
             />
