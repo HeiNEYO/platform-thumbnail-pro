@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
+import { usePathname } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { MemberCard } from "@/components/ui/MemberCard";
 import { createClient } from "@/lib/supabase/client";
@@ -45,32 +46,28 @@ async function queryMembers(fallbackWithoutScore = false) {
 
 export function CommunityClient({ initialMembers }: { initialMembers: CommunityMember[] }) {
   const { user: currentUser } = useAuth();
+  const pathname = usePathname();
   const [members, setMembers] = useState<CommunityMember[]>(initialMembers);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const hasLoadedRef = useRef(false);
   const isLoadingRef = useRef(false);
+  const lastLoadTimeRef = useRef<number>(0);
+  const lastPathnameRef = useRef<string>("");
 
-  useEffect(() => {
-    // Si on a déjà des membres initiaux, ne pas recharger immédiatement
-    // Utiliser les données du serveur directement
-    if (initialMembers.length > 0 && !hasLoadedRef.current) {
-      hasLoadedRef.current = true;
+  const loadMembers = async (forceRefresh = false) => {
+    // Éviter les requêtes multiples simultanées
+    if (isLoadingRef.current) return;
+    
+    // Si on a déjà chargé récemment (moins de 5 secondes) et qu'on ne force pas, ne pas recharger
+    const now = Date.now();
+    if (!forceRefresh && hasLoadedRef.current && (now - lastLoadTimeRef.current < 5000)) {
       return;
     }
-
-    // Si on a déjà chargé ou si une requête est en cours, ne pas recharger
-    if (hasLoadedRef.current || isLoadingRef.current) {
-      return;
-    }
-
-    const loadMembers = async () => {
-      // Éviter les requêtes multiples simultanées
-      if (isLoadingRef.current) return;
-      
-      isLoadingRef.current = true;
-      setLoading(true);
-      setError(null);
+    
+    isLoadingRef.current = true;
+    setLoading(true);
+    setError(null);
 
       try {
         // Essayer d'abord avec community_score
@@ -148,6 +145,7 @@ export function CommunityClient({ initialMembers }: { initialMembers: CommunityM
 
         setMembers(finalMembers);
         hasLoadedRef.current = true;
+        lastLoadTimeRef.current = Date.now();
         console.log(`✅ ${finalMembers.length} membre(s) chargé(s) avec succès`);
       } catch (err: any) {
         console.error("❌ Erreur lors du chargement des membres:", err);
@@ -176,14 +174,61 @@ export function CommunityClient({ initialMembers }: { initialMembers: CommunityM
         setLoading(false);
         isLoadingRef.current = false;
       }
-    };
+  };
+
+  // Chargement initial
+  useEffect(() => {
+    // Si on a déjà des membres initiaux, ne pas recharger immédiatement
+    // Utiliser les données du serveur directement
+    if (initialMembers.length > 0 && !hasLoadedRef.current) {
+      hasLoadedRef.current = true;
+      lastLoadTimeRef.current = Date.now();
+      return;
+    }
+
+    // Si on a déjà chargé ou si une requête est en cours, ne pas recharger
+    if (hasLoadedRef.current || isLoadingRef.current) {
+      return;
+    }
 
     // Ne charger qu'une seule fois, seulement si on n'a pas de membres initiaux
     if (initialMembers.length === 0 && currentUser) {
       loadMembers();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentUser?.id, initialMembers.length]); // Dépendances minimales pour éviter les re-renders
+  }, [currentUser?.id, initialMembers.length]);
+
+  // Rafraîchir quand on revient sur la route /dashboard/community
+  useEffect(() => {
+    // Si on vient d'une autre route et qu'on revient sur /dashboard/community
+    if (pathname === "/dashboard/community" && lastPathnameRef.current !== pathname && hasLoadedRef.current && currentUser) {
+      // Attendre un peu avant de rafraîchir pour éviter les requêtes multiples
+      const timeoutId = setTimeout(() => {
+        loadMembers(true);
+      }, 300);
+      return () => clearTimeout(timeoutId);
+    }
+    lastPathnameRef.current = pathname;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pathname, currentUser?.id]);
+
+  // Rafraîchir quand la page redevient visible (quand on revient sur l'onglet du navigateur)
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible" && hasLoadedRef.current && currentUser && pathname === "/dashboard/community") {
+        // Attendre un peu avant de rafraîchir pour éviter les requêtes multiples
+        setTimeout(() => {
+          loadMembers(true);
+        }, 500);
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentUser?.id, pathname]);
 
   if (loading) {
     return (
