@@ -103,10 +103,10 @@ export function EpisodeViewer({
           </div>
 
           {/* Panneau de notes à droite */}
-          <div className="w-full lg:w-80 shrink-0 border-t lg:border-t-0 border-white/10">
+          <div className="w-full lg:w-80 shrink-0">
             <div className="h-full flex flex-col">
               {/* En-tête du panneau */}
-              <div className="p-4 border-b border-white/10 flex items-center justify-between bg-[#0F0F0F]">
+              <div className="p-4 flex items-center justify-between">
                 <h2 className="text-base font-semibold text-white">Notes</h2>
                 <button
                   type="button"
