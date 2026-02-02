@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
-import { ChevronLeft, ChevronRight } from "lucide-react";
 
 interface BannerImage {
   src: string;
@@ -19,7 +18,6 @@ interface HeroBannerProps {
 export function HeroBanner({ images, interval = 5000 }: HeroBannerProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
-  const [direction, setDirection] = useState<"left" | "right">("left");
   const [imageErrors, setImageErrors] = useState<Set<number>>(new Set());
   
   // Refs pour éviter les re-renders et gérer le timer
@@ -42,52 +40,17 @@ export function HeroBanner({ images, interval = 5000 }: HeroBannerProps) {
     return (baseIndex + offset + imagesRef.current.length) % imagesRef.current.length;
   };
 
-  // Fonction pour passer à la slide suivante
+  // Fonction pour passer à la slide suivante (toujours vers la droite)
   const goToNext = () => {
     if (isTransitioningRef.current || imagesRef.current.length <= 1) return;
     
     isTransitioningRef.current = true;
     setIsTransitioning(true);
-    setDirection("left");
     
     setTimeout(() => {
       const newIndex = (currentIndexRef.current + 1) % imagesRef.current.length;
       setCurrentIndex(newIndex);
       currentIndexRef.current = newIndex;
-      setIsTransitioning(false);
-      isTransitioningRef.current = false;
-    }, 1000);
-  };
-
-  // Fonction pour passer à la slide précédente
-  const goToPrevious = () => {
-    if (isTransitioningRef.current || imagesRef.current.length <= 1) return;
-    
-    isTransitioningRef.current = true;
-    setIsTransitioning(true);
-    setDirection("right");
-    
-    setTimeout(() => {
-      const newIndex = (currentIndexRef.current - 1 + imagesRef.current.length) % imagesRef.current.length;
-      setCurrentIndex(newIndex);
-      currentIndexRef.current = newIndex;
-      setIsTransitioning(false);
-      isTransitioningRef.current = false;
-    }, 1000);
-  };
-
-  // Fonction pour aller à une slide spécifique
-  const goToSlide = (index: number) => {
-    if (index === currentIndexRef.current || isTransitioningRef.current || imagesRef.current.length <= 1) return;
-    
-    const newDirection = index > currentIndexRef.current ? "left" : "right";
-    isTransitioningRef.current = true;
-    setIsTransitioning(true);
-    setDirection(newDirection);
-    
-    setTimeout(() => {
-      setCurrentIndex(index);
-      currentIndexRef.current = index;
       setIsTransitioning(false);
       isTransitioningRef.current = false;
     }, 1000);
@@ -164,11 +127,7 @@ export function HeroBanner({ images, interval = 5000 }: HeroBannerProps) {
         {images.length > 1 && (
           <div
             className={`absolute -left-[8%] top-0 h-full w-[12%] z-[1] transition-transform duration-1000 ease-in-out overflow-hidden ${
-              isTransitioning && direction === "right" 
-                ? "translate-x-[calc(100%+8%)]" 
-                : isTransitioning && direction === "left"
-                ? "-translate-x-[calc(100%+8%)]"
-                : "translate-x-0"
+              isTransitioning ? "-translate-x-[calc(100%+8%)]" : "translate-x-0"
             }`}
           >
             <div className="relative w-full h-full">
@@ -189,51 +148,10 @@ export function HeroBanner({ images, interval = 5000 }: HeroBannerProps) {
           </div>
         )}
 
-        {/* BANDEAU PRÉCÉDENT - Image précédente qui arrive par la gauche (quand on va vers la gauche) */}
-        {images.length > 1 && direction === "right" && isTransitioning && (
-          <div
-            className="absolute -left-full top-0 h-full w-full z-[2] transition-transform duration-1000 ease-in-out"
-            style={{ transform: isTransitioning ? 'translateX(100%)' : 'translateX(0)' }}
-          >
-            <div className="relative w-full h-full">
-              {!imageErrors.has(prevIndex) ? (
-                <Image
-                  src={images[prevIndex].src}
-                  alt={images[prevIndex].alt}
-                  fill
-                  className="object-cover"
-                  sizes="100vw"
-                  onError={() => setImageErrors((prev) => new Set(prev).add(prevIndex))}
-                />
-              ) : (
-                <div className="absolute inset-0 bg-gradient-to-br from-[#0A0A0A] via-[#1A1A1A] to-[#0A0A0A]"></div>
-              )}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/50 to-black/30"></div>
-              <div className="absolute bottom-0 left-0 p-6 md:p-8 lg:p-10 z-30 max-w-2xl">
-                <h2 className="text-xl md:text-2xl lg:text-3xl font-bold text-white mb-2 uppercase tracking-tight leading-tight">
-                  {images[prevIndex].title}
-                </h2>
-                <p className="text-xs md:text-sm lg:text-base text-white/90 leading-relaxed">
-                  {images[prevIndex].subtitle}
-                </p>
-              </div>
-              <div className="absolute top-4 right-4 z-30">
-                <div className="px-3 py-1.5 bg-white rounded-lg shadow-lg">
-                  <span className="text-xs font-semibold text-[#0A0A0A]">What's new</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
         {/* BANDEAU CENTRAL - Image actuelle à 100% */}
         <div
           className={`absolute left-0 top-0 h-full w-full z-[2] transition-transform duration-1000 ease-in-out ${
-            isTransitioning && direction === "left" 
-              ? "-translate-x-full" 
-              : isTransitioning && direction === "right"
-              ? "translate-x-full"
-              : "translate-x-0"
+            isTransitioning ? "-translate-x-full" : "translate-x-0"
           }`}
         >
           <div className="relative w-full h-full">
@@ -273,8 +191,8 @@ export function HeroBanner({ images, interval = 5000 }: HeroBannerProps) {
           </div>
         </div>
 
-        {/* BANDEAU SUIVANT - Image suivante qui glisse depuis la droite (quand on va vers la droite) */}
-        {images.length > 1 && direction === "left" && isTransitioning && (
+        {/* BANDEAU SUIVANT - Image suivante qui glisse depuis la droite */}
+        {images.length > 1 && isTransitioning && (
           <div
             className="absolute left-full top-0 h-full w-full z-[2] transition-transform duration-1000 ease-in-out"
             style={{ transform: isTransitioning ? 'translateX(-100%)' : 'translateX(0)' }}
@@ -314,11 +232,7 @@ export function HeroBanner({ images, interval = 5000 }: HeroBannerProps) {
         {images.length > 1 && (
           <div
             className={`absolute -right-[8%] top-0 h-full w-[12%] z-[1] transition-transform duration-1000 ease-in-out overflow-hidden ${
-              isTransitioning && direction === "left"
-                ? "translate-x-[calc(100%+8%)]"
-                : isTransitioning && direction === "right"
-                ? "-translate-x-[calc(100%+8%)]"
-                : "translate-x-0"
+              isTransitioning ? "translate-x-[calc(100%+8%)]" : "translate-x-0"
             }`}
           >
             <div className="relative w-full h-full">
@@ -340,42 +254,17 @@ export function HeroBanner({ images, interval = 5000 }: HeroBannerProps) {
         )}
       </div>
 
-      {/* Flèches de navigation */}
-      {images.length > 1 && (
-        <>
-          <button
-            onClick={goToPrevious}
-            disabled={isTransitioningRef.current}
-            className="absolute left-4 top-1/2 -translate-y-1/2 z-40 w-10 h-10 rounded-full bg-black/60 hover:bg-black/80 backdrop-blur-md border border-white/30 flex items-center justify-center transition-all duration-300 hover:scale-110 hover:border-white/50 group disabled:opacity-50 disabled:cursor-not-allowed"
-            aria-label="Image précédente"
-          >
-            <ChevronLeft className="w-5 h-5 text-white group-hover:text-white/90" />
-          </button>
-          <button
-            onClick={goToNext}
-            disabled={isTransitioningRef.current}
-            className="absolute right-4 top-1/2 -translate-y-1/2 z-40 w-10 h-10 rounded-full bg-black/60 hover:bg-black/80 backdrop-blur-md border border-white/30 flex items-center justify-center transition-all duration-300 hover:scale-110 hover:border-white/50 group disabled:opacity-50 disabled:cursor-not-allowed"
-            aria-label="Image suivante"
-          >
-            <ChevronRight className="w-5 h-5 text-white group-hover:text-white/90" />
-          </button>
-        </>
-      )}
-
       {/* Indicateurs dots */}
       {images.length > 1 && (
         <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-40 flex gap-2">
           {images.map((_, index) => (
-            <button
+            <div
               key={index}
-              onClick={() => goToSlide(index)}
-              disabled={isTransitioningRef.current}
-              className={`transition-all duration-500 rounded-full disabled:opacity-50 disabled:cursor-not-allowed ${
+              className={`transition-all duration-500 rounded-full ${
                 index === displayIndex
                   ? "w-8 h-2 bg-white shadow-lg"
-                  : "w-2 h-2 bg-white/50 hover:bg-white/70"
+                  : "w-2 h-2 bg-white/50"
               }`}
-              aria-label={`Aller à l'image ${index + 1}`}
             />
           ))}
         </div>
