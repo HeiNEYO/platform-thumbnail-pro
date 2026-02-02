@@ -52,22 +52,22 @@ export default async function DashboardHomePage() {
   // Images du bandeau avec titres et sous-titres
   const bannerImages = [
     {
-      src: "/images/carousel/polaris.jpg",
-      alt: "Polaris - Système solaire",
+      src: "/images/carousel/image1.png",
+      alt: "Homme entre Lamborghini et Audi R8 devant un château",
       title: "DÉCOUVREZ LE 8LAB ECOSYSTEM : THE INFINITE",
       subtitle: "Le début d'une nouvelle ère pour le e-commerce francophone.",
     },
     {
-      src: "/images/carousel/cours-videos.jpg",
-      alt: "Interface de cours vidéos",
-      title: "COURS VIDÉOS PREMIUM",
-      subtitle: "Maîtrisez les outils de VKStudio à travers des formations complètes.",
+      src: "/images/carousel/image2.png",
+      alt: "Scène de soirée avec voitures de luxe",
+      title: "EXPÉRIENCE PREMIUM",
+      subtitle: "Rejoignez une communauté exclusive et développez votre business.",
     },
     {
-      src: "/images/carousel/ateliers.jpg",
-      alt: "Interface d'atelier",
-      title: "ATELIERS INTERACTIFS",
-      subtitle: "Participez à des sessions pratiques et développez vos compétences.",
+      src: "/images/carousel/image3.png",
+      alt: "Moment décontracté entre amis",
+      title: "COMMUNAUTÉ & PARTAGE",
+      subtitle: "Connectez-vous avec d'autres entrepreneurs et partagez vos expériences.",
     },
   ];
 
