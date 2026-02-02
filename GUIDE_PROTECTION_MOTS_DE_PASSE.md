@@ -14,18 +14,27 @@ Cette fonctionnalité vérifie si les mots de passe des utilisateurs ont été c
 
 ### Méthode 1 : Via le Dashboard Supabase (Recommandé)
 
-1. **Connectez-vous à votre projet Supabase**
-   - Allez sur [supabase.com](https://supabase.com)
-   - Sélectionnez votre projet
+**Étape 1 : Accéder à Authentication**
+1. Connectez-vous à votre projet Supabase sur [supabase.com](https://supabase.com)
+2. Dans le menu de gauche, cliquez sur **Authentication** (icône de cadenas)
 
-2. **Accédez aux Paramètres d'Authentification**
-   - Dans le menu de gauche, cliquez sur **Authentication**
-   - Cliquez sur **Settings** (ou **Paramètres**)
+**Étape 2 : Ouvrir les Paramètres**
+1. Une fois dans Authentication, cliquez sur l'onglet **Settings** (ou **Paramètres** en français)
+2. Vous verrez plusieurs sections de configuration
 
-3. **Activez la Protection**
-   - Cherchez la section **"Password Protection"** ou **"Leaked Password Protection"**
-   - Activez le toggle **"Check for leaked passwords"** ou **"Enable leaked password protection"**
-   - Sauvegardez les modifications
+**Étape 3 : Activer la Protection**
+1. Faites défiler jusqu'à la section **"Password Protection"** ou **"Security"**
+2. Cherchez l'option **"Enable leaked password protection"** ou **"Check for leaked passwords"**
+3. Activez le toggle (bascule) à côté de cette option
+4. Cliquez sur **Save** (ou **Sauvegarder**) en bas de la page
+
+**Emplacement exact dans l'interface :**
+- **Authentication** → **Settings** → Section **"Password Protection"** ou **"Security"**
+- L'option peut aussi être dans la section **"Password Requirements"**
+
+**Si vous ne trouvez pas l'option :**
+- Vérifiez que vous êtes sur la bonne version de Supabase (certaines fonctionnalités peuvent varier selon la version)
+- L'option peut être dans **Project Settings** → **Auth** → **Password Protection**
 
 ### Méthode 2 : Via l'API Supabase (Avancé)
 
