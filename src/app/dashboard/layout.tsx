@@ -194,7 +194,7 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
             <div className="pt-4 border-t border-sidebar-border">
               <Link
                 href="#"
-                className="flex items-center gap-3 text-sm text-white/70 hover:text-white"
+                className="flex items-center gap-3 text-sm font-normal text-white/70 hover:text-white"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 <HelpCircle className="h-4 w-4" />
@@ -205,7 +205,7 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
                   setShowDiscountModal(true);
                   setMobileMenuOpen(false);
                 }}
-                className="mt-2 flex items-center gap-3 text-sm text-white/70 hover:text-white"
+                className="mt-2 flex items-center gap-3 text-sm font-normal text-white/70 hover:text-white"
               >
                 <ShoppingBag className="h-4 w-4" />
                 Réduction Legal Place
@@ -268,14 +268,14 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
           <div className="p-3 border-t border-sidebar-border space-y-1">
             <Link
               href="#"
-              className="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-white/70 hover:text-white hover:bg-[#141414] rounded-md transition-all duration-150"
+              className="flex items-center gap-3 px-3 py-2.5 text-sm font-normal text-white/70 hover:text-white hover:bg-[#141414] rounded-md transition-all duration-150"
             >
               <HelpCircle className="h-5 w-5 shrink-0 text-white/60" />
               <span>Support</span>
             </Link>
             <button
               onClick={() => setShowDiscountModal(true)}
-              className="w-full flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-white/70 hover:text-white hover:bg-[#141414] rounded-md transition-all duration-150 text-left"
+              className="w-full flex items-center gap-3 px-3 py-2.5 text-sm font-normal text-white/70 hover:text-white hover:bg-[#141414] rounded-md transition-all duration-150 text-left"
             >
               <ShoppingBag className="h-5 w-5 shrink-0 text-white/60" />
               <span className="truncate">Réduction Legal Place</span>
