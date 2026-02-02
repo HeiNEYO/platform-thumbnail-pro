@@ -187,13 +187,17 @@ export function HeroBanner({ images, interval = 5000 }: HeroBannerProps) {
         )}
       </div>
 
-      {/* Barres de progression (timer) - Positionnées à droite */}
+      {/* Barres de progression (timer) - Positionnées à droite, sur la même ligne */}
       {images.length > 1 && (
-        <div className="absolute bottom-6 right-6 z-40 flex flex-col gap-1.5 items-end">
+        <div className="absolute bottom-6 right-6 z-40 flex flex-row gap-2 items-center">
           {images.map((_, index) => (
             <div
               key={index}
-              className="relative w-8 h-0.5 bg-white/20 rounded-full overflow-hidden"
+              className={`relative bg-white/20 rounded-full overflow-hidden transition-all duration-300 ${
+                index === currentIndex
+                  ? "w-4 h-1"
+                  : "w-2 h-0.5"
+              }`}
             >
               {index === currentIndex ? (
                 <div
@@ -202,7 +206,7 @@ export function HeroBanner({ images, interval = 5000 }: HeroBannerProps) {
                 />
               ) : (
                 <div
-                  className={`absolute left-0 top-0 h-full bg-white rounded-full ${
+                  className={`absolute left-0 top-0 h-full bg-white rounded-full transition-all duration-300 ${
                     index < currentIndex ? "w-full" : "w-0"
                   }`}
                 />
