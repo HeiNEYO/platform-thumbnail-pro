@@ -4,31 +4,39 @@ import Link from "next/link";
 import { BookOpen, Play, FileText, ArrowRight } from "lucide-react";
 
 interface FormationCardProps {
-  type: "polaris" | "cours" | "ateliers";
+  type: "formation" | "plateforme" | "communaute";
   title: string;
   description: string;
   ctaText: string;
   ctaHref: string;
   ctaStyle: "blue" | "white";
+  stats?: {
+    duration?: string;
+    parts?: number;
+    videos?: number;
+    members?: number;
+    coaches?: number;
+    availability?: string;
+  };
 }
 
 const cardConfig = {
-  polaris: {
+  formation: {
     icon: BookOpen,
-    imageTitle: "Polaris",
+    imageTitle: "FORMATION",
   },
-  cours: {
+  plateforme: {
     icon: Play,
-    imageTitle: "Cours vidéos",
+    imageTitle: "PLATEFORME",
   },
-  ateliers: {
+  communaute: {
     icon: FileText,
-    imageTitle: "Ateliers",
+    imageTitle: "COMMUNAUTÉ",
   },
 };
 
 // Composant pour l'écran d'ordinateur avec contenu spécifique
-function LaptopScreen({ type }: { type: "polaris" | "cours" | "ateliers" }) {
+function LaptopScreen({ type }: { type: "formation" | "plateforme" | "communaute" }) {
   return (
     <div className="relative w-full max-w-[280px] mx-auto">
       {/* Cadre de l'écran */}
@@ -44,7 +52,7 @@ function LaptopScreen({ type }: { type: "polaris" | "cours" | "ateliers" }) {
         
         {/* Contenu de l'écran */}
         <div className="aspect-video bg-[#0A0A0A] p-4">
-          {type === "polaris" && (
+          {type === "formation" && (
             <div className="relative w-full h-full flex items-center justify-center">
               {/* Système solaire */}
               <div className="relative w-32 h-32">
@@ -86,7 +94,7 @@ function LaptopScreen({ type }: { type: "polaris" | "cours" | "ateliers" }) {
             </div>
           )}
           
-          {type === "cours" && (
+          {type === "plateforme" && (
             <div className="grid grid-cols-4 gap-2 w-full h-full">
               {[...Array(16)].map((_, i) => (
                 <div
@@ -99,7 +107,7 @@ function LaptopScreen({ type }: { type: "polaris" | "cours" | "ateliers" }) {
             </div>
           )}
           
-          {type === "ateliers" && (
+          {type === "communaute" && (
             <div className="w-full h-full flex flex-col gap-2">
               {/* Barre d'outils */}
               <div className="h-8 bg-[#1A1A1A] rounded border border-[#2A2A2A] flex items-center gap-2 px-2">
@@ -145,6 +153,7 @@ export function FormationCard({
   ctaText,
   ctaHref,
   ctaStyle,
+  stats,
 }: FormationCardProps) {
   const config = cardConfig[type];
   const Icon = config.icon;
@@ -201,9 +210,51 @@ export function FormationCard({
         </div>
 
         {/* Description */}
-        <p className="text-[#999999] text-xs md:text-sm leading-relaxed mb-5">
+        <p className="text-[#999999] text-xs md:text-sm leading-relaxed mb-4">
           {description}
         </p>
+
+        {/* Statistiques */}
+        {stats && (
+          <div className="flex items-center gap-4 mb-4">
+            {stats.duration && (
+              <div>
+                <div className="text-white text-base font-semibold">{stats.duration}</div>
+                <div className="text-[#999999] text-xs">Durée totale</div>
+              </div>
+            )}
+            {stats.parts !== undefined && (
+              <div>
+                <div className="text-white text-base font-semibold">{stats.parts}</div>
+                <div className="text-[#999999] text-xs">Parties</div>
+              </div>
+            )}
+            {stats.videos !== undefined && (
+              <div>
+                <div className="text-white text-base font-semibold">{stats.videos}</div>
+                <div className="text-[#999999] text-xs">Vidéos</div>
+              </div>
+            )}
+            {stats.members !== undefined && (
+              <div>
+                <div className="text-white text-base font-semibold">{stats.members}</div>
+                <div className="text-[#999999] text-xs">Membres</div>
+              </div>
+            )}
+            {stats.coaches !== undefined && (
+              <div>
+                <div className="text-white text-base font-semibold">{stats.coaches}</div>
+                <div className="text-[#999999] text-xs">Coachs</div>
+              </div>
+            )}
+            {stats.availability && (
+              <div>
+                <div className="text-white text-base font-semibold">{stats.availability}</div>
+                <div className="text-[#999999] text-xs">Disponibilité</div>
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Bouton CTA */}
         <div
