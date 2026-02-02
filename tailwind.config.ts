@@ -23,8 +23,8 @@ export default {
           border: "#1a1a1a",
         },
         primary: {
-          DEFAULT: "#5C6FFF",
-          hover: "#7F85FF",
+          DEFAULT: "#1D4ED8",
+          hover: "#3B6FE8",
         },
         sidebar: {
           DEFAULT: "#000000",
