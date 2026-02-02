@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
@@ -21,8 +21,11 @@ export function HeroBanner({ images, interval = 5000 }: HeroBannerProps) {
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [direction, setDirection] = useState<"left" | "right">("left");
   const [imageErrors, setImageErrors] = useState<Set<number>>(new Set());
+  
+  // Refs pour éviter les re-renders et gérer le timer
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const isTransitioningRef = useRef(false);
+  const currentIndexRef = useRef(0);
   const imagesRef = useRef(images);
   const intervalRef = useRef(interval);
 
@@ -30,104 +33,69 @@ export function HeroBanner({ images, interval = 5000 }: HeroBannerProps) {
   useEffect(() => {
     imagesRef.current = images;
     intervalRef.current = interval;
-  }, [images, interval]);
+    currentIndexRef.current = currentIndex;
+  }, [images, interval, currentIndex]);
 
-  // Fonction pour réinitialiser le timer
-  const resetTimer = useCallback(() => {
-    if (timerRef.current) {
-      clearInterval(timerRef.current);
-    }
+  // Fonction pour obtenir l'index avec offset (utilise le ref pour éviter les changements pendant la transition)
+  const getSlideIndex = (offset: number) => {
+    const baseIndex = isTransitioning ? currentIndexRef.current : currentIndex;
+    return (baseIndex + offset + imagesRef.current.length) % imagesRef.current.length;
+  };
 
-    const nextSlide = () => {
-      if (!isTransitioningRef.current) {
-        setIsTransitioning(true);
-        setDirection("left");
-        isTransitioningRef.current = true;
-        
-        setTimeout(() => {
-          setCurrentIndex((prev) => (prev + 1) % imagesRef.current.length);
-          setIsTransitioning(false);
-          isTransitioningRef.current = false;
-        }, 1000);
-      }
-    };
-
-    timerRef.current = setInterval(nextSlide, intervalRef.current);
-  }, []);
-
-  // Fonction pour passer à la slide suivante (vers la droite)
-  const goToNext = useCallback(() => {
+  // Fonction pour passer à la slide suivante
+  const goToNext = () => {
     if (isTransitioningRef.current || imagesRef.current.length <= 1) return;
     
+    isTransitioningRef.current = true;
     setIsTransitioning(true);
     setDirection("left");
-    isTransitioningRef.current = true;
-    
-    // Réinitialiser le timer
-    resetTimer();
     
     setTimeout(() => {
-      setCurrentIndex((prev) => (prev + 1) % imagesRef.current.length);
+      const newIndex = (currentIndexRef.current + 1) % imagesRef.current.length;
+      setCurrentIndex(newIndex);
+      currentIndexRef.current = newIndex;
       setIsTransitioning(false);
       isTransitioningRef.current = false;
     }, 1000);
-  }, [resetTimer]);
+  };
 
-  // Fonction pour passer à la slide précédente (vers la gauche)
-  const goToPrevious = useCallback(() => {
+  // Fonction pour passer à la slide précédente
+  const goToPrevious = () => {
     if (isTransitioningRef.current || imagesRef.current.length <= 1) return;
     
+    isTransitioningRef.current = true;
     setIsTransitioning(true);
     setDirection("right");
-    isTransitioningRef.current = true;
-    
-    // Réinitialiser le timer
-    resetTimer();
     
     setTimeout(() => {
-      setCurrentIndex((prev) => (prev - 1 + imagesRef.current.length) % imagesRef.current.length);
+      const newIndex = (currentIndexRef.current - 1 + imagesRef.current.length) % imagesRef.current.length;
+      setCurrentIndex(newIndex);
+      currentIndexRef.current = newIndex;
       setIsTransitioning(false);
       isTransitioningRef.current = false;
     }, 1000);
-  }, [resetTimer]);
+  };
 
   // Fonction pour aller à une slide spécifique
-  const goToSlide = useCallback((index: number) => {
-    if (index === currentIndex || isTransitioningRef.current || imagesRef.current.length <= 1) return;
+  const goToSlide = (index: number) => {
+    if (index === currentIndexRef.current || isTransitioningRef.current || imagesRef.current.length <= 1) return;
     
-    const newDirection = index > currentIndex ? "left" : "right";
+    const newDirection = index > currentIndexRef.current ? "left" : "right";
+    isTransitioningRef.current = true;
     setIsTransitioning(true);
     setDirection(newDirection);
-    isTransitioningRef.current = true;
-    
-    // Réinitialiser le timer
-    resetTimer();
     
     setTimeout(() => {
       setCurrentIndex(index);
+      currentIndexRef.current = index;
       setIsTransitioning(false);
       isTransitioningRef.current = false;
     }, 1000);
-  }, [currentIndex, resetTimer]);
+  };
 
-  // Initialiser et gérer le timer automatique
+  // Gérer le timer automatique
   useEffect(() => {
     if (images.length <= 1) return;
-
-    // Fonction pour passer à la suivante
-    const nextSlide = () => {
-      if (!isTransitioningRef.current) {
-        setIsTransitioning(true);
-        setDirection("left");
-        isTransitioningRef.current = true;
-        
-        setTimeout(() => {
-          setCurrentIndex((prev) => (prev + 1) % imagesRef.current.length);
-          setIsTransitioning(false);
-          isTransitioningRef.current = false;
-        }, 1000);
-      }
-    };
 
     // Nettoyer le timer existant
     if (timerRef.current) {
@@ -135,7 +103,11 @@ export function HeroBanner({ images, interval = 5000 }: HeroBannerProps) {
     }
 
     // Créer un nouveau timer
-    timerRef.current = setInterval(nextSlide, intervalRef.current);
+    timerRef.current = setInterval(() => {
+      if (!isTransitioningRef.current) {
+        goToNext();
+      }
+    }, intervalRef.current);
 
     return () => {
       if (timerRef.current) {
@@ -155,22 +127,12 @@ export function HeroBanner({ images, interval = 5000 }: HeroBannerProps) {
 
     // Créer un nouveau timer après la transition
     const timeoutId = setTimeout(() => {
-      const nextSlide = () => {
+      timerRef.current = setInterval(() => {
         if (!isTransitioningRef.current) {
-          setIsTransitioning(true);
-          setDirection("left");
-          isTransitioningRef.current = true;
-          
-          setTimeout(() => {
-            setCurrentIndex((prev) => (prev + 1) % imagesRef.current.length);
-            setIsTransitioning(false);
-            isTransitioningRef.current = false;
-          }, 1000);
+          goToNext();
         }
-      };
-
-      timerRef.current = setInterval(nextSlide, intervalRef.current);
-    }, 1000); // Attendre la fin de la transition
+      }, intervalRef.current);
+    }, 1000);
 
     return () => {
       clearTimeout(timeoutId);
@@ -180,10 +142,6 @@ export function HeroBanner({ images, interval = 5000 }: HeroBannerProps) {
     };
   }, [currentIndex, images.length, isTransitioning]);
 
-  const getSlideIndex = (offset: number) => {
-    return (currentIndex + offset + images.length) % images.length;
-  };
-
   if (images.length === 0) {
     return (
       <div className="relative w-full h-[350px] md:h-[420px] rounded-[16px] bg-[#0A0A0A] border border-white/10 flex items-center justify-center">
@@ -192,15 +150,17 @@ export function HeroBanner({ images, interval = 5000 }: HeroBannerProps) {
     );
   }
 
+  // Calculer les indices AVANT le render pour éviter les changements pendant la transition
   const prevIndex = getSlideIndex(-1);
   const nextIndex = getSlideIndex(1);
+  const displayIndex = isTransitioning ? currentIndexRef.current : currentIndex;
 
   return (
     <div className="relative w-full h-[350px] md:h-[420px] lg:h-[490px] rounded-[16px] overflow-hidden border border-white/10">
       {/* Container principal */}
       <div className="relative w-full h-full overflow-hidden">
         
-        {/* BANDEAU GAUCHE - Image précédente */}
+        {/* BANDEAU GAUCHE - Image précédente (aperçu) */}
         {images.length > 1 && (
           <div
             className={`absolute -left-[8%] top-0 h-full w-[12%] z-[1] transition-transform duration-1000 ease-in-out overflow-hidden ${
@@ -230,11 +190,10 @@ export function HeroBanner({ images, interval = 5000 }: HeroBannerProps) {
         )}
 
         {/* BANDEAU PRÉCÉDENT - Image précédente qui arrive par la gauche (quand on va vers la gauche) */}
-        {images.length > 1 && direction === "right" && (
+        {images.length > 1 && direction === "right" && isTransitioning && (
           <div
-            className={`absolute -left-full top-0 h-full w-full z-[2] transition-transform duration-1000 ease-in-out ${
-              isTransitioning ? "translate-x-full" : "translate-x-0"
-            }`}
+            className="absolute -left-full top-0 h-full w-full z-[2] transition-transform duration-1000 ease-in-out"
+            style={{ transform: isTransitioning ? 'translateX(100%)' : 'translateX(0)' }}
           >
             <div className="relative w-full h-full">
               {!imageErrors.has(prevIndex) ? (
@@ -278,15 +237,15 @@ export function HeroBanner({ images, interval = 5000 }: HeroBannerProps) {
           }`}
         >
           <div className="relative w-full h-full">
-            {!imageErrors.has(currentIndex) ? (
+            {!imageErrors.has(displayIndex) ? (
               <Image
-                src={images[currentIndex].src}
-                alt={images[currentIndex].alt}
+                src={images[displayIndex].src}
+                alt={images[displayIndex].alt}
                 fill
                 className="object-cover"
-                priority={currentIndex === 0}
+                priority={displayIndex === 0}
                 sizes="100vw"
-                onError={() => setImageErrors((prev) => new Set(prev).add(currentIndex))}
+                onError={() => setImageErrors((prev) => new Set(prev).add(displayIndex))}
               />
             ) : (
               <div className="absolute inset-0 bg-gradient-to-br from-[#0A0A0A] via-[#1A1A1A] to-[#0A0A0A]"></div>
@@ -298,10 +257,10 @@ export function HeroBanner({ images, interval = 5000 }: HeroBannerProps) {
             {/* Contenu texte en bas à gauche */}
             <div className="absolute bottom-0 left-0 p-6 md:p-8 lg:p-10 z-30 max-w-2xl">
               <h2 className="text-xl md:text-2xl lg:text-3xl font-bold text-white mb-2 uppercase tracking-tight leading-tight">
-                {images[currentIndex].title}
+                {images[displayIndex].title}
               </h2>
               <p className="text-xs md:text-sm lg:text-base text-white/90 leading-relaxed">
-                {images[currentIndex].subtitle}
+                {images[displayIndex].subtitle}
               </p>
             </div>
 
@@ -315,11 +274,10 @@ export function HeroBanner({ images, interval = 5000 }: HeroBannerProps) {
         </div>
 
         {/* BANDEAU SUIVANT - Image suivante qui glisse depuis la droite (quand on va vers la droite) */}
-        {images.length > 1 && direction === "left" && (
+        {images.length > 1 && direction === "left" && isTransitioning && (
           <div
-            className={`absolute left-full top-0 h-full w-full z-[2] transition-transform duration-1000 ease-in-out ${
-              isTransitioning ? "-translate-x-full" : "translate-x-0"
-            }`}
+            className="absolute left-full top-0 h-full w-full z-[2] transition-transform duration-1000 ease-in-out"
+            style={{ transform: isTransitioning ? 'translateX(-100%)' : 'translateX(0)' }}
           >
             <div className="relative w-full h-full">
               {!imageErrors.has(nextIndex) ? (
@@ -413,7 +371,7 @@ export function HeroBanner({ images, interval = 5000 }: HeroBannerProps) {
               onClick={() => goToSlide(index)}
               disabled={isTransitioningRef.current}
               className={`transition-all duration-500 rounded-full disabled:opacity-50 disabled:cursor-not-allowed ${
-                index === currentIndex
+                index === displayIndex
                   ? "w-8 h-2 bg-white shadow-lg"
                   : "w-2 h-2 bg-white/50 hover:bg-white/70"
               }`}
