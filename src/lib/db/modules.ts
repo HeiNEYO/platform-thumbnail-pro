@@ -73,3 +73,73 @@ export async function getModuleProgress(
     return 0;
   }
 }
+
+/**
+ * Fonction optimisée : récupère tous les modules avec leurs statistiques en une seule requête
+ * Au lieu de faire N requêtes (une par module), on fait 2 requêtes au total
+ */
+export async function getModulesWithStats(userId: string): Promise<Array<ModuleRow & { episodeCount: number; completedCount: number }>> {
+  try {
+    const supabase = await createClient();
+    
+    // 1. Récupérer tous les modules
+    const { data: modules, error: modulesError } = await supabase
+      .from("modules")
+      .select("*")
+      .order("order_index", { ascending: true });
+    
+    if (modulesError || !modules) {
+      console.error("Erreur lors de la récupération des modules:", modulesError);
+      return [];
+    }
+
+    // 2. Récupérer tous les épisodes avec leur module_id en une seule requête
+    const { data: episodes, error: episodesError } = await supabase
+      .from("episodes")
+      .select("id, module_id")
+      .order("order_index", { ascending: true });
+    
+    if (episodesError) {
+      console.error("Erreur lors de la récupération des épisodes:", episodesError);
+    }
+
+    // 3. Récupérer toutes les progressions de l'utilisateur en une seule requête
+    const episodeIds = episodes?.map(e => e.id) || [];
+    const { data: progressData, error: progressError } = episodeIds.length > 0
+      ? await supabase
+          .from("progress")
+          .select("episode_id")
+          .eq("user_id", userId)
+          .in("episode_id", episodeIds)
+      : { data: [], error: null };
+    
+    if (progressError) {
+      console.error("Erreur lors de la récupération des progressions:", progressError);
+    }
+
+    // Créer un Set pour une recherche rapide O(1)
+    const completedEpisodeIds = new Set((progressData || []).map(p => p.episode_id));
+
+    // Compter les épisodes et complétions par module
+    const episodeCountByModule = new Map<string, number>();
+    const completedCountByModule = new Map<string, number>();
+
+    episodes?.forEach(episode => {
+      const moduleId = episode.module_id;
+      episodeCountByModule.set(moduleId, (episodeCountByModule.get(moduleId) || 0) + 1);
+      if (completedEpisodeIds.has(episode.id)) {
+        completedCountByModule.set(moduleId, (completedCountByModule.get(moduleId) || 0) + 1);
+      }
+    });
+
+    // Combiner les données
+    return modules.map(module => ({
+      ...module,
+      episodeCount: episodeCountByModule.get(module.id) || 0,
+      completedCount: completedCountByModule.get(module.id) || 0,
+    })) as Array<ModuleRow & { episodeCount: number; completedCount: number }>;
+  } catch (err) {
+    console.error("Erreur dans getModulesWithStats:", err);
+    return [];
+  }
+}

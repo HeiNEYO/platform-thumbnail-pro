@@ -170,6 +170,7 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
                         <Link
                           key={item.href}
                           href={item.href}
+                          prefetch={true}
                           className={`flex items-center gap-3 rounded-md py-2 text-sm ${
                             active
                               ? "text-white font-medium bg-[#2563EB]/15 border-l-4 border-[#2563EB] pl-[9px] pr-3"
@@ -241,6 +242,7 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
                         <Link
                           key={item.href}
                           href={item.href}
+                          prefetch={true}
                           className={`relative flex items-center gap-3 py-2 text-sm rounded-md ${
                             active
                               ? "text-white font-medium bg-[#2563EB]/15 border-l-4 border-[#2563EB] pl-[9px] pr-3"

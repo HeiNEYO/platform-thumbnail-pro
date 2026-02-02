@@ -1,9 +1,6 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { getModules } from "@/lib/db/modules";
-import { getEpisodesByModule } from "@/lib/db/episodes";
-import { isEpisodeCompleted } from "@/lib/db/episodes";
-import { getModuleProgress } from "@/lib/db/modules";
+import { getModulesWithStats } from "@/lib/db/modules";
 import { BookOpen } from "lucide-react";
 import { NetflixStyleModuleCards } from "@/components/NetflixStyleModuleCards";
 
@@ -42,10 +39,11 @@ export default async function ModulesPage() {
       redirect("/login");
     }
 
-    const modules = await getModules();
+    // Récupérer tous les modules avec leurs statistiques en une seule requête optimisée
+    const modulesWithStats = await getModulesWithStats(authUser.id);
 
     // Si aucun module, afficher un message
-    if (!modules || modules.length === 0) {
+    if (!modulesWithStats || modulesWithStats.length === 0) {
       return (
         <div className="space-y-7 animate-fade-in">
           <div>
@@ -62,32 +60,6 @@ export default async function ModulesPage() {
         </div>
       );
     }
-
-    // Récupérer les statistiques pour chaque module (épisodes, progression)
-    const modulesWithStats = await Promise.all(
-      modules.map(async (module) => {
-        try {
-          const episodes = await getEpisodesByModule(module.id);
-          const completedFlags = await Promise.all(
-            episodes.map((ep) => isEpisodeCompleted(authUser.id, ep.id))
-          );
-          const completedCount = completedFlags.filter(Boolean).length;
-          
-          return {
-            ...module,
-            episodeCount: episodes.length,
-            completedCount,
-          };
-        } catch (err) {
-          console.error(`Erreur pour le module ${module.id}:`, err);
-          return {
-            ...module,
-            episodeCount: 0,
-            completedCount: 0,
-          };
-        }
-      })
-    );
 
     // Filtrer pour n'afficher que les 5 modules demandés : Les Outils, Les Bases, La Pratique, Business, Bonus
     const modulesToDisplay = modulesWithStats.filter((module) => {
@@ -116,7 +88,7 @@ export default async function ModulesPage() {
             Formation
           </h1>
           <p className="text-white/70 text-sm">
-            {modules.length} module{modules.length > 1 ? "s" : ""} disponible{modules.length > 1 ? "s" : ""}
+            {modulesWithStats.length} module{modulesWithStats.length > 1 ? "s" : ""} disponible{modulesWithStats.length > 1 ? "s" : ""}
           </p>
         </div>
 
@@ -142,7 +114,7 @@ export default async function ModulesPage() {
                 <div className="absolute bottom-0 left-0 right-0 p-5 flex flex-col gap-2">
                   <h2 className="text-xl font-bold text-white">Thumbnail Pro</h2>
                   <div className="flex items-center gap-4 text-sm text-white/80">
-                    <span>{modules.length} modules</span>
+                    <span>{modulesWithStats.length} modules</span>
                     <span>•</span>
                     <span>{totalEpisodes} épisodes</span>
                     {totalCompleted > 0 && (
