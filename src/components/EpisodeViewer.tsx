@@ -176,7 +176,7 @@ export function EpisodeViewer({
           {/* Informations instructeur et navigation */}
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pt-6 border-t border-white/10">
             {/* Informations instructeur */}
-            <div className="flex items-center gap-2 px-2.5 py-1.5 rounded-full border border-white/20 bg-[#0A0A0A]">
+            <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-white/20 bg-[#0A0A0A]">
               <UserAvatar 
                 name={instructorName} 
                 photo={instructorAvatar} 
