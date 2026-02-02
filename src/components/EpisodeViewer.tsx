@@ -89,7 +89,7 @@ export function EpisodeViewer({
       {/* Zone principale - Lecteur vidéo et contenu */}
       <div className="flex-1 space-y-6">
         {/* Lecteur vidéo principal avec picture-in-picture */}
-        <div className="relative aspect-video bg-[#0A0A0A] rounded-lg overflow-hidden border border-white/10">
+        <div className="relative aspect-video bg-[#0A0A0A] rounded-xl overflow-hidden border border-white/10 shadow-2xl">
           {/* Vidéo principale */}
           {episode.video_url ? (
             <video
@@ -98,7 +98,7 @@ export function EpisodeViewer({
               className="w-full h-full object-contain"
             />
           ) : (
-            <div className="w-full h-full flex items-center justify-center">
+            <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#0A0A0A] via-[#1A1A1A] to-[#0A0A0A]">
               <div className="text-center text-white/50">
                 <p className="text-lg font-medium mb-2">{episode.title}</p>
                 <p className="text-sm">Vidéo à intégrer</p>
@@ -107,14 +107,14 @@ export function EpisodeViewer({
           )}
 
           {/* Picture-in-picture (vidéo instructeur) - En bas à droite */}
-          <div className="absolute bottom-4 right-4 w-48 h-32 rounded-lg overflow-hidden border-2 border-white/20 bg-[#0A0A0A]">
-            {/* Placeholder pour la vidéo picture-in-picture */}
-            <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#1A1A1A] to-[#0A0A0A]">
-              <div className="text-center text-white/40 text-xs">
-                <p>Instructeur</p>
-                <p className="text-[10px] mt-1">Video PiP</p>
-              </div>
-            </div>
+          <div className="absolute bottom-4 right-4 w-64 h-40 rounded-lg overflow-hidden border-2 border-white/40 bg-[#0A0A0A] shadow-2xl z-10">
+            <iframe
+              src="https://www.youtube.com/embed/RB5dsc7Dqy4?autoplay=0&controls=1&modestbranding=1&rel=0"
+              className="w-full h-full"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+              title="Instructeur"
+            />
           </div>
         </div>
 
@@ -127,16 +127,16 @@ export function EpisodeViewer({
                 type="button"
                 onClick={handleToggleFavorite}
                 disabled={favoriteLoading}
-                className={`inline-flex items-center gap-2 mb-3 transition-colors ${
+                className={`inline-flex items-center gap-2 mb-4 transition-colors ${
                   isFavorite
                     ? "text-[#5C6FFF]"
-                    : "text-white/60 hover:text-white"
+                    : "text-white/70 hover:text-white"
                 }`}
               >
                 <Heart className={`h-5 w-5 ${isFavorite ? "fill-current" : ""}`} />
                 <span className="text-sm font-normal">Favoris</span>
               </button>
-              <h1 className="text-2xl md:text-3xl font-bold text-white">
+              <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-white leading-tight">
                 {episode.title}
               </h1>
             </div>
@@ -144,24 +144,24 @@ export function EpisodeViewer({
 
           {/* Ressources complémentaires */}
           {complementaryResource && (
-            <div>
-              <h3 className="text-sm font-semibold text-white/70 mb-3">
+            <div className="rounded-lg border border-white/10 bg-[#0A0A0A] p-4">
+              <h3 className="text-sm font-semibold text-white/80 mb-3">
                 Ressources complémentaires utilisées dans ce cours
               </h3>
               <a
                 href={complementaryResource.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 text-sm text-white/80 hover:text-white transition-colors"
+                className="inline-flex items-center gap-2 text-sm text-white/90 hover:text-white transition-colors group"
               >
-                <span>{complementaryResource.title}</span>
-                <ExternalLink className="h-4 w-4" />
+                <span className="group-hover:text-[#5C6FFF] transition-colors">{complementaryResource.title}</span>
+                <ExternalLink className="h-4 w-4 group-hover:text-[#5C6FFF] transition-colors" />
               </a>
             </div>
           )}
 
           {/* Informations instructeur et navigation */}
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pt-4 border-t border-white/10">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pt-6 border-t border-white/10">
             {/* Informations instructeur */}
             <div className="flex items-center gap-3">
               <UserAvatar 
@@ -171,16 +171,16 @@ export function EpisodeViewer({
               />
               <div>
                 <p className="text-sm font-semibold text-white">{instructorName}</p>
-                <p className="text-xs text-white/60">{instructorTitle}</p>
+                <p className="text-xs text-white/60 font-normal">{instructorTitle}</p>
               </div>
             </div>
 
             {/* Navigation précédent/suivant */}
-            <div className="flex items-center gap-2 w-full sm:w-auto">
+            <div className="flex items-center gap-3 w-full sm:w-auto">
               {previousEpisode && (
                 <Link
                   href={`/dashboard/modules/${moduleId}/episode/${previousEpisode.id}`}
-                  className="flex items-center gap-2 px-4 py-2 rounded-lg border border-white/10 bg-[#0A0A0A] hover:bg-[#141414] transition-colors text-sm text-white flex-1 sm:flex-initial justify-center"
+                  className="flex items-center gap-2 px-5 py-2.5 rounded-lg border border-white/10 bg-[#0A0A0A] hover:bg-[#141414] hover:border-white/20 transition-all text-sm text-white font-normal flex-1 sm:flex-initial justify-center"
                 >
                   <ChevronLeft className="h-4 w-4" />
                   <span>Précédent</span>
@@ -189,7 +189,7 @@ export function EpisodeViewer({
               {nextEpisode && (
                 <Link
                   href={`/dashboard/modules/${moduleId}/episode/${nextEpisode.id}`}
-                  className="flex items-center gap-2 px-4 py-2 rounded-lg bg-[#5C6FFF] hover:bg-[#4C5FEF] transition-colors text-sm text-white font-medium flex-1 sm:flex-initial justify-center"
+                  className="flex items-center gap-2 px-5 py-2.5 rounded-lg bg-[#5C6FFF] hover:bg-[#4C5FEF] hover:shadow-lg transition-all text-sm text-white font-medium flex-1 sm:flex-initial justify-center"
                 >
                   <span>Suivant</span>
                   <ChevronRight className="h-4 w-4" />
@@ -199,16 +199,16 @@ export function EpisodeViewer({
           </div>
 
           {/* Section "Continuer le module" */}
-          <div className="pt-4 border-t border-white/10">
-            <h3 className="text-sm font-semibold text-white/70 mb-3">
+          <div className="pt-6 border-t border-white/10">
+            <h3 className="text-sm font-semibold text-white/80 mb-4">
               Continuer le module
             </h3>
             <Link
               href={`/dashboard/modules/${moduleId}`}
-              className="inline-flex items-center gap-2 text-sm text-white/80 hover:text-white transition-colors"
+              className="inline-flex items-center gap-2 text-sm text-white/90 hover:text-[#5C6FFF] transition-colors group"
             >
               <span>Voir tous les épisodes</span>
-              <ArrowRight className="h-4 w-4" />
+              <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
             </Link>
           </div>
         </div>
@@ -216,15 +216,15 @@ export function EpisodeViewer({
 
       {/* Panneau de notes à droite */}
       <div className="w-full lg:w-80 shrink-0">
-        <div className="sticky top-6 rounded-lg border border-white/10 bg-[#0A0A0A] overflow-hidden">
+        <div className="sticky top-6 rounded-xl border border-white/10 bg-[#0A0A0A] overflow-hidden shadow-xl">
           {/* En-tête du panneau */}
-          <div className="p-4 border-b border-white/10 flex items-center justify-between">
+          <div className="p-4 border-b border-white/10 flex items-center justify-between bg-[#0F0F0F]">
             <h2 className="text-base font-semibold text-white">Notes</h2>
             <button
               type="button"
               onClick={handleSaveNote}
               disabled={noteSaving}
-              className="px-3 py-1.5 rounded-lg bg-[#5C6FFF] hover:bg-[#4C5FEF] text-white text-xs font-medium transition-colors disabled:opacity-50"
+              className="px-4 py-2 rounded-lg bg-[#5C6FFF] hover:bg-[#4C5FEF] hover:shadow-lg text-white text-xs font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {noteSaving ? "Sauvegarde..." : "Sauvegarder"}
             </button>
@@ -236,7 +236,7 @@ export function EpisodeViewer({
               value={noteContent}
               onChange={(e) => setNoteContent(e.target.value)}
               placeholder="Commencez à écrire votre note ici..."
-              className="w-full h-[400px] rounded-lg border border-white/10 bg-[#141414] px-4 py-3 text-sm text-white placeholder-white/40 focus:border-[#5C6FFF] focus:outline-none resize-none"
+              className="w-full h-[400px] rounded-lg border border-white/10 bg-[#141414] px-4 py-3 text-sm text-white placeholder-white/30 focus:border-[#5C6FFF] focus:outline-none focus:ring-1 focus:ring-[#5C6FFF]/20 resize-none transition-all"
             />
           </div>
         </div>
