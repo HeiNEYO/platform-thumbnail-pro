@@ -81,11 +81,11 @@ export function EpisodeGridCard({
   const thumbnailPath = getThumbnailPath(episode.title);
 
   return (
-    <div className="space-y-4 p-4 rounded-lg border border-white/10">
+    <div className="overflow-hidden rounded-[20px] border border-white/10">
       {/* SECTION 1 : LA MINIATURE */}
       <Link
         href={`/dashboard/modules/${moduleId}/episode/${episode.id}`}
-        className="group relative block aspect-video rounded-xl overflow-hidden border border-white/20 shadow-lg hover:scale-[1.02] transition-transform duration-300"
+        className="group relative block aspect-video overflow-hidden hover:scale-[1.02] transition-transform duration-300"
       >
         {/* Image de preview de la vidéo */}
         <div className="relative w-full h-full bg-gradient-to-br from-[#1D4ED8]/20 to-[#0a0a0a]">
@@ -125,10 +125,15 @@ export function EpisodeGridCard({
         </div>
       </Link>
 
-      {/* SECTION 2 : TITRE DE LA VIDÉO */}
-      <h3 className="text-base font-semibold text-white leading-relaxed line-clamp-2">
-        {episode.title}
-      </h3>
+      {/* Trait de séparation */}
+      <div className="border-t border-white/10"></div>
+
+      {/* Contenu de la carte */}
+      <div className="p-4 space-y-4">
+        {/* SECTION 2 : TITRE DE LA VIDÉO */}
+        <h3 className="text-base font-semibold text-white leading-relaxed line-clamp-2">
+          {episode.title}
+        </h3>
 
       {/* SECTION 3 : INFORMATIONS VIDÉO (Stats) */}
       <div className="flex justify-around">
@@ -149,30 +154,31 @@ export function EpisodeGridCard({
         </div>
       </div>
 
-      {/* SECTION 4 : CTA ET AVATAR */}
-      <div className="flex items-center justify-between">
-        {/* Bouton CTA */}
-        <Link
-          href={`/dashboard/modules/${moduleId}/episode/${episode.id}`}
-          className="group/cta inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full border border-white/20 hover:bg-[#1D4ED8]/10 hover:border-[#1D4ED8] transition-all duration-300 text-white text-sm font-medium"
-        >
-          <span>Visionner</span>
-          <ArrowRight className="h-3 w-3 group-hover/cta:translate-x-1 transition-transform" />
-        </Link>
+        {/* SECTION 4 : CTA ET AVATAR */}
+        <div className="flex items-center justify-between">
+          {/* Bouton CTA */}
+          <Link
+            href={`/dashboard/modules/${moduleId}/episode/${episode.id}`}
+            className="group/cta inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full border border-white/20 hover:bg-[#1D4ED8]/10 hover:border-[#1D4ED8] transition-all duration-300 text-white text-sm font-medium"
+          >
+            <span>Visionner</span>
+            <ArrowRight className="h-3 w-3 group-hover/cta:translate-x-1 transition-transform" />
+          </Link>
 
-        {/* Avatar formateur */}
-        <div className="w-8 h-8 rounded-full overflow-hidden border border-white/10">
-          {instructorAvatar ? (
-            <Image
-              src={instructorAvatar}
-              alt={instructorName}
-              width={32}
-              height={32}
-              className="object-cover w-full h-full"
-            />
-          ) : (
-            <UserAvatar name={instructorName} size="sm" />
-          )}
+          {/* Avatar formateur */}
+          <div className="w-8 h-8 rounded-full overflow-hidden border border-white/10">
+            {instructorAvatar ? (
+              <Image
+                src={instructorAvatar}
+                alt={instructorName}
+                width={32}
+                height={32}
+                className="object-cover w-full h-full"
+              />
+            ) : (
+              <UserAvatar name={instructorName} size="sm" />
+            )}
+          </div>
         </div>
       </div>
     </div>
