@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import Image from "next/image";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
@@ -20,58 +20,81 @@ export function HeroBanner({ images, interval = 5000 }: HeroBannerProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [imageErrors, setImageErrors] = useState<Set<number>>(new Set());
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
   const isTransitioningRef = useRef(false);
 
-  useEffect(() => {
-    if (images.length <= 1) return;
-
-    const timer = setInterval(() => {
-      if (!isTransitioningRef.current) {
-        setIsTransitioning(true);
-        isTransitioningRef.current = true;
-        setTimeout(() => {
-          setCurrentIndex((prev) => (prev + 1) % images.length);
-          setIsTransitioning(false);
-          isTransitioningRef.current = false;
-        }, 1000);
-      }
-    }, interval);
-
-    return () => clearInterval(timer);
-  }, [images.length, interval]);
-
-  const goToSlide = (index: number) => {
-    if (index === currentIndex || isTransitioningRef.current) return;
+  // Fonction pour passer à la slide suivante
+  const goToNext = useCallback(() => {
+    if (isTransitioningRef.current || images.length <= 1) return;
+    
     setIsTransitioning(true);
     isTransitioningRef.current = true;
-    setTimeout(() => {
-      setCurrentIndex(index);
-      setIsTransitioning(false);
-      isTransitioningRef.current = false;
-    }, 1000);
-  };
-
-  const goToPrevious = () => {
-    if (isTransitioningRef.current) return;
-    setIsTransitioning(true);
-    isTransitioningRef.current = true;
-    setTimeout(() => {
-      setCurrentIndex((prev) => (prev - 1 + images.length) % images.length);
-      setIsTransitioning(false);
-      isTransitioningRef.current = false;
-    }, 1000);
-  };
-
-  const goToNext = () => {
-    if (isTransitioningRef.current) return;
-    setIsTransitioning(true);
-    isTransitioningRef.current = true;
+    
     setTimeout(() => {
       setCurrentIndex((prev) => (prev + 1) % images.length);
       setIsTransitioning(false);
       isTransitioningRef.current = false;
+      
+      // Réinitialiser le timer après la transition
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+      }
+      timerRef.current = setInterval(goToNext, interval);
     }, 1000);
-  };
+  }, [images.length, interval]);
+
+  // Fonction pour passer à la slide précédente
+  const goToPrevious = useCallback(() => {
+    if (isTransitioningRef.current || images.length <= 1) return;
+    
+    setIsTransitioning(true);
+    isTransitioningRef.current = true;
+    
+    setTimeout(() => {
+      setCurrentIndex((prev) => (prev - 1 + images.length) % images.length);
+      setIsTransitioning(false);
+      isTransitioningRef.current = false;
+      
+      // Réinitialiser le timer après la transition
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+      }
+      timerRef.current = setInterval(goToNext, interval);
+    }, 1000);
+  }, [images.length, interval, goToNext]);
+
+  // Fonction pour aller à une slide spécifique
+  const goToSlide = useCallback((index: number) => {
+    if (index === currentIndex || isTransitioningRef.current || images.length <= 1) return;
+    
+    setIsTransitioning(true);
+    isTransitioningRef.current = true;
+    
+    setTimeout(() => {
+      setCurrentIndex(index);
+      setIsTransitioning(false);
+      isTransitioningRef.current = false;
+      
+      // Réinitialiser le timer après la transition
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+      }
+      timerRef.current = setInterval(goToNext, interval);
+    }, 1000);
+  }, [currentIndex, images.length, interval, goToNext]);
+
+  // Initialiser le timer automatique
+  useEffect(() => {
+    if (images.length <= 1) return;
+
+    timerRef.current = setInterval(goToNext, interval);
+
+    return () => {
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+      }
+    };
+  }, [images.length, interval, goToNext]);
 
   const getSlideIndex = (offset: number) => {
     return (currentIndex + offset + images.length) % images.length;
@@ -161,7 +184,45 @@ export function HeroBanner({ images, interval = 5000 }: HeroBannerProps) {
           </div>
         </div>
 
-        {/* BANDEAU DROITE - Image suivante */}
+        {/* BANDEAU SUIVANT - Image suivante qui arrive par la droite pendant la transition */}
+        {images.length > 1 && (
+          <div
+            className={`absolute left-full top-0 h-full w-full z-[3] transition-transform duration-1000 ease-in-out ${
+              isTransitioning ? "-translate-x-full" : "translate-x-0"
+            }`}
+          >
+            <div className="relative w-full h-full">
+              {!imageErrors.has(nextIndex) ? (
+                <Image
+                  src={images[nextIndex].src}
+                  alt={images[nextIndex].alt}
+                  fill
+                  className="object-cover"
+                  sizes="100vw"
+                  onError={() => setImageErrors((prev) => new Set(prev).add(nextIndex))}
+                />
+              ) : (
+                <div className="absolute inset-0 bg-gradient-to-br from-[#0A0A0A] via-[#1A1A1A] to-[#0A0A0A]"></div>
+              )}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/50 to-black/30"></div>
+              <div className="absolute bottom-0 left-0 p-6 md:p-8 lg:p-10 z-30 max-w-2xl">
+                <h2 className="text-xl md:text-2xl lg:text-3xl font-bold text-white mb-2 uppercase tracking-tight leading-tight">
+                  {images[nextIndex].title}
+                </h2>
+                <p className="text-xs md:text-sm lg:text-base text-white/90 leading-relaxed">
+                  {images[nextIndex].subtitle}
+                </p>
+              </div>
+              <div className="absolute top-4 right-4 z-30">
+                <div className="px-3 py-1.5 bg-white rounded-lg shadow-lg">
+                  <span className="text-xs font-semibold text-[#0A0A0A]">What's new</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* BANDEAU DROITE - Image suivante (aperçu) */}
         {images.length > 1 && (
           <div
             className={`absolute -right-[8%] top-0 h-full w-[12%] z-[1] transition-transform duration-1000 ease-in-out overflow-hidden ${
