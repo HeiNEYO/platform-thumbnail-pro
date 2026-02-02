@@ -124,7 +124,7 @@ export function EpisodeViewer({
                   value={noteContent}
                   onChange={(e) => setNoteContent(e.target.value)}
                   placeholder="Commencez à écrire votre note ici..."
-                  className="w-full h-full min-h-[400px] rounded-lg border border-white/10 bg-[#141414] px-4 py-3 text-sm text-white placeholder-white/30 focus:border-[#5C6FFF] focus:outline-none focus:ring-1 focus:ring-[#5C6FFF]/20 resize-none transition-all"
+                  className="w-full h-full min-h-[400px] text-sm text-white placeholder-white/30 focus:outline-none resize-none bg-transparent"
                 />
               </div>
             </div>
