@@ -36,7 +36,7 @@ export function EpisodeViewer({
   previousEpisode,
   initialNoteContent = "",
   instructorName = "Corentin",
-  instructorTitle = "Formateur",
+  instructorTitle = "CEO Thumbnail Pro",
   instructorAvatar,
   complementaryResource,
 }: EpisodeViewerProps) {
@@ -140,10 +140,10 @@ export function EpisodeViewer({
                 type="button"
                 onClick={handleToggleFavorite}
                 disabled={favoriteLoading}
-                className={`inline-flex items-center gap-2 mb-4 transition-colors ${
+                className={`inline-flex items-center gap-2 mb-4 px-4 py-2 rounded-full border transition-all ${
                   isFavorite
-                    ? "text-[#5C6FFF]"
-                    : "text-white/70 hover:text-white"
+                    ? "text-[#5C6FFF] border-[#5C6FFF]/50 bg-[#5C6FFF]/10"
+                    : "text-white/70 border-white/20 bg-[#0A0A0A] hover:text-white hover:border-white/30"
                 }`}
               >
                 <Heart className={`h-5 w-5 ${isFavorite ? "fill-current" : ""}`} />
@@ -176,16 +176,18 @@ export function EpisodeViewer({
           {/* Informations instructeur et navigation */}
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pt-6 border-t border-white/10">
             {/* Informations instructeur */}
-            <div className="flex items-center gap-3">
-              <UserAvatar 
-                name={instructorName} 
-                photo={instructorAvatar} 
-                size="md" 
-              />
-              <div>
-                <p className="text-sm font-semibold text-white">{instructorName}</p>
-                <p className="text-xs text-white/60 font-normal">{instructorTitle}</p>
+            <div className="flex flex-col items-start gap-3">
+              <div className="flex items-center gap-3 px-4 py-3 rounded-full border border-white/20 bg-[#0A0A0A]">
+                <UserAvatar 
+                  name={instructorName} 
+                  photo={instructorAvatar} 
+                  size="md" 
+                />
+                <div>
+                  <p className="text-sm font-semibold text-white">{instructorName}</p>
+                </div>
               </div>
+              <p className="text-xs text-white/60 font-normal ml-4">CEO Thumbnail Pro</p>
             </div>
 
             {/* Navigation précédent/suivant */}

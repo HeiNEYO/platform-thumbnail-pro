@@ -63,7 +63,7 @@ export default async function EpisodePage({
         previousEpisode={previousEpisode}
         initialNoteContent={note?.content ?? ""}
         instructorName={corentinData?.full_name || "Corentin"}
-        instructorTitle="Formateur"
+        instructorTitle="CEO Thumbnail Pro"
         instructorAvatar={corentinData?.avatar_url || undefined}
       />
     </div>
