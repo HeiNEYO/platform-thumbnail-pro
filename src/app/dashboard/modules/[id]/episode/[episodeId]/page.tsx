@@ -38,7 +38,9 @@ export default async function EpisodePage({
     .select("full_name, avatar_url")
     .or("full_name.ilike.%Corentin%,email.ilike.%corentin%")
     .limit(1)
-    .single();
+    .maybeSingle();
+
+  const corentinData = corentinProfile as { full_name: string | null; avatar_url: string | null } | null;
 
   const currentIndex = episodes.findIndex((e) => e.id === episodeId);
   const nextEpisode =
@@ -60,9 +62,9 @@ export default async function EpisodePage({
         nextEpisode={nextEpisode}
         previousEpisode={previousEpisode}
         initialNoteContent={note?.content ?? ""}
-        instructorName={corentinProfile?.full_name || "Corentin"}
+        instructorName={corentinData?.full_name || "Corentin"}
         instructorTitle="Formateur"
-        instructorAvatar={corentinProfile?.avatar_url || undefined}
+        instructorAvatar={corentinData?.avatar_url || undefined}
       />
     </div>
   );
