@@ -45,7 +45,9 @@ export default async function DashboardHomePage() {
     .eq("id", authUser.id)
     .single();
 
-  const displayName = profileData?.full_name || authUser.email?.split("@")[0] || "Membre";
+  type ProfileData = { full_name: string | null } | null;
+  const profile = profileData as ProfileData;
+  const displayName = profile?.full_name || authUser.email?.split("@")[0] || "Membre";
 
   // Images du bandeau avec titres et sous-titres
   const bannerImages = [
