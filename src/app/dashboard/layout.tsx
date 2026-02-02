@@ -170,10 +170,10 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
                         <Link
                           key={item.href}
                           href={item.href}
-                          className={`flex items-center gap-3 rounded-md py-2 text-sm transition-all duration-200 ${
+                          className={`flex items-center gap-3 rounded-md py-2 text-sm ${
                             active
                               ? "text-white font-medium bg-[#2563EB]/15 border-l-4 border-[#2563EB] pl-[9px] pr-3"
-                              : "text-white/70 hover:bg-white/5 hover:text-white px-3"
+                              : "text-white/70 hover:bg-white/5 hover:text-white px-3 transition-colors"
                           }`}
                           onClick={() => setMobileMenuOpen(false)}
                         >
@@ -241,10 +241,10 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
                         <Link
                           key={item.href}
                           href={item.href}
-                          className={`relative flex items-center gap-3 py-2 text-sm transition-all duration-200 rounded-md ${
+                          className={`relative flex items-center gap-3 py-2 text-sm rounded-md ${
                             active
                               ? "text-white font-medium bg-[#2563EB]/15 border-l-4 border-[#2563EB] pl-[9px] pr-3"
-                              : "text-white/60 hover:text-white/90 hover:bg-[#141414]/50 px-3"
+                              : "text-white/60 hover:text-white/90 hover:bg-[#141414]/50 px-3 transition-colors"
                           }`}
                         >
                           {item.customIcon ? (

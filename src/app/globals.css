@@ -134,7 +134,10 @@ body {
 }
 
 .animate-fade-in {
-  animation: fadeIn 0.4s ease-out;
+  /* Animation désactivée pour navigation instantanée */
+  animation: none !important;
+  opacity: 1 !important;
+  transform: none !important;
 }
 
 /* Skeleton loading (style YouTube) */
