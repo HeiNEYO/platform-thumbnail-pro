@@ -89,7 +89,7 @@ export function EpisodeViewer({
       {/* Zone principale - Lecteur vidéo et contenu */}
       <div className="flex-1 space-y-6">
         {/* Lecteur vidéo principal avec picture-in-picture */}
-        <div className="relative aspect-video bg-[#0A0A0A] overflow-hidden">
+        <div className="relative w-full h-[600px] md:h-[700px] lg:h-[800px] bg-[#0A0A0A] overflow-hidden">
           {/* Vidéo principale */}
           {episode.video_url ? (
             <video
