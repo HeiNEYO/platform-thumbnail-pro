@@ -83,15 +83,23 @@ export async function getModulesWithStats(userId: string): Promise<Array<ModuleR
     const supabase = await createClient();
     
     // 1. Récupérer tous les modules
-    const { data: modules, error: modulesError } = await supabase
+    const { data: modulesData, error: modulesError } = await supabase
       .from("modules")
       .select("*")
       .order("order_index", { ascending: true });
     
-    if (modulesError || !modules) {
+    if (modulesError || !modulesData) {
       console.error("Erreur lors de la récupération des modules:", modulesError);
       return [];
     }
+
+    // Typage explicite pour garantir que modules est un tableau d'objets
+    if (!Array.isArray(modulesData)) {
+      console.error("Les modules ne sont pas un tableau");
+      return [];
+    }
+    
+    const modules: ModuleRow[] = modulesData as ModuleRow[];
 
     // 2. Récupérer tous les épisodes avec leur module_id en une seule requête
     const { data: episodesData, error: episodesError } = await supabase
@@ -136,11 +144,24 @@ export async function getModulesWithStats(userId: string): Promise<Array<ModuleR
     });
 
     // Combiner les données
-    return modules.map(module => ({
-      ...module,
-      episodeCount: episodeCountByModule.get(module.id) || 0,
-      completedCount: completedCountByModule.get(module.id) || 0,
-    })) as Array<ModuleRow & { episodeCount: number; completedCount: number }>;
+    const result: Array<ModuleRow & { episodeCount: number; completedCount: number }> = [];
+    
+    for (const module of modules) {
+      result.push({
+        id: module.id,
+        title: module.title,
+        description: module.description,
+        order_index: module.order_index,
+        duration_estimate: module.duration_estimate,
+        image_url: module.image_url,
+        created_at: module.created_at,
+        updated_at: module.updated_at,
+        episodeCount: episodeCountByModule.get(module.id) || 0,
+        completedCount: completedCountByModule.get(module.id) || 0,
+      });
+    }
+    
+    return result;
   } catch (err) {
     console.error("Erreur dans getModulesWithStats:", err);
     return [];
