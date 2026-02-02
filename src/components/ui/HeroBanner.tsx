@@ -17,13 +17,10 @@ interface HeroBannerProps {
 
 export function HeroBanner({ images, interval = 5000 }: HeroBannerProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [isTransitioning, setIsTransitioning] = useState(false);
   const [imageErrors, setImageErrors] = useState<Set<number>>(new Set());
   
-  // Refs pour éviter les re-renders et gérer le timer
+  // Refs pour gérer le timer
   const timerRef = useRef<NodeJS.Timeout | null>(null);
-  const isTransitioningRef = useRef(false);
-  const currentIndexRef = useRef(0);
   const imagesRef = useRef(images);
   const intervalRef = useRef(interval);
 
@@ -31,29 +28,17 @@ export function HeroBanner({ images, interval = 5000 }: HeroBannerProps) {
   useEffect(() => {
     imagesRef.current = images;
     intervalRef.current = interval;
-    currentIndexRef.current = currentIndex;
-  }, [images, interval, currentIndex]);
+  }, [images, interval]);
 
-  // Fonction pour obtenir l'index avec offset (utilise le ref pour éviter les changements pendant la transition)
+  // Fonction pour obtenir l'index avec offset
   const getSlideIndex = (offset: number) => {
-    const baseIndex = isTransitioning ? currentIndexRef.current : currentIndex;
-    return (baseIndex + offset + imagesRef.current.length) % imagesRef.current.length;
+    return (currentIndex + offset + imagesRef.current.length) % imagesRef.current.length;
   };
 
-  // Fonction pour passer à la slide suivante (toujours vers la droite)
+  // Fonction pour passer à la slide suivante (toujours vers la droite) - cut instantané
   const goToNext = () => {
-    if (isTransitioningRef.current || imagesRef.current.length <= 1) return;
-    
-    isTransitioningRef.current = true;
-    setIsTransitioning(true);
-    
-    setTimeout(() => {
-      const newIndex = (currentIndexRef.current + 1) % imagesRef.current.length;
-      setCurrentIndex(newIndex);
-      currentIndexRef.current = newIndex;
-      setIsTransitioning(false);
-      isTransitioningRef.current = false;
-    }, 1000);
+    if (imagesRef.current.length <= 1) return;
+    setCurrentIndex((prev) => (prev + 1) % imagesRef.current.length);
   };
 
   // Gérer le timer automatique
@@ -67,9 +52,7 @@ export function HeroBanner({ images, interval = 5000 }: HeroBannerProps) {
 
     // Créer un nouveau timer
     timerRef.current = setInterval(() => {
-      if (!isTransitioningRef.current) {
-        goToNext();
-      }
+      goToNext();
     }, intervalRef.current);
 
     return () => {
@@ -79,32 +62,6 @@ export function HeroBanner({ images, interval = 5000 }: HeroBannerProps) {
     };
   }, [images.length, interval]);
 
-  // Réinitialiser le timer après chaque transition
-  useEffect(() => {
-    if (images.length <= 1 || isTransitioning) return;
-
-    // Nettoyer le timer existant
-    if (timerRef.current) {
-      clearInterval(timerRef.current);
-    }
-
-    // Créer un nouveau timer après la transition
-    const timeoutId = setTimeout(() => {
-      timerRef.current = setInterval(() => {
-        if (!isTransitioningRef.current) {
-          goToNext();
-        }
-      }, intervalRef.current);
-    }, 1000);
-
-    return () => {
-      clearTimeout(timeoutId);
-      if (timerRef.current) {
-        clearInterval(timerRef.current);
-      }
-    };
-  }, [currentIndex, images.length, isTransitioning]);
-
   if (images.length === 0) {
     return (
       <div className="relative w-full h-[350px] md:h-[420px] rounded-[16px] bg-[#0A0A0A] border border-white/10 flex items-center justify-center">
@@ -113,10 +70,9 @@ export function HeroBanner({ images, interval = 5000 }: HeroBannerProps) {
     );
   }
 
-  // Calculer les indices AVANT le render pour éviter les changements pendant la transition
+  // Calculer les indices
   const prevIndex = getSlideIndex(-1);
   const nextIndex = getSlideIndex(1);
-  const displayIndex = isTransitioning ? currentIndexRef.current : currentIndex;
 
   return (
     <div className="relative w-full h-[350px] md:h-[420px] lg:h-[490px] rounded-[16px] overflow-hidden border border-white/10">
@@ -125,11 +81,7 @@ export function HeroBanner({ images, interval = 5000 }: HeroBannerProps) {
         
         {/* BANDEAU GAUCHE - Image précédente (aperçu) */}
         {images.length > 1 && (
-          <div
-            className={`absolute -left-[8%] top-0 h-full w-[12%] z-[1] transition-transform duration-1000 ease-in-out overflow-hidden ${
-              isTransitioning ? "-translate-x-[calc(100%+8%)]" : "translate-x-0"
-            }`}
-          >
+          <div className="absolute -left-[8%] top-0 h-full w-[12%] z-[1] overflow-hidden">
             <div className="relative w-full h-full">
               {!imageErrors.has(prevIndex) ? (
                 <Image
@@ -149,36 +101,32 @@ export function HeroBanner({ images, interval = 5000 }: HeroBannerProps) {
         )}
 
         {/* BANDEAU CENTRAL - Image actuelle à 100% */}
-        <div
-          className={`absolute left-0 top-0 h-full w-full z-[2] transition-transform duration-1000 ease-in-out ${
-            isTransitioning ? "-translate-x-full" : "translate-x-0"
-          }`}
-        >
+        <div className="absolute left-0 top-0 h-full w-full z-[2]">
           <div className="relative w-full h-full">
-            {!imageErrors.has(displayIndex) ? (
+            {!imageErrors.has(currentIndex) ? (
               <Image
-                src={images[displayIndex].src}
-                alt={images[displayIndex].alt}
+                src={images[currentIndex].src}
+                alt={images[currentIndex].alt}
                 fill
                 className="object-cover"
-                priority={displayIndex === 0}
+                priority={currentIndex === 0}
                 sizes="100vw"
-                onError={() => setImageErrors((prev) => new Set(prev).add(displayIndex))}
+                onError={() => setImageErrors((prev) => new Set(prev).add(currentIndex))}
               />
             ) : (
               <div className="absolute inset-0 bg-gradient-to-br from-[#0A0A0A] via-[#1A1A1A] to-[#0A0A0A]"></div>
             )}
             
-            {/* Overlay sombre pour la lisibilité du texte */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/50 to-black/30"></div>
+            {/* Masque d'opacité : sombre en bas (où sera le texte), clair en haut */}
+            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/10 to-black/90"></div>
 
             {/* Contenu texte en bas à gauche */}
             <div className="absolute bottom-0 left-0 p-6 md:p-8 lg:p-10 z-30 max-w-2xl">
               <h2 className="text-xl md:text-2xl lg:text-3xl font-bold text-white mb-2 uppercase tracking-tight leading-tight">
-                {images[displayIndex].title}
+                {images[currentIndex].title}
               </h2>
               <p className="text-xs md:text-sm lg:text-base text-white/90 leading-relaxed">
-                {images[displayIndex].subtitle}
+                {images[currentIndex].subtitle}
               </p>
             </div>
 
@@ -191,50 +139,9 @@ export function HeroBanner({ images, interval = 5000 }: HeroBannerProps) {
           </div>
         </div>
 
-        {/* BANDEAU SUIVANT - Image suivante qui glisse depuis la droite */}
-        {images.length > 1 && isTransitioning && (
-          <div
-            className="absolute left-full top-0 h-full w-full z-[2] transition-transform duration-1000 ease-in-out"
-            style={{ transform: isTransitioning ? 'translateX(-100%)' : 'translateX(0)' }}
-          >
-            <div className="relative w-full h-full">
-              {!imageErrors.has(nextIndex) ? (
-                <Image
-                  src={images[nextIndex].src}
-                  alt={images[nextIndex].alt}
-                  fill
-                  className="object-cover"
-                  sizes="100vw"
-                  onError={() => setImageErrors((prev) => new Set(prev).add(nextIndex))}
-                />
-              ) : (
-                <div className="absolute inset-0 bg-gradient-to-br from-[#0A0A0A] via-[#1A1A1A] to-[#0A0A0A]"></div>
-              )}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/50 to-black/30"></div>
-              <div className="absolute bottom-0 left-0 p-6 md:p-8 lg:p-10 z-30 max-w-2xl">
-                <h2 className="text-xl md:text-2xl lg:text-3xl font-bold text-white mb-2 uppercase tracking-tight leading-tight">
-                  {images[nextIndex].title}
-                </h2>
-                <p className="text-xs md:text-sm lg:text-base text-white/90 leading-relaxed">
-                  {images[nextIndex].subtitle}
-                </p>
-              </div>
-              <div className="absolute top-4 right-4 z-30">
-                <div className="px-3 py-1.5 bg-white rounded-lg shadow-lg">
-                  <span className="text-xs font-semibold text-[#0A0A0A]">What's new</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
         {/* BANDEAU DROITE - Image suivante (aperçu) */}
         {images.length > 1 && (
-          <div
-            className={`absolute -right-[8%] top-0 h-full w-[12%] z-[1] transition-transform duration-1000 ease-in-out overflow-hidden ${
-              isTransitioning ? "translate-x-[calc(100%+8%)]" : "translate-x-0"
-            }`}
-          >
+          <div className="absolute -right-[8%] top-0 h-full w-[12%] z-[1] overflow-hidden">
             <div className="relative w-full h-full">
               {!imageErrors.has(nextIndex) ? (
                 <Image
@@ -260,8 +167,8 @@ export function HeroBanner({ images, interval = 5000 }: HeroBannerProps) {
           {images.map((_, index) => (
             <div
               key={index}
-              className={`transition-all duration-500 rounded-full ${
-                index === displayIndex
+              className={`rounded-full ${
+                index === currentIndex
                   ? "w-8 h-2 bg-white shadow-lg"
                   : "w-2 h-2 bg-white/50"
               }`}
