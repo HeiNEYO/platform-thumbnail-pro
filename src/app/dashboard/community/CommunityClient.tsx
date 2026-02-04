@@ -4,6 +4,7 @@ import { useEffect, useState, useRef } from "react";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { MemberCard } from "@/components/ui/MemberCard";
+import { MemberCardSkeleton } from "@/components/ui/MemberCardSkeleton";
 import { createClient } from "@/lib/supabase/client";
 import type { CommunityMember } from "@/lib/db/community";
 
@@ -232,8 +233,55 @@ export function CommunityClient({ initialMembers }: { initialMembers: CommunityM
 
   if (loading) {
     return (
-      <div className="rounded-lg border border-card-border bg-[#0a0a0a] p-12 text-center">
-        <p className="text-white/70">Chargement des membres...</p>
+      <div className="space-y-8">
+        {/* Skeleton pour Administrateurs */}
+        <div className="space-y-4">
+          <div className="flex items-center gap-3">
+            <div className="h-6 w-32 bg-white/10 rounded animate-pulse" />
+            <div className="h-5 w-8 bg-white/5 rounded animate-pulse" />
+          </div>
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {[1, 2].map((i) => (
+              <MemberCardSkeleton key={i} />
+            ))}
+          </div>
+        </div>
+
+        {/* Skeleton pour Intervenants */}
+        <div className="space-y-4">
+          <div className="relative my-6">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-white/10"></div>
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="h-6 w-28 bg-white/10 rounded animate-pulse" />
+            <div className="h-5 w-8 bg-white/5 rounded animate-pulse" />
+          </div>
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {[1, 2, 3].map((i) => (
+              <MemberCardSkeleton key={i} />
+            ))}
+          </div>
+        </div>
+
+        {/* Skeleton pour Membres */}
+        <div className="space-y-4">
+          <div className="relative my-6">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-white/10"></div>
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="h-6 w-20 bg-white/10 rounded animate-pulse" />
+            <div className="h-5 w-8 bg-white/5 rounded animate-pulse" />
+          </div>
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+              <MemberCardSkeleton key={i} />
+            ))}
+          </div>
+        </div>
       </div>
     );
   }
