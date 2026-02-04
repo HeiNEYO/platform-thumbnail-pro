@@ -119,6 +119,13 @@ export function NetflixStyleEpisodes({
                       )}
                     </div>
 
+                    {/* Description */}
+                    {episode.description && (
+                      <p className="text-xs text-white/60 leading-relaxed line-clamp-2 mb-2">
+                        {episode.description}
+                      </p>
+                    )}
+
                     {/* Durée */}
                     {episode.duration && (
                       <div className="flex items-center gap-1.5 text-xs text-white/60">
