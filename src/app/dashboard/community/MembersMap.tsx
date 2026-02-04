@@ -37,26 +37,49 @@ function MembersMap({ members }: MembersMapProps) {
 
       // Ajouter le fond de carte dark avec seulement les contours des pays
       // Utiliser CartoDB Dark Matter (style dark minimaliste)
-      const tileLayer = L.default.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
-        maxZoom: 19,
-        subdomains: "abcd",
-        tileSize: 256,
-        zoomOffset: 0,
-      });
+      let tileLayer: any;
       
-      tileLayer.addTo(map);
-      
-      // Gérer les erreurs de chargement des tuiles
-      tileLayer.on("tileerror", (error: any) => {
-        console.error("Erreur de chargement de tuile:", error);
-      });
+      try {
+        tileLayer = L.default.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
+          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
+          maxZoom: 19,
+          subdomains: "abcd",
+          tileSize: 256,
+          zoomOffset: 0,
+        });
+        
+        tileLayer.addTo(map);
+        
+        // Gérer les erreurs de chargement des tuiles - fallback vers OSM si nécessaire
+        tileLayer.on("tileerror", (error: any) => {
+          console.warn("Erreur de chargement de tuile CartoDB, utilisation du fallback OSM");
+          // Si CartoDB ne fonctionne pas, utiliser OpenStreetMap avec un filtre dark
+          if (mapRef.current) {
+            mapRef.current.removeLayer(tileLayer);
+            const osmLayer = L.default.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+              attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+              maxZoom: 19,
+            });
+            osmLayer.addTo(mapRef.current);
+          }
+        });
+      } catch (err) {
+        console.error("Erreur lors de la création du tile layer:", err);
+        // Fallback vers OpenStreetMap
+        const osmLayer = L.default.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+          maxZoom: 19,
+        });
+        osmLayer.addTo(map);
+      }
       
       // Vérifier que la carte est bien initialisée
       map.whenReady(() => {
         console.log("Carte Leaflet initialisée avec succès");
         // Forcer le redraw si nécessaire
-        map.invalidateSize();
+        setTimeout(() => {
+          map.invalidateSize();
+        }, 100);
       });
 
       mapRef.current = map;
