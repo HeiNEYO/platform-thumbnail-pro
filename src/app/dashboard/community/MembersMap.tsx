@@ -209,6 +209,10 @@ function MembersMap({ members }: MembersMapProps) {
         .leaflet-tile-pane {
           opacity: 1 !important;
         }
+        /* Rendre les contours des pays plus visibles avec un filtre léger */
+        .leaflet-tile {
+          filter: brightness(1.2) contrast(1.1) !important;
+        }
       `}</style>
     </div>
   );
