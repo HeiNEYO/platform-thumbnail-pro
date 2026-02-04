@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getModulesWithStats } from "@/lib/db/modules";
-import { BookOpen, Video, Users } from "lucide-react";
+import { BookOpen, Video, Users, Clock } from "lucide-react";
 import { NetflixStyleModuleCards } from "@/components/NetflixStyleModuleCards";
 
 // Force le rendu dynamique car on utilise cookies() pour l'authentification
@@ -84,6 +84,32 @@ export default async function ModulesPage() {
       .select("*", { count: "exact", head: true })
       .in("role", ["admin", "intervenant"]);
 
+    // Calculer la durée totale de tous les épisodes
+    const { data: allEpisodes } = await supabase
+      .from("episodes")
+      .select("duration");
+    
+    const totalDuration = allEpisodes?.reduce((total, ep) => {
+      if (!ep.duration) return total;
+      // Format attendu: "HH:MM:SS" ou "MM:SS"
+      const parts = ep.duration.split(":").map(Number);
+      if (parts.length === 2) {
+        // MM:SS
+        return total + parts[0] * 60 + parts[1];
+      } else if (parts.length === 3) {
+        // HH:MM:SS
+        return total + parts[0] * 3600 + parts[1] * 60 + parts[2];
+      }
+      return total;
+    }, 0) || 0;
+
+    // Formater la durée totale en heures et minutes
+    const hours = Math.floor(totalDuration / 3600);
+    const minutes = Math.floor((totalDuration % 3600) / 60);
+    const formattedDuration = hours > 0 
+      ? `${hours}h ${minutes}min`
+      : `${minutes}min`;
+
     // Trouver le module principal (celui avec l'image, généralement le premier)
     const mainModule = modulesWithStats.find((m) => m.image_url) || modulesWithStats[0];
 
@@ -142,6 +168,12 @@ export default async function ModulesPage() {
               <div className="flex items-center gap-2 px-4 py-2 rounded-full border border-white/20 bg-transparent">
                 <BookOpen className="h-4 w-4 text-white/70" />
                 <span className="text-sm text-white/80">{modulesWithStats.length} module{modulesWithStats.length > 1 ? "s" : ""}</span>
+              </div>
+
+              {/* Rectangle Durée */}
+              <div className="flex items-center gap-2 px-4 py-2 rounded-full border border-white/20 bg-transparent">
+                <Clock className="h-4 w-4 text-white/70" />
+                <span className="text-sm text-white/80">{formattedDuration}</span>
               </div>
 
               {/* Rectangle Intervenants */}

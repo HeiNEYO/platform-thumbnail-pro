@@ -6,7 +6,7 @@ import { getEpisodesByModule } from "@/lib/db/episodes";
 import { getModuleProgress } from "@/lib/db/modules";
 import { isEpisodeCompleted } from "@/lib/db/episodes";
 import { EpisodeGrid } from "@/components/EpisodeGrid";
-import { Video, Users } from "lucide-react";
+import { Video, Users, Clock } from "lucide-react";
 
 // Force le rendu dynamique car on utilise cookies() pour l'authentification
 export const dynamic = 'force-dynamic';
@@ -50,6 +50,28 @@ export default async function ModuleDetailPage({
     .from("users")
     .select("*", { count: "exact", head: true })
     .in("role", ["admin", "intervenant"]);
+
+  // Calculer la durée totale des épisodes du module
+  const totalDuration = episodes.reduce((total, ep) => {
+    if (!ep.duration) return total;
+    // Format attendu: "HH:MM:SS" ou "MM:SS"
+    const parts = ep.duration.split(":").map(Number);
+    if (parts.length === 2) {
+      // MM:SS
+      return total + parts[0] * 60 + parts[1];
+    } else if (parts.length === 3) {
+      // HH:MM:SS
+      return total + parts[0] * 3600 + parts[1] * 60 + parts[2];
+    }
+    return total;
+  }, 0);
+
+  // Formater la durée totale en heures et minutes
+  const hours = Math.floor(totalDuration / 3600);
+  const minutes = Math.floor((totalDuration % 3600) / 60);
+  const formattedDuration = hours > 0 
+    ? `${hours}h ${minutes}min`
+    : `${minutes}min`;
 
   return (
     <div className="space-y-7 animate-fade-in">
@@ -98,6 +120,12 @@ export default async function ModuleDetailPage({
         <div className="flex items-center gap-2 px-4 py-2 rounded-full border border-white/20 bg-transparent">
           <Video className="h-4 w-4 text-white/70" />
           <span className="text-sm text-white/80">{episodes.length} épisode{episodes.length > 1 ? "s" : ""}</span>
+        </div>
+
+        {/* Rectangle Durée */}
+        <div className="flex items-center gap-2 px-4 py-2 rounded-full border border-white/20 bg-transparent">
+          <Clock className="h-4 w-4 text-white/70" />
+          <span className="text-sm text-white/80">{formattedDuration}</span>
         </div>
 
         {/* Rectangle Intervenants */}
