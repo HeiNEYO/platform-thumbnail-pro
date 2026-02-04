@@ -2,6 +2,20 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Leaflet CSS fixes */
+.leaflet-container {
+  font-family: inherit;
+}
+
+.leaflet-popup-content-wrapper {
+  border-radius: 8px;
+}
+
+.leaflet-popup-content {
+  margin: 0;
+  padding: 0;
+}
+
 /* Masquer la scrollbar pour le style Netflix */
 .scrollbar-hide {
   -ms-overflow-style: none; /* IE and Edge */

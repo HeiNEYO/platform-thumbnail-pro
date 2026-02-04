@@ -7,6 +7,18 @@ import { MemberCard } from "@/components/ui/MemberCard";
 import { MemberCardSkeleton } from "@/components/ui/MemberCardSkeleton";
 import { createClient } from "@/lib/supabase/client";
 import type { CommunityMember } from "@/lib/db/community";
+import { MapPin, Users } from "lucide-react";
+import dynamic from "next/dynamic";
+
+// Import dynamique de la carte pour éviter les problèmes SSR
+const MembersMap = dynamic(() => import("./MembersMap"), {
+  ssr: false,
+  loading: () => (
+    <div className="h-[600px] rounded-lg border border-white/10 bg-[#0a0a0a] flex items-center justify-center">
+      <div className="text-white/50">Chargement de la carte...</div>
+    </div>
+  ),
+});
 
 function mapMembersFromRows(rows: any[]): CommunityMember[] {
   return rows
@@ -24,6 +36,11 @@ function mapMembersFromRows(rows: any[]): CommunityMember[] {
         discord_tag: discordTag,
         community_score: communityScore,
         role: (row.role || "member") as "member" | "admin" | "intervenant",
+        latitude: row.latitude ?? null,
+        longitude: row.longitude ?? null,
+        city: row.city ?? null,
+        country: row.country ?? null,
+        show_location: row.show_location ?? false,
       };
     })
     .sort((a, b) => b.community_score - a.community_score);
@@ -36,8 +53,8 @@ function mapMembersFromRows(rows: any[]): CommunityMember[] {
 async function queryMembers(fallbackWithoutScore = false) {
   const supabase = createClient();
   const columns = fallbackWithoutScore
-    ? "id, email, full_name, avatar_url, role, twitter_handle, discord_tag"
-    : "id, email, full_name, avatar_url, role, twitter_handle, discord_tag, community_score";
+    ? "id, email, full_name, avatar_url, role, twitter_handle, discord_tag, latitude, longitude, city, country, show_location"
+    : "id, email, full_name, avatar_url, role, twitter_handle, discord_tag, community_score, latitude, longitude, city, country, show_location";
   // Récupération de TOUS les utilisateurs sans filtre
   return supabase
     .from("users")
@@ -45,12 +62,15 @@ async function queryMembers(fallbackWithoutScore = false) {
     .order("created_at", { ascending: false });
 }
 
+type TabType = "list" | "map";
+
 export function CommunityClient({ initialMembers }: { initialMembers: CommunityMember[] }) {
   const { user: currentUser } = useAuth();
   const pathname = usePathname();
   const [members, setMembers] = useState<CommunityMember[]>(initialMembers);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<TabType>("list");
   const hasLoadedRef = useRef(false);
   const isLoadingRef = useRef(false);
   const lastLoadTimeRef = useRef<number>(0);
@@ -367,28 +387,94 @@ export function CommunityClient({ initialMembers }: { initialMembers: CommunityM
     );
   };
 
+  // Membres avec localisation activée pour la carte
+  const membersWithLocation = members.filter(m => 
+    m.show_location && m.latitude && m.longitude
+  );
+
   return (
-    <div className="space-y-8">
-      {/* Section Administrateurs */}
-      <Section 
-        title="Administrateurs" 
-        members={admins} 
-        showDivider={false}
-      />
+    <div className="space-y-6">
+      {/* Onglets */}
+      <div className="flex items-center gap-3 border-b border-white/10">
+        <button
+          onClick={() => setActiveTab("list")}
+          className={`flex items-center gap-2 px-4 py-3 text-sm font-medium transition-colors border-b-2 ${
+            activeTab === "list"
+              ? "text-white border-[#1D4ED8]"
+              : "text-white/60 border-transparent hover:text-white/80"
+          }`}
+        >
+          <Users className="h-4 w-4" />
+          <span>Liste</span>
+        </button>
+        <button
+          onClick={() => setActiveTab("map")}
+          className={`flex items-center gap-2 px-4 py-3 text-sm font-medium transition-colors border-b-2 ${
+            activeTab === "map"
+              ? "text-white border-[#1D4ED8]"
+              : "text-white/60 border-transparent hover:text-white/80"
+          }`}
+        >
+          <MapPin className="h-4 w-4" />
+          <span>Cartes membres</span>
+          {membersWithLocation.length > 0 && (
+            <span className="ml-1 px-2 py-0.5 text-xs rounded-full bg-[#1D4ED8]/20 text-[#1D4ED8]">
+              {membersWithLocation.length}
+            </span>
+          )}
+        </button>
+      </div>
 
-      {/* Section Intervenants */}
-      <Section 
-        title="Intervenants" 
-        members={intervenants}
-        showDivider={admins.length > 0}
-      />
+      {/* Contenu selon l'onglet actif */}
+      {activeTab === "list" ? (
+        <div className="space-y-8">
+          {/* Section Administrateurs */}
+          <Section 
+            title="Administrateurs" 
+            members={admins} 
+            showDivider={false}
+          />
 
-      {/* Section Membres */}
-      <Section 
-        title="Membres" 
-        members={regularMembers}
-        showDivider={admins.length > 0 || intervenants.length > 0}
-      />
+          {/* Section Intervenants */}
+          <Section 
+            title="Intervenants" 
+            members={intervenants}
+            showDivider={admins.length > 0}
+          />
+
+          {/* Section Membres */}
+          <Section 
+            title="Membres" 
+            members={regularMembers}
+            showDivider={admins.length > 0 || intervenants.length > 0}
+          />
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {membersWithLocation.length > 0 ? (
+            <>
+              <div className="flex items-center justify-between">
+                <p className="text-white/70 text-sm">
+                  {membersWithLocation.length} membre{membersWithLocation.length > 1 ? "s" : ""} visible{membersWithLocation.length > 1 ? "s" : ""} sur la carte
+                </p>
+                <p className="text-white/50 text-xs">
+                  Activez l'affichage de votre localisation dans votre profil pour apparaître sur la carte
+                </p>
+              </div>
+              <MembersMap members={membersWithLocation as any} />
+            </>
+          ) : (
+            <div className="h-[600px] rounded-lg border border-white/10 bg-[#0a0a0a] flex flex-col items-center justify-center p-8 text-center">
+              <MapPin className="h-12 w-12 text-white/30 mb-4" />
+              <h3 className="text-lg font-semibold text-white mb-2">Aucun membre visible</h3>
+              <p className="text-white/60 text-sm max-w-md">
+                Aucun membre n'a activé l'affichage de sa localisation pour le moment.
+                Activez cette option dans votre profil pour apparaître sur la carte !
+              </p>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }

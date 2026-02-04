@@ -16,6 +16,11 @@ export interface Database {
           twitter_handle?: string | null;
           discord_tag?: string | null;
           community_score?: number | null;
+          latitude?: number | null;
+          longitude?: number | null;
+          city?: string | null;
+          country?: string | null;
+          show_location?: boolean | null;
           created_at: string;
           updated_at: string;
         };
@@ -29,6 +34,11 @@ export interface Database {
           twitter_handle?: string | null;
           discord_tag?: string | null;
           community_score?: number | null;
+          latitude?: number | null;
+          longitude?: number | null;
+          city?: string | null;
+          country?: string | null;
+          show_location?: boolean | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -42,6 +52,11 @@ export interface Database {
           twitter_handle?: string | null;
           discord_tag?: string | null;
           community_score?: number | null;
+          latitude?: number | null;
+          longitude?: number | null;
+          city?: string | null;
+          country?: string | null;
+          show_location?: boolean | null;
           created_at?: string;
           updated_at?: string;
         };

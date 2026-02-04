@@ -9,6 +9,11 @@ export interface CommunityMember {
   discord_tag: string | null;
   community_score: number;
   role: "member" | "admin" | "intervenant";
+  latitude?: number | null;
+  longitude?: number | null;
+  city?: string | null;
+  country?: string | null;
+  show_location?: boolean | null;
 }
 
 function mapMembers(rows: any[]) {
@@ -27,6 +32,11 @@ function mapMembers(rows: any[]) {
         discord_tag: discordTag,
         community_score: communityScore,
         role: (row.role || "member") as "member" | "admin" | "intervenant",
+        latitude: row.latitude ?? null,
+        longitude: row.longitude ?? null,
+        city: row.city ?? null,
+        country: row.country ?? null,
+        show_location: row.show_location ?? false,
       };
     })
     .sort((a, b) => b.community_score - a.community_score);
@@ -46,7 +56,7 @@ export async function getAllCommunityMembers(): Promise<CommunityMember[]> {
     // Limiter à 1000 pour éviter les timeouts
     let query = supabase
       .from("users")
-      .select("id, email, full_name, avatar_url, role, twitter_handle, discord_tag, community_score")
+      .select("id, email, full_name, avatar_url, role, twitter_handle, discord_tag, community_score, latitude, longitude, city, country, show_location")
       .order("created_at", { ascending: false })
       .limit(1000);
 

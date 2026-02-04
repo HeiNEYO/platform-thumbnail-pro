@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { createClient } from "@/lib/supabase/client";
 import { UserAvatar } from "@/components/ui/UserAvatar";
-import { Save, Loader2, Upload, X, CheckCircle2, AlertCircle } from "lucide-react";
+import { Save, Loader2, Upload, X, CheckCircle2, AlertCircle, MapPin, Search } from "lucide-react";
 import type { UserRow } from "@/lib/supabase/database.types";
 
 export default function ProfilePage() {
@@ -14,6 +14,10 @@ export default function ProfilePage() {
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [discordTag, setDiscordTag] = useState("");
   const [twitterHandle, setTwitterHandle] = useState("");
+  const [city, setCity] = useState("");
+  const [country, setCountry] = useState("");
+  const [showLocation, setShowLocation] = useState(false);
+  const [searchingLocation, setSearchingLocation] = useState(false);
   const [xp, setXp] = useState(0);
   const [completedEvaluations, setCompletedEvaluations] = useState(0);
   const [saving, setSaving] = useState(false);
@@ -69,6 +73,24 @@ export default function ProfilePage() {
           console.warn("Impossible de charger les handles Twitter/Discord :", err);
           setDiscordTag("");
           setTwitterHandle("");
+        }
+
+        // Charger les données de localisation
+        try {
+          const { data: locationData, error: locationError } = await supabase
+            .from("users")
+            .select("city, country, show_location, latitude, longitude")
+            .eq("id", user.id)
+            .single();
+
+          if (!locationError && locationData) {
+            const location = locationData as any;
+            setCity(location.city || "");
+            setCountry(location.country || "");
+            setShowLocation(location.show_location || false);
+          }
+        } catch (err) {
+          console.warn("Impossible de charger les données de localisation :", err);
         }
         
         // Calculer l'XP basé sur la progression (à adapter selon votre logique)
@@ -280,6 +302,53 @@ export default function ProfilePage() {
         throw handlesError;
       }
 
+      // Sauvegarder les données de localisation
+      const cleanCity = city.trim() || null;
+      const cleanCountry = country.trim() || null;
+      
+      // Si la localisation est activée et qu'on a une ville ou un pays, géocoder
+      let latitude: number | null = null;
+      let longitude: number | null = null;
+      
+      if (showLocation && (cleanCity || cleanCountry)) {
+        try {
+          const query = [cleanCity, cleanCountry].filter(Boolean).join(", ");
+          const response = await fetch(
+            `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1`,
+            {
+              headers: {
+                "User-Agent": "ThumbnailPro/1.0",
+              },
+            }
+          );
+          const data = await response.json();
+          if (data && data.length > 0) {
+            latitude = parseFloat(data[0].lat);
+            longitude = parseFloat(data[0].lon);
+          }
+        } catch (err) {
+          console.warn("Erreur lors du géocodage:", err);
+        }
+      }
+
+      const locationUpdateData: any = {
+        city: cleanCity,
+        country: cleanCountry,
+        show_location: showLocation,
+        latitude: showLocation ? latitude : null,
+        longitude: showLocation ? longitude : null,
+      };
+      
+      const { error: locationError } = await supabase
+        .from("users")
+        .update(locationUpdateData as never)
+        .eq("id", user.id);
+      
+      if (locationError) {
+        console.warn("Erreur lors de la sauvegarde de la localisation:", locationError);
+        // Ne pas bloquer la sauvegarde si les colonnes n'existent pas encore
+      }
+
       // Rafraîchir le profil dans le contexte
       await refreshUserProfile();
       
@@ -476,6 +545,60 @@ export default function ProfilePage() {
                 />
               </div>
               <p className="text-xs text-white/50 mt-1.5">Votre tag Discord (ex: username#1234)</p>
+            </div>
+
+            {/* Section Localisation */}
+            <div className="flex-shrink-0 pt-4 border-t border-white/10">
+              <div className="flex items-center gap-2 mb-4">
+                <MapPin className="h-4 w-4 text-white/70" />
+                <h3 className="text-sm font-semibold text-white">Localisation</h3>
+              </div>
+              
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-semibold text-white mb-2">
+                    Ville
+                  </label>
+                  <input
+                    type="text"
+                    value={city}
+                    onChange={(e) => setCity(e.target.value)}
+                    className="w-full rounded-lg border border-card-border bg-black px-4 py-3 text-white text-sm placeholder-white/50 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+                    placeholder="Paris"
+                    maxLength={100}
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-white mb-2">
+                    Pays
+                  </label>
+                  <input
+                    type="text"
+                    value={country}
+                    onChange={(e) => setCountry(e.target.value)}
+                    className="w-full rounded-lg border border-card-border bg-black px-4 py-3 text-white text-sm placeholder-white/50 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+                    placeholder="France"
+                    maxLength={100}
+                  />
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <input
+                    type="checkbox"
+                    id="showLocation"
+                    checked={showLocation}
+                    onChange={(e) => setShowLocation(e.target.checked)}
+                    className="w-4 h-4 rounded border-card-border bg-black text-primary focus:ring-2 focus:ring-primary/20 cursor-pointer"
+                  />
+                  <label htmlFor="showLocation" className="text-sm text-white/80 cursor-pointer">
+                    Afficher ma localisation sur la carte des membres
+                  </label>
+                </div>
+                <p className="text-xs text-white/50">
+                  Votre position sera visible sur la carte de la communauté si vous activez cette option
+                </p>
+              </div>
             </div>
 
             {/* Message de succès/erreur */}
