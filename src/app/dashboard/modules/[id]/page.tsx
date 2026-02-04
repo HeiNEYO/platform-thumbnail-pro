@@ -85,7 +85,7 @@ export default async function ModuleDetailPage({
       </div>
 
       {/* En-tête du module avec image et blur */}
-      <div className="relative h-[320px] rounded-lg border border-white/10 overflow-hidden bg-[#0a0a0a]">
+      <div className="relative h-[450px] rounded-lg border border-white/10 overflow-hidden bg-[#0a0a0a]">
         {/* Image de fond - pleine hauteur */}
         <div className="absolute inset-0 w-full h-full">
           {module.image_url ? (
