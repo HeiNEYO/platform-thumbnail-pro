@@ -96,8 +96,8 @@ export default async function ModulesPage() {
         {mainModule && (
           <div className="mb-8">
             <div className="relative h-[280px] rounded-lg border border-white/10 overflow-hidden bg-[#0a0a0a]">
-              {/* Image de fond - 80% */}
-              <div className="absolute inset-0 w-full h-[80%]">
+              {/* Image de fond - pleine hauteur */}
+              <div className="absolute inset-0 w-full h-full">
                 {mainModule.image_url ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
@@ -110,8 +110,8 @@ export default async function ModulesPage() {
                 )}
               </div>
 
-              {/* Masque flou avec opacité réduite - 20% en bas */}
-              <div className="absolute bottom-0 left-0 right-0 h-[20%] bg-gradient-to-t from-black/90 via-black/70 to-transparent backdrop-blur-sm">
+              {/* Blur sur 15% du bas de l'image */}
+              <div className="absolute bottom-0 left-0 right-0 h-[15%] backdrop-blur-md bg-gradient-to-t from-black/60 via-black/40 to-transparent">
                 <div className="absolute bottom-0 left-0 right-0 p-5 flex flex-col gap-2">
                   <h2 className="text-xl font-bold text-white">Thumbnail Pro</h2>
                   <div className="flex items-center gap-4 text-sm text-white/80">

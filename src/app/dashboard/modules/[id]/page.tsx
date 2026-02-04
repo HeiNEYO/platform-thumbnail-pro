@@ -56,27 +56,46 @@ export default async function ModuleDetailPage({
         <span className="text-white">{module.title}</span>
       </div>
 
-      {/* En-tête du module */}
-      <div className="rounded-lg border border-card-border bg-black p-6">
-        <h1 className="text-2xl font-bold text-white mb-2">{module.title}</h1>
-        {module.description && (
-          <p className="text-white/70 mb-4">{module.description}</p>
-        )}
-        <div className="flex items-center gap-6 text-sm text-white/60">
-          <span>{episodes.length} épisode{episodes.length > 1 ? "s" : ""}</span>
-          {module.duration_estimate && (
-            <>
-              <span>•</span>
-              <span>{module.duration_estimate}</span>
-            </>
+      {/* En-tête du module avec image et blur */}
+      <div className="relative h-[280px] rounded-lg border border-white/10 overflow-hidden bg-[#0a0a0a]">
+        {/* Image de fond - pleine hauteur */}
+        <div className="absolute inset-0 w-full h-full">
+          {module.image_url ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={module.image_url}
+              alt={module.title}
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <div className="w-full h-full bg-gradient-to-br from-primary/20 via-primary/10 to-[#0a0a0a]" />
           )}
         </div>
-        <div className="mt-4">
-          <div className="flex justify-between text-sm mb-2">
-            <span className="text-white/70">Progression</span>
-            <span className="text-primary font-medium">{progressPercent}%</span>
+
+        {/* Blur sur 15% du bas de l'image */}
+        <div className="absolute bottom-0 left-0 right-0 h-[15%] backdrop-blur-md bg-gradient-to-t from-black/60 via-black/40 to-transparent">
+          <div className="absolute bottom-0 left-0 right-0 p-5 flex flex-col gap-2">
+            <h1 className="text-xl font-bold text-white">{module.title}</h1>
+            {module.description && (
+              <p className="text-white/80 text-sm line-clamp-2">{module.description}</p>
+            )}
+            <div className="flex items-center gap-4 text-sm text-white/80">
+              <span>{episodes.length} épisode{episodes.length > 1 ? "s" : ""}</span>
+              {module.duration_estimate && (
+                <>
+                  <span>•</span>
+                  <span>{module.duration_estimate}</span>
+                </>
+              )}
+            </div>
+            <div className="mt-1">
+              <div className="flex justify-between text-xs mb-1">
+                <span className="text-white/70">Progression</span>
+                <span className="text-primary font-medium">{progressPercent}%</span>
+              </div>
+              <ProgressBar value={progressPercent} />
+            </div>
           </div>
-          <ProgressBar value={progressPercent} />
         </div>
       </div>
 

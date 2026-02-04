@@ -20,7 +20,7 @@ export function EpisodeGrid({
   instructorName = "Corentin",
   instructorAvatar,
 }: EpisodeGridProps) {
-  // Pour chaque �pisode, calculer le pourcentage de progression (0% ou 100% selon completed)
+  // Pour chaque épisode, calculer le pourcentage de progression (0% ou 100% selon completed)
   const getProgressPercent = (index: number): number => {
     return completedFlags[index] ? 100 : 0;
   };
@@ -29,7 +29,7 @@ export function EpisodeGrid({
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
       {episodes.length === 0 ? (
         <div className="col-span-full py-12 text-center text-white/50">
-          Aucun �pisode disponible
+          Aucun épisode disponible
         </div>
       ) : (
         episodes.map((episode, index) => (
