@@ -8,21 +8,6 @@ interface MembersMapProps {
   members: CommunityMember[];
 }
 
-// Fix pour les icônes Leaflet avec Next.js
-const createIcon = (iconUrl: string) => {
-  return L.icon({
-    iconUrl,
-    iconSize: [25, 41],
-    iconAnchor: [12, 41],
-    popupAnchor: [1, -34],
-    shadowSize: [41, 41],
-  });
-};
-
-// Icône par défaut pour les marqueurs
-const defaultIcon = createIcon("https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png");
-const shadowIcon = "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png";
-
 function MembersMap({ members }: MembersMapProps) {
   const mapRef = useRef<any>(null);
   const mapContainerRef = useRef<HTMLDivElement>(null);
