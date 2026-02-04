@@ -36,17 +36,27 @@ function MembersMap({ members }: MembersMapProps) {
       });
 
       // Ajouter le fond de carte dark avec seulement les contours des pays
-      // Utiliser un style dark minimaliste
-      L.default.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
+      // Utiliser CartoDB Dark Matter (style dark minimaliste)
+      const tileLayer = L.default.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
         maxZoom: 19,
         subdomains: "abcd",
-        errorTileUrl: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==",
-      }).addTo(map);
+        tileSize: 256,
+        zoomOffset: 0,
+      });
+      
+      tileLayer.addTo(map);
+      
+      // Gérer les erreurs de chargement des tuiles
+      tileLayer.on("tileerror", (error: any) => {
+        console.error("Erreur de chargement de tuile:", error);
+      });
       
       // Vérifier que la carte est bien initialisée
       map.whenReady(() => {
         console.log("Carte Leaflet initialisée avec succès");
+        // Forcer le redraw si nécessaire
+        map.invalidateSize();
       });
 
       mapRef.current = map;
