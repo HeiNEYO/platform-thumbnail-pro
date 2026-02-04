@@ -92,13 +92,13 @@ export default async function ModuleDetailPage({
       {/* Rectangles avec statistiques sous l'image */}
       <div className="flex items-center gap-3">
         {/* Rectangle Épisodes */}
-        <div className="flex items-center gap-2 px-4 py-2 rounded-lg border border-white/20 bg-transparent">
+        <div className="flex items-center gap-2 px-4 py-2 rounded-full border border-white/20 bg-transparent">
           <Video className="h-4 w-4 text-white/70" />
           <span className="text-sm text-white/80">{episodes.length} épisode{episodes.length > 1 ? "s" : ""}</span>
         </div>
 
         {/* Rectangle Intervenants */}
-        <div className="flex items-center gap-2 px-4 py-2 rounded-lg border border-white/20 bg-transparent">
+        <div className="flex items-center gap-2 px-4 py-2 rounded-full border border-white/20 bg-transparent">
           <Users className="h-4 w-4 text-white/70" />
           <span className="text-sm text-white/80">{intervenantsCount || 0} intervenant{(intervenantsCount || 0) > 1 ? "s" : ""}</span>
         </div>
