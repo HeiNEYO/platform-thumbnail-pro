@@ -217,14 +217,10 @@ function MembersMap({ members }: MembersMapProps) {
         .leaflet-tile-pane {
           opacity: 1 !important;
         }
-        /* Inverser les couleurs : océans = fond du site (#0a0a0a), pays = couleur légèrement différente */
-        /* Le style CartoDB Dark Matter est déjà sombre, on ajuste juste les couleurs */
+        /* Le style CartoDB Dark Matter est déjà sombre avec océans noirs et pays gris foncé */
+        /* Ajuster légèrement pour correspondre au design du site */
         .leaflet-tile {
-          filter: brightness(0.8) contrast(1.1) !important;
-        }
-        /* Forcer les océans à être de la couleur du fond */
-        .leaflet-tile-container {
-          mix-blend-mode: normal;
+          filter: brightness(0.9) contrast(1.05) !important;
         }
         /* Masquer l'attribution OpenStreetMap */
         .leaflet-control-attribution {
