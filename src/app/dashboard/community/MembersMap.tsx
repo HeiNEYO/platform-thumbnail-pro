@@ -35,10 +35,11 @@ function MembersMap({ members }: MembersMapProps) {
         worldCopyJump: true,
       });
 
-      // Ajouter le fond de carte (tile layer) - style simple et épuré
-      L.default.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+      // Ajouter le fond de carte dark avec seulement les contours des pays
+      L.default.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
         maxZoom: 19,
+        subdomains: "abcd",
       }).addTo(map);
 
       mapRef.current = map;
@@ -79,47 +80,35 @@ function MembersMap({ members }: MembersMapProps) {
 
         if (isNaN(lat) || isNaN(lng)) return;
 
-        // Créer un marqueur personnalisé avec avatar
-        const customIcon = L.default.divIcon({
-          className: "custom-marker",
+        // Créer une icône de localisation simple et sobre
+        const locationIcon = L.default.divIcon({
+          className: "location-marker",
           html: `
-            <div class="relative">
-              <div class="w-10 h-10 rounded-full border-2 border-white shadow-lg overflow-hidden bg-[#0a0a0a]">
-                ${member.avatar_url 
-                  ? `<img src="${member.avatar_url}" alt="${member.full_name || 'Membre'}" class="w-full h-full object-cover" />`
-                  : `<div class="w-full h-full flex items-center justify-center text-white text-xs font-semibold bg-[#1D4ED8]">${(member.full_name || member.email || 'M').charAt(0).toUpperCase()}</div>`
-                }
-              </div>
-              <div class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-3 h-3 bg-[#1D4ED8] rounded-full border-2 border-white"></div>
+            <div class="relative flex items-center justify-center">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" fill="#1D4ED8" stroke="#0a0a0a" stroke-width="1.5"/>
+              </svg>
             </div>
           `,
-          iconSize: [40, 40],
-          iconAnchor: [20, 40],
-          popupAnchor: [0, -40],
+          iconSize: [24, 24],
+          iconAnchor: [12, 24],
+          popupAnchor: [0, -24],
         });
 
-        const marker = L.default.marker([lat, lng], { icon: customIcon }).addTo(mapRef.current!);
+        const marker = L.default.marker([lat, lng], { icon: locationIcon }).addTo(mapRef.current!);
 
-        // Créer le contenu du popup
+        // Créer le contenu du popup sobre
         const popupContent = `
-          <div class="p-3 min-w-[200px]">
-            <div class="flex items-center gap-3 mb-2">
-              ${member.avatar_url 
-                ? `<img src="${member.avatar_url}" alt="${member.full_name || 'Membre'}" class="w-10 h-10 rounded-full object-cover" />`
-                : `<div class="w-10 h-10 rounded-full flex items-center justify-center text-white text-sm font-semibold bg-[#1D4ED8]">${(member.full_name || member.email || 'M').charAt(0).toUpperCase()}</div>`
-              }
-              <div>
-                <h3 class="font-semibold text-gray-900 text-sm">${member.full_name || "Membre"}</h3>
-                ${member.city || member.country 
-                  ? `<p class="text-xs text-gray-600">${[member.city, member.country].filter(Boolean).join(", ")}</p>`
-                  : ""
-                }
-              </div>
-            </div>
+          <div class="p-3 min-w-[180px]">
+            <h3 class="font-semibold text-white text-sm mb-1">${member.full_name || "Membre"}</h3>
+            ${member.city || member.country 
+              ? `<p class="text-xs text-white/60 mb-2">${[member.city, member.country].filter(Boolean).join(", ")}</p>`
+              : ""
+            }
             ${member.role === "admin" 
-              ? `<span class="inline-block px-2 py-0.5 text-xs rounded bg-blue-100 text-blue-800">Admin</span>`
+              ? `<span class="inline-block px-2 py-0.5 text-xs rounded bg-[#1D4ED8]/20 text-[#1D4ED8] border border-[#1D4ED8]/30">Admin</span>`
               : member.role === "intervenant"
-              ? `<span class="inline-block px-2 py-0.5 text-xs rounded bg-purple-100 text-purple-800">Intervenant</span>`
+              ? `<span class="inline-block px-2 py-0.5 text-xs rounded bg-[#1D4ED8]/20 text-[#1D4ED8] border border-[#1D4ED8]/30">Intervenant</span>`
               : ""
             }
           </div>
@@ -155,20 +144,27 @@ function MembersMap({ members }: MembersMapProps) {
         style={{ zIndex: 1 }}
       />
       <style jsx global>{`
-        .custom-marker {
+        .location-marker {
           background: transparent !important;
           border: none !important;
         }
         .leaflet-popup-content-wrapper {
-          background: white;
+          background: #0a0a0a;
+          border: 1px solid rgba(255, 255, 255, 0.1);
           border-radius: 8px;
-          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+          color: white;
         }
         .leaflet-popup-tip {
-          background: white;
+          background: #0a0a0a;
+          border: 1px solid rgba(255, 255, 255, 0.1);
         }
         .leaflet-container {
           background: #0a0a0a;
+        }
+        /* Filtrer les couleurs de la carte pour rendre les contours dans la couleur secondaire */
+        .leaflet-tile-container img {
+          filter: brightness(0.3) contrast(1.2) hue-rotate(200deg) saturate(0.5);
         }
       `}</style>
     </div>
