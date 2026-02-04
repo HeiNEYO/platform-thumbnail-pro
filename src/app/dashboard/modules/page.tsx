@@ -145,8 +145,8 @@ export default async function ModulesPage() {
                 )}
               </div>
 
-              {/* Blur sur 30% du bas de l'image */}
-              <div className="absolute bottom-0 left-0 right-0 h-[30%] backdrop-blur-md bg-gradient-to-t from-black/60 via-black/40 to-transparent border-t border-white/10">
+              {/* Blur sur 22% du bas de l'image */}
+              <div className="absolute bottom-0 left-0 right-0 h-[22%] backdrop-blur-md bg-gradient-to-t from-black/60 via-black/40 to-transparent border-t border-white/10">
                 <div className="absolute bottom-0 left-0 right-0 p-5 flex flex-col gap-2">
                   <h2 className="text-xl font-bold text-white">Thumbnail Pro</h2>
                   {mainModule.description && (
