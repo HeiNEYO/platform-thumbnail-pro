@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getModulesWithStats } from "@/lib/db/modules";
 import { BookOpen, Video, Users, Clock } from "lucide-react";
 import { NetflixStyleModuleCards } from "@/components/NetflixStyleModuleCards";
+import type { EpisodeRow } from "@/lib/supabase/database.types";
 
 // Force le rendu dynamique car on utilise cookies() pour l'authentification
 export const dynamic = 'force-dynamic';
@@ -85,11 +86,13 @@ export default async function ModulesPage() {
       .in("role", ["admin", "intervenant"]);
 
     // Calculer la durée totale de tous les épisodes
-    const { data: allEpisodes } = await supabase
+    const { data: allEpisodesData } = await supabase
       .from("episodes")
       .select("duration");
     
-    const totalDuration = allEpisodes?.reduce((total, ep) => {
+    const allEpisodes = (allEpisodesData || []) as Pick<EpisodeRow, "duration">[];
+    
+    const totalDuration = allEpisodes.reduce((total, ep) => {
       if (!ep.duration) return total;
       // Format attendu: "HH:MM:SS" ou "MM:SS"
       const parts = ep.duration.split(":").map(Number);
@@ -101,7 +104,7 @@ export default async function ModulesPage() {
         return total + parts[0] * 3600 + parts[1] * 60 + parts[2];
       }
       return total;
-    }, 0) || 0;
+    }, 0);
 
     // Formater la durée totale en heures et minutes
     const hours = Math.floor(totalDuration / 3600);
