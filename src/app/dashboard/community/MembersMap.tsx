@@ -41,7 +41,7 @@ function MembersMap({ members }: MembersMapProps) {
       
       try {
         tileLayer = L.default.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
-          attribution: false, // Masquer l'attribution
+          attribution: "", // Masquer l'attribution
           maxZoom: 19,
           subdomains: "abcd",
           tileSize: 256,
@@ -57,7 +57,7 @@ function MembersMap({ members }: MembersMapProps) {
           if (mapRef.current) {
             mapRef.current.removeLayer(tileLayer);
             const osmLayer = L.default.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-              attribution: false, // Masquer l'attribution
+              attribution: "", // Masquer l'attribution
               maxZoom: 19,
             });
             osmLayer.addTo(mapRef.current);
@@ -67,7 +67,7 @@ function MembersMap({ members }: MembersMapProps) {
         console.error("Erreur lors de la création du tile layer:", err);
         // Fallback vers OpenStreetMap
         const osmLayer = L.default.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-          attribution: false, // Masquer l'attribution
+          attribution: "", // Masquer l'attribution
           maxZoom: 19,
         });
         osmLayer.addTo(map);
