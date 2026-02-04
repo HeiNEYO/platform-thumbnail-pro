@@ -83,6 +83,7 @@ export interface Database {
           id: string;
           module_id: string;
           title: string;
+          description: string | null;
           duration: string | null;
           order_index: number;
           video_url: string | null;
@@ -93,6 +94,7 @@ export interface Database {
           id?: string;
           module_id: string;
           title: string;
+          description?: string | null;
           duration?: string | null;
           order_index: number;
           video_url?: string | null;
@@ -103,6 +105,7 @@ export interface Database {
           id?: string;
           module_id?: string;
           title?: string;
+          description?: string | null;
           duration?: string | null;
           order_index?: number;
           video_url?: string | null;

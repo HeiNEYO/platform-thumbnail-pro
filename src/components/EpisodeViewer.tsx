@@ -152,6 +152,11 @@ export function EpisodeViewer({
               <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-white leading-tight">
                 {episode.title}
               </h1>
+              {episode.description && (
+                <p className="text-base text-white/70 leading-relaxed mt-3 max-w-3xl">
+                  {episode.description}
+                </p>
+              )}
             </div>
           </div>
 

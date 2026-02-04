@@ -114,6 +114,13 @@ export function EpisodeGridCard({
           {episode.title}
         </h3>
 
+        {/* Description */}
+        {episode.description && (
+          <p className="text-sm text-white/60 leading-relaxed line-clamp-2">
+            {episode.description}
+          </p>
+        )}
+
         {/* SECTION 3 : CTA ET AVATAR */}
         <div className="flex items-center justify-between">
           {/* Bouton CTA */}
