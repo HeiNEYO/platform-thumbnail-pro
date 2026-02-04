@@ -70,38 +70,17 @@ export default function MarketplacePage() {
       {/* Content Cards Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {/* LegalPlace Card */}
-        <div className="rounded-lg border border-white/10 bg-[#0a0a0a] overflow-hidden">
-          {/* Banner Area - White Background */}
-          <div className="bg-white p-6">
-            <h2 className="text-2xl font-bold text-[#0a0a0a] mb-2">
-              Lancez votre société, simplement.
-            </h2>
-            <p className="text-sm text-[#666666] mb-4">
-              Créez et gérez votre entreprise en toute simplicité. Des démarches administratives à la gestion quotidienne, simplifiez vos procédures légales.
-            </p>
-            
-            {/* Buttons */}
-            <div className="flex flex-col sm:flex-row gap-2 mb-4">
-              <button className="px-4 py-2 bg-[#2563EB] text-white rounded-lg text-sm font-medium hover:bg-[#1D4ED8] transition-colors">
-                Créer mon entreprise
-              </button>
-              <button className="px-4 py-2 bg-[#2563EB] text-white rounded-lg text-sm font-medium hover:bg-[#1D4ED8] transition-colors">
-                Découvrir mes offres
-              </button>
-            </div>
-
-            {/* Trustpilot and Google Ratings */}
-            <div className="flex items-center gap-4 text-xs text-[#666666]">
-              <div className="flex items-center gap-1">
-                <span className="font-medium">Excellent</span>
-                <span>Trustpilot</span>
-              </div>
-              <div className="flex items-center gap-1">
-                {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="h-3 w-3 fill-[#FFA500] text-[#FFA500]" />
-                ))}
-                <span className="ml-1">Google</span>
-              </div>
+        <a
+          href="https://www.legalplace.fr"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="block rounded-lg border border-white/10 bg-[#0a0a0a] overflow-hidden hover:border-white/20 transition-colors"
+        >
+          {/* Banner Area - Image */}
+          <div className="relative h-[200px] bg-gradient-to-br from-white/10 to-white/5">
+            {/* Placeholder pour l'image - à remplacer par l'image du partenariat */}
+            <div className="w-full h-full flex items-center justify-center text-white/30 text-sm">
+              Image du partenariat
             </div>
           </div>
 
