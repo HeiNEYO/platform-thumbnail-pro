@@ -135,18 +135,7 @@ export default function LegalPlacePage() {
             return (
               <div
                 key={offer.id}
-                className={`relative rounded-lg border bg-[#0a0a0a] overflow-hidden hover:border-white/20 transition-colors ${
-                  isMicroEntreprise
-                    ? "border-[#2563EB]"
-                    : "border-white/10"
-                }`}
-                style={
-                  isMicroEntreprise
-                    ? {
-                        animation: "shimmer-blue 2s ease-in-out infinite",
-                      }
-                    : {}
-                }
+                className="relative rounded-lg border border-white/10 bg-[#0a0a0a] overflow-hidden hover:border-white/20 transition-colors"
               >
                 {/* Badge "Le plus choisi" pour Micro-entreprise */}
                 {isMicroEntreprise && (
