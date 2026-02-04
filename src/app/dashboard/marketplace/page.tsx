@@ -75,11 +75,13 @@ export default function MarketplacePage() {
           className="block rounded-lg border border-white/10 bg-[#0a0a0a] overflow-hidden hover:border-white/20 transition-colors"
         >
           {/* Banner Area - Image */}
-          <div className="relative h-[200px] bg-gradient-to-br from-white/10 to-white/5">
-            {/* Placeholder pour l'image - à remplacer par l'image du partenariat */}
-            <div className="w-full h-full flex items-center justify-center text-white/30 text-sm">
-              Image du partenariat
-            </div>
+          <div className="relative h-[200px] overflow-hidden">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="https://www.legalplace.fr/wp-content/uploads/2024/11/HeroBackground2x_1.webp"
+              alt="LegalPlace"
+              className="w-full h-full object-cover"
+            />
           </div>
 
           {/* Separator Line */}

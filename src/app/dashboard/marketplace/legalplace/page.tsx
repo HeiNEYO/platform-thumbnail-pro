@@ -66,10 +66,12 @@ export default function LegalPlacePage() {
       {/* Hero Section - Image Header */}
       <div className="relative h-[400px] rounded-lg border border-white/10 overflow-hidden bg-[#0a0a0a]">
         <div className="absolute inset-0 w-full h-full">
-          {/* Placeholder pour l'image header - à remplacer par l'image du partenariat */}
-          <div className="w-full h-full bg-gradient-to-br from-white/10 to-white/5 flex items-center justify-center text-white/30 text-lg">
-            Image header LegalPlace
-          </div>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="https://www.legalplace.fr/wp-content/uploads/2024/11/HeroBackground2x_1.webp"
+            alt="LegalPlace"
+            className="w-full h-full object-cover"
+          />
         </div>
       </div>
 
