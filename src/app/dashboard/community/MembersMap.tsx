@@ -36,11 +36,18 @@ function MembersMap({ members }: MembersMapProps) {
       });
 
       // Ajouter le fond de carte dark avec seulement les contours des pays
+      // Utiliser un style dark minimaliste
       L.default.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
         maxZoom: 19,
         subdomains: "abcd",
+        errorTileUrl: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==",
       }).addTo(map);
+      
+      // Vérifier que la carte est bien initialisée
+      map.whenReady(() => {
+        console.log("Carte Leaflet initialisée avec succès");
+      });
 
       mapRef.current = map;
 
@@ -162,9 +169,12 @@ function MembersMap({ members }: MembersMapProps) {
         .leaflet-container {
           background: #0a0a0a;
         }
-        /* Filtrer les couleurs de la carte pour rendre les contours dans la couleur secondaire */
+        /* S'assurer que les tuiles sont visibles */
         .leaflet-tile-container img {
-          filter: brightness(0.3) contrast(1.2) hue-rotate(200deg) saturate(0.5);
+          opacity: 1 !important;
+        }
+        .leaflet-tile-pane {
+          opacity: 1 !important;
         }
       `}</style>
     </div>
