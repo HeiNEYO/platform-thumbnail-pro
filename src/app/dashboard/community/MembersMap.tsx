@@ -217,15 +217,15 @@ function MembersMap({ members }: MembersMapProps) {
         .leaflet-tile-pane {
           opacity: 1 !important;
         }
-        /* Inverser les couleurs : océans = fond du site, pays = couleur légèrement différente */
+        /* Inverser les couleurs : océans = fond du site (#0a0a0a), pays = couleur légèrement différente */
         .leaflet-tile {
           filter: 
-            brightness(0.4) 
-            contrast(1.5) 
-            invert(0.85) 
-            hue-rotate(180deg) 
-            saturate(0.3) 
-            brightness(0.6) !important;
+            brightness(0.5) 
+            contrast(1.3) 
+            invert(0.9) 
+            hue-rotate(200deg) 
+            saturate(0.4) 
+            brightness(0.7) !important;
         }
         /* Masquer l'attribution OpenStreetMap */
         .leaflet-control-attribution {
