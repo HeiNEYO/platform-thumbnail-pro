@@ -105,7 +105,7 @@ export default function MarketplacePage() {
               <ArrowRight className="h-4 w-4" />
             </button>
           </div>
-        </div>
+        </a>
 
         {/* Placeholder for other cards - can be added later */}
       </div>
