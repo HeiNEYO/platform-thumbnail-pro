@@ -117,40 +117,50 @@ function MembersMap({ members }: MembersMapProps) {
 
       const bounds = L.default.latLngBounds([]);
 
+      // Couleurs des grades (alignées avec MemberCard)
+      const gradeStyles: Record<string, { color: string; bg: string; border: string; label: string }> = {
+        admin: { color: "#FF8282", bg: "rgba(255, 130, 130, 0.15)", border: "rgba(255, 130, 130, 0.4)", label: "Admin" },
+        intervenant: { color: "#82FFBC", bg: "rgba(130, 255, 188, 0.15)", border: "rgba(130, 255, 188, 0.4)", label: "Intervenant" },
+        member: { color: "#82ACFF", bg: "rgba(130, 172, 255, 0.15)", border: "rgba(130, 172, 255, 0.4)", label: "Membre" },
+      };
+
       membersWithLocation.forEach((member) => {
         const lat = Number(member.latitude);
         const lng = Number(member.longitude);
+        const role = member.role || "member";
+        const grade = gradeStyles[role] || gradeStyles.member;
 
-        // Marqueur classique (icône par défaut) + cercle bleu pour visibilité max
-        const circle = L.default.circleMarker([lat, lng], {
-          radius: 14,
-          fillColor: "#2563EB",
-          color: "#ffffff",
-          weight: 3,
-          opacity: 1,
-          fillOpacity: 1,
+        // Icône pin (location) en SVG, couleur selon le grade
+        const pinIcon = L.default.divIcon({
+          className: "map-pin-icon",
+          html: `
+            <div style="position:relative;display:inline-block;">
+              <svg width="32" height="40" viewBox="0 0 24 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 0C7.31 0 3.5 3.81 3.5 8.5c0 5.25 8 14.5 8.5 15 .15.2.36.3.5.3s.35-.1.5-.3c.5-.5 8.5-9.75 8.5-15C20.5 3.81 16.69 0 12 0z" fill="${grade.color}" stroke="#0a0a0a" stroke-width="1.5"/>
+                <circle cx="12" cy="8.5" r="3.5" fill="#0a0a0a"/>
+              </svg>
+            </div>
+          `,
+          iconSize: [32, 40],
+          iconAnchor: [16, 40],
+          popupAnchor: [0, -40],
         });
-        circle.addTo(mapRef.current!);
 
-        // Popup au clic
+        const marker = L.default.marker([lat, lng], { icon: pinIcon }).addTo(mapRef.current!);
+
         const popupContent = `
-          <div class="p-3 min-w-[180px]">
-            <h3 class="font-semibold text-white text-sm mb-1">${member.full_name || "Membre"}</h3>
+          <div class="p-3 min-w-[180px]" style="background:#0a0a0a;color:#fff;border:1px solid rgba(255,255,255,0.1);border-radius:8px;">
+            <h3 class="font-semibold text-sm mb-1" style="color:#fff;">${(member.full_name || "Membre").replace(/</g, "&lt;")}</h3>
             ${member.city || member.country 
-              ? `<p class="text-xs text-white/60 mb-2">${[member.city, member.country].filter(Boolean).join(", ")}</p>`
+              ? `<p class="text-xs mb-2" style="color:rgba(255,255,255,0.6);">${[member.city, member.country].filter(Boolean).join(", ").replace(/</g, "&lt;")}</p>`
               : ""
             }
-            ${member.role === "admin" 
-              ? `<span class="inline-block px-2 py-0.5 text-xs rounded bg-[#1D4ED8]/20 text-[#1D4ED8] border border-[#1D4ED8]/30">Admin</span>`
-              : member.role === "intervenant"
-              ? `<span class="inline-block px-2 py-0.5 text-xs rounded bg-[#1D4ED8]/20 text-[#1D4ED8] border border-[#1D4ED8]/30">Intervenant</span>`
-              : ""
-            }
+            <span class="inline-block px-2 py-0.5 text-xs rounded" style="color:${grade.color};background:${grade.bg};border:1px solid ${grade.border}">${grade.label}</span>
           </div>
         `;
 
-        circle.bindPopup(popupContent);
-        markersRef.current.push(circle);
+        marker.bindPopup(popupContent);
+        markersRef.current.push(marker);
         bounds.extend([lat, lng]);
       });
 
@@ -182,14 +192,13 @@ function MembersMap({ members }: MembersMapProps) {
         style={{ zIndex: 1 }}
       />
       <style jsx global>{`
-        .location-marker {
-          background: transparent !important;
+        .map-pin-icon {
+          background: none !important;
           border: none !important;
         }
-        .location-marker svg {
-          display: block !important;
-          width: 24px !important;
-          height: 24px !important;
+        .map-pin-icon svg {
+          display: block;
+          filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
         }
         .leaflet-marker-icon {
           z-index: 1000 !important;

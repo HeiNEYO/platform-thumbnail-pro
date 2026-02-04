@@ -465,15 +465,6 @@ export function CommunityClient({ initialMembers }: { initialMembers: CommunityM
                   Activez l'affichage de votre localisation dans votre profil pour apparaître sur la carte
                 </p>
               </div>
-              {/* Diagnostic : vérifier que les données ont bien lat/lng */}
-              <div className="rounded-lg border border-white/10 bg-[#0a0a0a]/80 px-3 py-2 text-xs text-white/60">
-                Données reçues : {members.length} membre(s) au total. Affichés sur la carte : {membersWithLocation.length} (avec localisation activée et coordonnées valides).
-                {membersWithLocation.length > 0 && (
-                  <span className="block mt-1 text-white/50">
-                    Ex. {membersWithLocation[0].full_name || "Membre"} — {membersWithLocation[0].city || ""} {membersWithLocation[0].country || ""} ({Number(membersWithLocation[0].latitude)?.toFixed(2)}, {Number(membersWithLocation[0].longitude)?.toFixed(2)})
-                  </span>
-                )}
-              </div>
               <MembersMap members={membersWithLocation as any} />
             </>
           ) : (
