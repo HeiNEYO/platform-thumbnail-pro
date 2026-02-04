@@ -71,9 +71,7 @@ export default function MarketplacePage() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {/* LegalPlace Card */}
         <a
-          href="https://www.legalplace.fr"
-          target="_blank"
-          rel="noopener noreferrer"
+          href="/dashboard/marketplace/legalplace"
           className="block rounded-lg border border-white/10 bg-[#0a0a0a] overflow-hidden hover:border-white/20 transition-colors"
         >
           {/* Banner Area - Image */}
