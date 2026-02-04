@@ -331,6 +331,7 @@ export default function ProfilePage() {
         }
       }
 
+      // Sauvegarder les données de localisation
       const locationUpdateData: any = {
         city: cleanCity,
         country: cleanCountry,
@@ -339,14 +340,37 @@ export default function ProfilePage() {
         longitude: showLocation ? longitude : null,
       };
       
-      const { error: locationError } = await supabase
-        .from("users")
-        .update(locationUpdateData as never)
-        .eq("id", user.id);
-      
-      if (locationError) {
-        console.warn("Erreur lors de la sauvegarde de la localisation:", locationError);
-        // Ne pas bloquer la sauvegarde si les colonnes n'existent pas encore
+      try {
+        const { error: locationError } = await supabase
+          .from("users")
+          .update(locationUpdateData as never)
+          .eq("id", user.id);
+        
+        if (locationError) {
+          console.error("Erreur lors de la sauvegarde de la localisation:", locationError);
+          // Vérifier si c'est parce que les colonnes n'existent pas
+          const errorMessage = locationError.message?.toLowerCase() || "";
+          if (errorMessage.includes("column") || errorMessage.includes("does not exist")) {
+            setSaveMessage({ 
+              type: "error", 
+              text: "Les colonnes de localisation n'existent pas encore. Veuillez exécuter le script SQL dans Supabase." 
+            });
+            setTimeout(() => setSaveMessage(null), 8000);
+            return;
+          }
+          throw locationError;
+        }
+      } catch (locationErr: any) {
+        console.error("Erreur lors de la sauvegarde de la localisation:", locationErr);
+        const errorMessage = locationErr.message?.toLowerCase() || "";
+        if (errorMessage.includes("column") || errorMessage.includes("does not exist")) {
+          setSaveMessage({ 
+            type: "error", 
+            text: "Les colonnes de localisation n'existent pas. Exécutez le script supabase-add-location-fields.sql dans Supabase." 
+          });
+          setTimeout(() => setSaveMessage(null), 8000);
+          return;
+        }
       }
 
       // Rafraîchir le profil dans le contexte
