@@ -22,7 +22,7 @@ export function AuthFormWrapper({
   switchLinkText,
 }: AuthFormWrapperProps) {
   return (
-    <div className="w-full lg:w-1/2 flex items-center justify-center p-8 sm:p-12 lg:p-16 xl:p-20 bg-[#0f0f0f] min-h-screen">
+    <div className="w-full lg:w-1/2 flex items-center justify-center p-8 sm:p-12 lg:p-16 xl:p-20 bg-[#0A0A0A] min-h-screen">
       <div className="w-full max-w-md">
         {/* Logo */}
         <Link href="/" className="inline-block mb-12">

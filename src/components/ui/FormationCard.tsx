@@ -51,7 +51,7 @@ export function FormationCard({
   return (
     <Link
       href={ctaHref}
-      className="group block bg-[#0f0f0f] border border-white/10 rounded-[16px] overflow-hidden"
+      className="group block bg-[#0A0A0A] border border-white/10 rounded-[16px] overflow-hidden"
     >
       {/* Zone visuelle en haut - Image en plein écran avec ratio adaptatif */}
       <div className="relative w-full aspect-video overflow-hidden">
@@ -65,7 +65,7 @@ export function FormationCard({
       </div>
 
       {/* Zone de contenu en bas (30-40% de la hauteur) */}
-      <div className="p-5 md:p-6 bg-[#0f0f0f]">
+      <div className="p-5 md:p-6 bg-[#0A0A0A]">
         {/* Icône + Titre */}
         <div className="flex items-center gap-2.5 mb-2.5">
           <div className="p-1.5 bg-[#1A1A1A] rounded-lg border border-[#2A2A2A]">

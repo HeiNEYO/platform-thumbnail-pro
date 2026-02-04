@@ -27,14 +27,14 @@
 }
 
 :root {
-  /* Palette design épuré - fonds gris foncé (éviter le noir pur) */
-  --background: #0f0f0f;
-  --background-secondary: #111111;
+  /* Palette design épuré - fonds gris foncé similaires à la sidebar */
+  --background: #0a0a0a;
+  --background-secondary: #0a0a0a;
   --foreground: #ffffff;
   --foreground-muted: #a1a1aa;
   
   /* Cards & Surfaces - Gris foncé */
-  --card: #0f0f0f;
+  --card: #0a0a0a;
   --card-hover: #141414;
   --card-border: #1f1f1f;
   
@@ -43,7 +43,7 @@
   --primary-hover: #3B6FE8;
   
   /* Sidebar - Gris foncé */
-  --sidebar: #0f0f0f;
+  --sidebar: #0a0a0a;
   --sidebar-border: #1a1a1a;
   --sidebar-selected: #141414;
   
@@ -85,7 +85,7 @@ body {
 }
 
 .bg-black\/50 {
-  background-color: rgba(15, 15, 15, 0.5) !important;
+  background-color: rgba(10, 10, 10, 0.5) !important;
 }
 
 .referral-btn {

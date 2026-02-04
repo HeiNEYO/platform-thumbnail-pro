@@ -130,7 +130,7 @@ export default async function ModulesPage() {
         {/* Carte principale Thumbnail Pro */}
         {mainModule && (
           <div className="mb-8">
-            <div className="relative h-[450px] rounded-lg border border-white/10 overflow-hidden bg-[#0f0f0f]">
+            <div className="relative h-[450px] rounded-lg border border-white/10 overflow-hidden bg-[#0a0a0a]">
               {/* Image de fond - pleine hauteur */}
               <div className="absolute inset-0 w-full h-full">
                 {mainModule.image_url ? (
@@ -141,7 +141,7 @@ export default async function ModulesPage() {
                     className="w-full h-full object-cover"
                   />
                 ) : (
-                  <div className="w-full h-full bg-gradient-to-br from-primary/20 via-primary/10 to-[#0f0f0f]" />
+                  <div className="w-full h-full bg-gradient-to-br from-primary/20 via-primary/10 to-[#0a0a0a]" />
                 )}
               </div>
 

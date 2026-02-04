@@ -89,9 +89,9 @@ export function EpisodeViewer({
       {/* Zone principale - Lecteur vidéo et contenu */}
       <div className="flex-1 space-y-6">
         {/* Conteneur unifié pour vidéo et notes */}
-        <div className="flex flex-col lg:flex-row border border-white/10 rounded-xl overflow-hidden bg-[#0f0f0f]">
+        <div className="flex flex-col lg:flex-row border border-white/10 rounded-xl overflow-hidden bg-[#0A0A0A]">
           {/* Lecteur vidéo principal */}
-          <div className="relative w-full lg:flex-1 aspect-video bg-[#0f0f0f] overflow-hidden border-r-0 lg:border-r border-white/10">
+          <div className="relative w-full lg:flex-1 aspect-video bg-[#0A0A0A] overflow-hidden border-r-0 lg:border-r border-white/10">
             {/* Vidéo Vimeo principale - remplit toute la zone */}
             <iframe
               src="https://player.vimeo.com/video/1104426446?autoplay=0&controls=1&title=0&byline=0&portrait=0"
@@ -143,7 +143,7 @@ export function EpisodeViewer({
                 className={`inline-flex items-center gap-1.5 mb-4 px-2.5 py-1 rounded-full border transition-all ${
                   isFavorite
                     ? "text-[#1D4ED8] border-[#1D4ED8]/50 bg-[#1D4ED8]/10"
-                    : "text-white/70 border-white/20 bg-[#0f0f0f] hover:text-white hover:border-white/30"
+                    : "text-white/70 border-white/20 bg-[#0A0A0A] hover:text-white hover:border-white/30"
                 }`}
               >
                 <Heart className={`h-4 w-4 ${isFavorite ? "fill-current" : ""}`} />
@@ -162,7 +162,7 @@ export function EpisodeViewer({
 
           {/* Ressources complémentaires */}
           {complementaryResource && (
-            <div className="rounded-lg border border-white/10 bg-[#0f0f0f] p-4">
+            <div className="rounded-lg border border-white/10 bg-[#0A0A0A] p-4">
               <h3 className="text-sm font-semibold text-white/80 mb-3">
                 Ressources complémentaires utilisées dans ce cours
               </h3>
@@ -181,7 +181,7 @@ export function EpisodeViewer({
           {/* Informations instructeur et navigation */}
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pt-6 border-t border-white/10">
             {/* Informations instructeur */}
-            <div className="flex items-center gap-2 pl-2.5 pr-4 py-1.5 rounded-full border border-white/20 bg-[#0f0f0f]">
+            <div className="flex items-center gap-2 pl-2.5 pr-4 py-1.5 rounded-full border border-white/20 bg-[#0A0A0A]">
               <UserAvatar 
                 name={instructorName} 
                 photo={instructorAvatar} 

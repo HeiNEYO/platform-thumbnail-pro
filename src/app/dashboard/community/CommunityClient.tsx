@@ -14,7 +14,7 @@ import dynamic from "next/dynamic";
 const MembersMap = dynamic(() => import("./MembersMap"), {
   ssr: false,
   loading: () => (
-    <div className="h-[600px] rounded-lg border border-white/10 bg-[#0f0f0f] flex items-center justify-center">
+    <div className="h-[600px] rounded-lg border border-white/10 bg-[#0a0a0a] flex items-center justify-center">
       <div className="text-white/50">Chargement de la carte...</div>
     </div>
   ),
@@ -308,7 +308,7 @@ export function CommunityClient({ initialMembers }: { initialMembers: CommunityM
 
   if (error) {
     return (
-      <div className="rounded-lg border border-card-border bg-[#0f0f0f] p-12 text-center">
+      <div className="rounded-lg border border-card-border bg-[#0a0a0a] p-12 text-center">
         <p className="text-white/70 mb-2">Erreur : {error}</p>
         <p className="text-xs text-white/50">Vérifiez la console pour plus de détails (F12)</p>
       </div>
@@ -317,7 +317,7 @@ export function CommunityClient({ initialMembers }: { initialMembers: CommunityM
 
   if (members.length === 0) {
     return (
-      <div className="rounded-lg border border-card-border bg-[#0f0f0f] p-12 text-center">
+      <div className="rounded-lg border border-card-border bg-[#0a0a0a] p-12 text-center">
         <p className="text-white/70 mb-2">Aucun membre pour le moment.</p>
         <p className="text-xs text-white/50 mb-4">Les membres apparaîtront ici une fois inscrits.</p>
         {process.env.NODE_ENV === "development" && (
@@ -477,7 +477,7 @@ export function CommunityClient({ initialMembers }: { initialMembers: CommunityM
               <MembersMap members={membersWithLocation as any} />
             </>
           ) : (
-            <div className="h-[600px] rounded-lg border border-white/10 bg-[#0f0f0f] flex flex-col items-center justify-center p-8 text-center">
+            <div className="h-[600px] rounded-lg border border-white/10 bg-[#0a0a0a] flex flex-col items-center justify-center p-8 text-center">
               <MapPin className="h-12 w-12 text-white/30 mb-4" />
               <h3 className="text-lg font-semibold text-white mb-2">Aucun membre visible</h3>
               <p className="text-white/60 text-sm max-w-md">

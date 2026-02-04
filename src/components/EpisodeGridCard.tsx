@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import Link from "next/link";
 import Image from "next/image";
@@ -15,15 +15,15 @@ interface EpisodeGridCardProps {
   instructorAvatar?: string;
 }
 
-// Mapping des titres d'�pisodes vers les miniatures
+// Mapping des titres d'?pisodes vers les miniatures
 const getThumbnailPath = (title: string): string | null => {
   const titleLower = title.toLowerCase();
   
-  // Mapping bas� sur les mots-cl�s dans les titres
-  if (titleLower.includes("d�placement") || titleLower.includes("d�placements")) {
+  // Mapping bas? sur les mots-cl?s dans les titres
+  if (titleLower.includes("d?placement") || titleLower.includes("d?placements")) {
     return "/images/episodes/1-outils-deplacements.png";
   }
-  if (titleLower.includes("s�lectionneur") || titleLower.includes("s�lection")) {
+  if (titleLower.includes("s?lectionneur") || titleLower.includes("s?lection")) {
     return "/images/episodes/2-selectionneur-forme.png";
   }
   if (titleLower.includes("lasso") || titleLower.includes("lassos")) {
@@ -68,10 +68,10 @@ export function EpisodeGridCard({
   instructorName = "Corentin",
   instructorAvatar,
 }: EpisodeGridCardProps) {
-  // Formater la dur�e (supposons que episode.duration est au format "MM:SS" ou "HH:MM:SS")
+  // Formater la dur?e (supposons que episode.duration est au format "MM:SS" ou "HH:MM:SS")
   const formatDuration = (duration: string | null | undefined): string => {
     if (!duration) return "00:00";
-    // Si la dur�e est d�j� au format MM:SS, la retourner telle quelle
+    // Si la dur?e est d?j? au format MM:SS, la retourner telle quelle
     if (duration.match(/^\d{2}:\d{2}$/)) return duration;
     // Sinon, essayer de parser d'autres formats
     return duration;
@@ -87,8 +87,8 @@ export function EpisodeGridCard({
         href={`/dashboard/modules/${moduleId}/episode/${episode.id}`}
         className="relative block aspect-video overflow-hidden"
       >
-        {/* Image de preview de la vid�o */}
-        <div className="relative w-full h-full bg-gradient-to-br from-[#1D4ED8]/20 to-[#0f0f0f]">
+        {/* Image de preview de la vid?o */}
+        <div className="relative w-full h-full bg-gradient-to-br from-[#1D4ED8]/20 to-[#0a0a0a]">
           {thumbnailPath ? (
             <Image
               src={thumbnailPath}
@@ -98,18 +98,18 @@ export function EpisodeGridCard({
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center">
-              <div className="text-white/30 text-sm">Miniature � ajouter</div>
+              <div className="text-white/30 text-sm">Miniature ? ajouter</div>
             </div>
           )}
         </div>
       </Link>
 
-      {/* Trait de s�paration */}
+      {/* Trait de s?paration */}
       <div className="border-t border-white/10"></div>
 
       {/* Contenu de la carte */}
       <div className="p-4 space-y-4">
-        {/* SECTION 2 : TITRE DE LA VID�O */}
+        {/* SECTION 2 : TITRE DE LA VID?O */}
         <h3 className="text-base font-semibold text-white leading-relaxed line-clamp-2">
           {episode.title}
         </h3>

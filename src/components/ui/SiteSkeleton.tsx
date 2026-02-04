@@ -2,11 +2,11 @@
 
 export function SiteSkeleton() {
   return (
-    <div className="min-h-screen bg-[#0f0f0f] text-white">
+    <div className="min-h-screen bg-[#0a0a0a] text-white">
       <div className="flex min-h-screen">
-        <section className="w-[240px] border-r border-[#1a1a1a] bg-[#0f0f0f]/80 p-4 space-y-4 animate-pulse">
+        <section className="w-[240px] border-r border-[#1a1a1a] bg-[#0a0a0a]/70 p-4 space-y-4 animate-pulse">
           {[...Array(5)].map((_, index) => (
-            <div key={index} className="h-8 rounded-xl bg-gradient-to-r from-[#1f1f1f] to-[#0f0f0f]" />
+            <div key={index} className="h-8 rounded-xl bg-gradient-to-r from-[#1f1f1f] to-[#0a0a0a]" />
           ))}
           <div className="pt-8 space-y-3">
             {[...Array(3)].map((_, index) => (
@@ -35,7 +35,7 @@ export function SiteSkeleton() {
           </section>
 
           <section className="space-y-4">
-            <div className="h-56 rounded-3xl border border-[#1a1a1a] bg-[#0f0f0f]/80 shadow-lg" />
+            <div className="h-56 rounded-3xl border border-[#1a1a1a] bg-[#0a0a0a]/80 shadow-lg" />
             <div className="grid gap-4 sm:grid-cols-3">
               {[...Array(3)].map((_, index) => (
                 <div key={index} className="h-24 rounded-2xl border border-[#1a1a1a] bg-[#111111]">

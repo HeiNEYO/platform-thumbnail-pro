@@ -100,9 +100,9 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
 
   // Fonction pour générer les breadcrumbs
   return (
-    <div className="min-h-screen flex flex-col bg-[#0f0f0f]">
+    <div className="min-h-screen flex flex-col bg-[#0a0a0a]">
       {/* Header Top Bar - Agrandi de 10% */}
-      <header className="h-[61.6px] shrink-0 border-b border-sidebar-border bg-[#0f0f0f] flex items-center justify-between px-[22px]">
+      <header className="h-[61.6px] shrink-0 border-b border-sidebar-border bg-[#0a0a0a] flex items-center justify-between px-[22px]">
         {/* Logo + Breadcrumbs */}
         <div className="flex items-center gap-[14px]">
           <button
@@ -143,7 +143,7 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
             className="absolute inset-0 bg-black/40"
             onClick={() => setMobileMenuOpen(false)}
           />
-          <div className="relative flex h-full w-64 flex-col overflow-y-auto bg-[#0f0f0f] border-r border-sidebar-border p-4 shadow-2xl">
+          <div className="relative flex h-full w-64 flex-col overflow-y-auto bg-[#0a0a0a] border-r border-sidebar-border p-4 shadow-2xl">
             <div className="flex items-center justify-between pb-4">
               <span className="text-sm font-semibold text-white">Navigation</span>
               <button
@@ -217,7 +217,7 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
 
       <div className="flex flex-1 overflow-hidden">
         {/* Sidebar - Design inspiré de l'image - Fixée pour rester visible */}
-        <aside className="hidden lg:flex w-[240px] shrink-0 bg-[#0f0f0f] border-r border-sidebar-border flex flex-col sticky top-[61.6px] h-[calc(100vh-61.6px)] overflow-y-auto">
+        <aside className="hidden lg:flex w-[240px] shrink-0 bg-[#0a0a0a] border-r border-sidebar-border flex flex-col sticky top-[61.6px] h-[calc(100vh-61.6px)] overflow-y-auto">
           {/* Navigation principale - Toutes les sections */}
           <nav className="flex-1 p-3">
             {/* Sections toujours ouvertes */}
@@ -311,7 +311,7 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
         </aside>
 
         {/* Main Content - Zone de scroll indépendante */}
-        <main className="flex-1 overflow-y-auto bg-[#0f0f0f] h-[calc(100vh-61.6px)]">
+        <main className="flex-1 overflow-y-auto bg-[#0a0a0a] h-[calc(100vh-61.6px)]">
           <div className="p-7 max-w-7xl mx-auto">{children}</div>
         </main>
       </div>

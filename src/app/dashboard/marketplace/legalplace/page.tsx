@@ -73,7 +73,7 @@ export default function LegalPlacePage() {
   return (
     <div className="space-y-8 animate-fade-in">
       {/* Hero Section - Image Header */}
-      <div className="relative h-[400px] rounded-lg border border-white/10 overflow-hidden bg-[#0f0f0f]">
+      <div className="relative h-[400px] rounded-lg border border-white/10 overflow-hidden bg-[#0a0a0a]">
         <div className="absolute inset-0 w-full h-full">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
@@ -85,7 +85,7 @@ export default function LegalPlacePage() {
       </div>
 
       {/* Bandeau Code Promo */}
-      <div className="w-full bg-[#0f0f0f] border border-white/10 px-6 py-4 rounded-lg flex items-center justify-between">
+      <div className="w-full bg-[#0a0a0a] border border-white/10 px-6 py-4 rounded-lg flex items-center justify-between">
         <div className="flex items-center gap-4">
           <div>
             <p className="text-white/80 text-sm font-medium">Code promo exclusif</p>
@@ -135,7 +135,7 @@ export default function LegalPlacePage() {
             return (
               <div
                 key={offer.id}
-                className={`relative rounded-lg border bg-[#0f0f0f] overflow-hidden hover:border-white/20 transition-colors ${
+                className={`relative rounded-lg border bg-[#0a0a0a] overflow-hidden hover:border-white/20 transition-colors ${
                   isMicroEntreprise
                     ? "border-[#2563EB]"
                     : "border-white/10"
