@@ -37,7 +37,7 @@ const navSections = [
     icon: GraduationCap,
     items: [
       { href: "/dashboard/modules", label: "Formation", icon: BookOpen },
-      { href: "/dashboard/masterclass", label: "Masterclass", icon: GraduationCap },
+      { href: "/dashboard/marketplace", label: "Marketplace", icon: ShoppingBag },
       { href: "/dashboard/resources", label: "Ressources", icon: FolderOpen },
     ],
   },
