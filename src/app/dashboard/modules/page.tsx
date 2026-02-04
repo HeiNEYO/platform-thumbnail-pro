@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getModulesWithStats } from "@/lib/db/modules";
-import { BookOpen } from "lucide-react";
+import { BookOpen, Video, Users } from "lucide-react";
 import { NetflixStyleModuleCards } from "@/components/NetflixStyleModuleCards";
 
 // Force le rendu dynamique car on utilise cookies() pour l'authentification
@@ -78,6 +78,12 @@ export default async function ModulesPage() {
     const totalCompleted = modulesWithStats.reduce((sum, m) => sum + m.completedCount, 0);
     const globalProgress = totalEpisodes > 0 ? Math.round((totalCompleted / totalEpisodes) * 100) : 0;
 
+    // Compter les intervenants (utilisateurs avec rôle admin ou intervenant)
+    const { count: intervenantsCount } = await supabase
+      .from("users")
+      .select("*", { count: "exact", head: true })
+      .in("role", ["admin", "intervenant"]);
+
     // Trouver le module principal (celui avec l'image, généralement le premier)
     const mainModule = modulesWithStats.find((m) => m.image_url) || modulesWithStats[0];
 
@@ -114,28 +120,31 @@ export default async function ModulesPage() {
               <div className="absolute bottom-0 left-0 right-0 h-[15%] backdrop-blur-md bg-gradient-to-t from-black/60 via-black/40 to-transparent">
                 <div className="absolute bottom-0 left-0 right-0 p-5 flex flex-col gap-2">
                   <h2 className="text-xl font-bold text-white">Thumbnail Pro</h2>
-                  <div className="flex items-center gap-4 text-sm text-white/80">
-                    <span>{modulesWithStats.length} modules</span>
-                    <span>•</span>
-                    <span>{totalEpisodes} épisodes</span>
-                    {totalCompleted > 0 && (
-                      <>
-                        <span>•</span>
-                        <span>{totalCompleted}/{totalEpisodes} complétés</span>
-                      </>
-                    )}
-                  </div>
-                  {totalEpisodes > 0 && (
-                    <div className="mt-1">
-                      <div className="h-1 bg-white/10 rounded-full overflow-hidden">
-                        <div
-                          className="h-full bg-primary transition-all duration-300"
-                          style={{ width: `${globalProgress}%` }}
-                        />
-                      </div>
-                    </div>
+                  {mainModule.description && (
+                    <p className="text-white/80 text-sm line-clamp-2">{mainModule.description}</p>
                   )}
                 </div>
+              </div>
+            </div>
+
+            {/* Rectangles avec statistiques sous l'image */}
+            <div className="flex items-center gap-3 mt-4">
+              {/* Rectangle Épisodes */}
+              <div className="flex items-center gap-2 px-4 py-2 rounded-lg border border-white/20 bg-transparent">
+                <Video className="h-4 w-4 text-white/70" />
+                <span className="text-sm text-white/80">{totalEpisodes} épisode{totalEpisodes > 1 ? "s" : ""}</span>
+              </div>
+
+              {/* Rectangle Modules */}
+              <div className="flex items-center gap-2 px-4 py-2 rounded-lg border border-white/20 bg-transparent">
+                <BookOpen className="h-4 w-4 text-white/70" />
+                <span className="text-sm text-white/80">{modulesWithStats.length} module{modulesWithStats.length > 1 ? "s" : ""}</span>
+              </div>
+
+              {/* Rectangle Intervenants */}
+              <div className="flex items-center gap-2 px-4 py-2 rounded-lg border border-white/20 bg-transparent">
+                <Users className="h-4 w-4 text-white/70" />
+                <span className="text-sm text-white/80">{intervenantsCount || 0} intervenant{(intervenantsCount || 0) > 1 ? "s" : ""}</span>
               </div>
             </div>
           </div>

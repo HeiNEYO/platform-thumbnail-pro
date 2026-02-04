@@ -5,8 +5,8 @@ import { getModuleById } from "@/lib/db/modules";
 import { getEpisodesByModule } from "@/lib/db/episodes";
 import { getModuleProgress } from "@/lib/db/modules";
 import { isEpisodeCompleted } from "@/lib/db/episodes";
-import { ProgressBar } from "@/components/ui/ProgressBar";
 import { EpisodeGrid } from "@/components/EpisodeGrid";
+import { Video, Users } from "lucide-react";
 
 // Force le rendu dynamique car on utilise cookies() pour l'authentification
 export const dynamic = 'force-dynamic';
@@ -45,6 +45,12 @@ export default async function ModuleDetailPage({
 
   const corentinData = corentinProfile as { full_name: string | null; avatar_url: string | null } | null;
 
+  // Compter les intervenants (utilisateurs avec rôle admin ou intervenant)
+  const { count: intervenantsCount } = await supabase
+    .from("users")
+    .select("*", { count: "exact", head: true })
+    .in("role", ["admin", "intervenant"]);
+
   return (
     <div className="space-y-7 animate-fade-in">
       {/* Breadcrumb */}
@@ -79,23 +85,22 @@ export default async function ModuleDetailPage({
             {module.description && (
               <p className="text-white/80 text-sm line-clamp-2">{module.description}</p>
             )}
-            <div className="flex items-center gap-4 text-sm text-white/80">
-              <span>{episodes.length} épisode{episodes.length > 1 ? "s" : ""}</span>
-              {module.duration_estimate && (
-                <>
-                  <span>•</span>
-                  <span>{module.duration_estimate}</span>
-                </>
-              )}
-            </div>
-            <div className="mt-1">
-              <div className="flex justify-between text-xs mb-1">
-                <span className="text-white/70">Progression</span>
-                <span className="text-primary font-medium">{progressPercent}%</span>
-              </div>
-              <ProgressBar value={progressPercent} />
-            </div>
           </div>
+        </div>
+      </div>
+
+      {/* Rectangles avec statistiques sous l'image */}
+      <div className="flex items-center gap-3">
+        {/* Rectangle Épisodes */}
+        <div className="flex items-center gap-2 px-4 py-2 rounded-lg border border-white/20 bg-transparent">
+          <Video className="h-4 w-4 text-white/70" />
+          <span className="text-sm text-white/80">{episodes.length} épisode{episodes.length > 1 ? "s" : ""}</span>
+        </div>
+
+        {/* Rectangle Intervenants */}
+        <div className="flex items-center gap-2 px-4 py-2 rounded-lg border border-white/20 bg-transparent">
+          <Users className="h-4 w-4 text-white/70" />
+          <span className="text-sm text-white/80">{intervenantsCount || 0} intervenant{(intervenantsCount || 0) > 1 ? "s" : ""}</span>
         </div>
       </div>
 
