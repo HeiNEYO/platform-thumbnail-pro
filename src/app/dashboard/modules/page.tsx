@@ -116,8 +116,8 @@ export default async function ModulesPage() {
                 )}
               </div>
 
-              {/* Blur sur 15% du bas de l'image */}
-              <div className="absolute bottom-0 left-0 right-0 h-[15%] backdrop-blur-md bg-gradient-to-t from-black/60 via-black/40 to-transparent">
+              {/* Blur sur 30% du bas de l'image */}
+              <div className="absolute bottom-0 left-0 right-0 h-[30%] backdrop-blur-md bg-gradient-to-t from-black/60 via-black/40 to-transparent">
                 <div className="absolute bottom-0 left-0 right-0 p-5 flex flex-col gap-2">
                   <h2 className="text-xl font-bold text-white">Thumbnail Pro</h2>
                   {mainModule.description && (
@@ -127,8 +127,11 @@ export default async function ModulesPage() {
               </div>
             </div>
 
+            {/* Ligne de séparation */}
+            <div className="border-t border-white/10 my-4"></div>
+
             {/* Rectangles avec statistiques sous l'image */}
-            <div className="flex items-center gap-3 mt-4">
+            <div className="flex items-center gap-3">
               {/* Rectangle Épisodes */}
               <div className="flex items-center gap-2 px-4 py-2 rounded-full border border-white/20 bg-transparent">
                 <Video className="h-4 w-4 text-white/70" />

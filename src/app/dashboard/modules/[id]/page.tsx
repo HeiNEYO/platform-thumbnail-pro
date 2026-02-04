@@ -78,8 +78,8 @@ export default async function ModuleDetailPage({
           )}
         </div>
 
-        {/* Blur sur 15% du bas de l'image */}
-        <div className="absolute bottom-0 left-0 right-0 h-[15%] backdrop-blur-md bg-gradient-to-t from-black/60 via-black/40 to-transparent">
+        {/* Blur sur 30% du bas de l'image */}
+        <div className="absolute bottom-0 left-0 right-0 h-[30%] backdrop-blur-md bg-gradient-to-t from-black/60 via-black/40 to-transparent">
           <div className="absolute bottom-0 left-0 right-0 p-5 flex flex-col gap-2">
             <h1 className="text-xl font-bold text-white">{module.title}</h1>
             {module.description && (
@@ -88,6 +88,9 @@ export default async function ModuleDetailPage({
           </div>
         </div>
       </div>
+
+      {/* Ligne de séparation */}
+      <div className="border-t border-white/10 my-4"></div>
 
       {/* Rectangles avec statistiques sous l'image */}
       <div className="flex items-center gap-3">
