@@ -77,7 +77,7 @@ export default function LegalPlacePage() {
         <div className="absolute inset-0 w-full h-full">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="https://www.legalplace.fr/wp-content/uploads/2024/11/HeroBackground2x_1.webp"
+            src="https://www.legalplace.fr/wp-content/uploads/2025/12/legalplace-creation-gestion-societe-og.png"
             alt="LegalPlace"
             className="w-full h-full object-cover"
           />
