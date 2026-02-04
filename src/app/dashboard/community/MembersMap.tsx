@@ -217,6 +217,14 @@ function MembersMap({ members }: MembersMapProps) {
           background: transparent !important;
           border: none !important;
         }
+        .location-marker svg {
+          display: block !important;
+          width: 24px !important;
+          height: 24px !important;
+        }
+        .leaflet-marker-icon {
+          z-index: 1000 !important;
+        }
         .leaflet-popup-content-wrapper {
           background: #0a0a0a;
           border: 1px solid rgba(255, 255, 255, 0.1);
