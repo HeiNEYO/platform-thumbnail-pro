@@ -13,8 +13,8 @@ function MembersMap({ members }: MembersMapProps) {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const markersRef = useRef<any[]>([]);
   const [isMounted, setIsMounted] = useState(false);
+  const [mapReady, setMapReady] = useState(false);
 
-  // S'assurer que le composant est monté côté client
   useEffect(() => {
     setIsMounted(true);
   }, []);
@@ -22,11 +22,9 @@ function MembersMap({ members }: MembersMapProps) {
   useEffect(() => {
     if (!isMounted || !mapContainerRef.current || mapRef.current) return;
 
-    // Charger Leaflet dynamiquement côté client uniquement
     import("leaflet").then((L) => {
       if (!mapContainerRef.current || mapRef.current) return;
 
-      // Initialiser la carte centrée sur le monde
       const map = L.default.map(mapContainerRef.current, {
         center: [20, 0],
         zoom: 2,
@@ -74,21 +72,20 @@ function MembersMap({ members }: MembersMapProps) {
       }
       
       // Vérifier que la carte est bien initialisée
+      mapRef.current = map;
       map.whenReady(() => {
-        console.log("Carte Leaflet initialisée avec succès");
-        // Forcer le redraw si nécessaire
         setTimeout(() => {
           map.invalidateSize();
-        }, 100);
+          setMapReady(true);
+        }, 150);
       });
-
-      mapRef.current = map;
 
       // Nettoyer lors du démontage
       return () => {
         if (mapRef.current) {
           mapRef.current.remove();
           mapRef.current = null;
+          setMapReady(false);
         }
       };
     }).catch((err) => {
@@ -97,9 +94,8 @@ function MembersMap({ members }: MembersMapProps) {
   }, [isMounted]);
 
   useEffect(() => {
-    if (!isMounted || !mapRef.current) return;
+    if (!isMounted || !mapReady || !mapRef.current || !members.length) return;
 
-    // Charger Leaflet dynamiquement
     import("leaflet").then((L) => {
       if (!mapRef.current) return;
 
@@ -109,64 +105,34 @@ function MembersMap({ members }: MembersMapProps) {
       });
       markersRef.current = [];
 
-      // Filtrer les membres avec localisation valide
-      console.log("🔍 Membres reçus pour la carte:", members.length);
-      console.log("🔍 Détails des membres:", members.map(m => ({
-        id: m.id,
-        name: m.full_name,
-        show_location: m.show_location,
-        latitude: m.latitude,
-        longitude: m.longitude,
-        city: m.city,
-        country: m.country
-      })));
-
-      const membersWithLocation = members.filter(m => 
-        m.latitude && m.longitude && 
-        !isNaN(Number(m.latitude)) && 
-        !isNaN(Number(m.longitude))
-      );
-
-      console.log("✅ Membres avec localisation valide:", membersWithLocation.length);
-      console.log("✅ Coordonnées:", membersWithLocation.map(m => ({
-        name: m.full_name,
-        lat: m.latitude,
-        lng: m.longitude
-      })));
+      const membersWithLocation = members.filter(m => {
+        const lat = Number(m.latitude);
+        const lng = Number(m.longitude);
+        return !isNaN(lat) && !isNaN(lng) && lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180;
+      });
 
       if (membersWithLocation.length === 0) {
-        console.log("⚠️ Aucun membre avec localisation valide à afficher");
         return;
       }
 
-      // Créer un groupe de marqueurs pour gérer les clusters si nécessaire
       const bounds = L.default.latLngBounds([]);
 
       membersWithLocation.forEach((member) => {
         const lat = Number(member.latitude);
         const lng = Number(member.longitude);
 
-        console.log(`📍 Création du marqueur pour ${member.full_name} à [${lat}, ${lng}]`);
-
-        // Créer une icône de localisation simple et sobre
-        const locationIcon = L.default.divIcon({
-          className: "location-marker",
-          html: `
-            <div class="relative flex items-center justify-center">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" fill="#1D4ED8" stroke="#0a0a0a" stroke-width="1.5"/>
-              </svg>
-            </div>
-          `,
-          iconSize: [24, 24],
-          iconAnchor: [12, 24],
-          popupAnchor: [0, -24],
+        // Marqueur classique (icône par défaut) + cercle bleu pour visibilité max
+        const circle = L.default.circleMarker([lat, lng], {
+          radius: 14,
+          fillColor: "#2563EB",
+          color: "#ffffff",
+          weight: 3,
+          opacity: 1,
+          fillOpacity: 1,
         });
+        circle.addTo(mapRef.current!);
 
-        const marker = L.default.marker([lat, lng], { icon: locationIcon }).addTo(mapRef.current!);
-        console.log(`✅ Marqueur créé et ajouté pour ${member.full_name}`);
-
-        // Créer le contenu du popup sobre
+        // Popup au clic
         const popupContent = `
           <div class="p-3 min-w-[180px]">
             <h3 class="font-semibold text-white text-sm mb-1">${member.full_name || "Membre"}</h3>
@@ -183,19 +149,22 @@ function MembersMap({ members }: MembersMapProps) {
           </div>
         `;
 
-        marker.bindPopup(popupContent);
-        markersRef.current.push(marker);
+        circle.bindPopup(popupContent);
+        markersRef.current.push(circle);
         bounds.extend([lat, lng]);
       });
 
-      // Ajuster la vue pour voir tous les marqueurs
-      if (membersWithLocation.length > 0 && bounds.isValid()) {
-        mapRef.current.fitBounds(bounds, { padding: [50, 50] });
+      // Forcer le rafraîchissement de la carte pour afficher les marqueurs
+      mapRef.current.invalidateSize();
+
+      // Ajuster la vue pour voir tous les marqueurs (avec zoom max pour 1 point)
+      if (bounds.isValid()) {
+        mapRef.current.fitBounds(bounds, { padding: [50, 50], maxZoom: 12 });
       }
     }).catch((err) => {
       console.error("Erreur lors du chargement de Leaflet pour les marqueurs:", err);
     });
-  }, [isMounted, members]);
+  }, [isMounted, mapReady, members]);
 
   if (!isMounted) {
     return (
@@ -254,6 +223,12 @@ function MembersMap({ members }: MembersMapProps) {
         /* Masquer l'attribution OpenStreetMap */
         .leaflet-control-attribution {
           display: none !important;
+        }
+        .leaflet-overlay-pane {
+          z-index: 400 !important;
+        }
+        .leaflet-pane svg {
+          overflow: visible !important;
         }
       `}</style>
     </div>

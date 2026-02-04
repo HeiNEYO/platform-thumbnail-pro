@@ -32,8 +32,8 @@ function mapMembers(rows: any[]) {
         discord_tag: discordTag,
         community_score: communityScore,
         role: (row.role || "member") as "member" | "admin" | "intervenant",
-        latitude: row.latitude ?? null,
-        longitude: row.longitude ?? null,
+        latitude: row.latitude != null ? Number(row.latitude) : null,
+        longitude: row.longitude != null ? Number(row.longitude) : null,
         city: row.city ?? null,
         country: row.country ?? null,
         show_location: row.show_location ?? false,
@@ -64,16 +64,20 @@ export async function getAllCommunityMembers(): Promise<CommunityMember[]> {
 
     if (error) {
       const message = (error.message || "").toLowerCase();
-      const isMissingColumn = 
+      const isMissingCommunityScore = 
         message.includes("community_score") || 
-        message.includes("column \"community_score\"") ||
+        message.includes("column \"community_score\"");
+      const isMissingLocationColumn = 
+        message.includes("latitude") || 
+        message.includes("longitude") || 
+        message.includes("show_location") ||
         message.includes("does not exist");
       
-      if (isMissingColumn) {
+      if (isMissingCommunityScore) {
         console.warn("⚠️ Colonne community_score absente, on la retire");
         const { data: fallbackUsers, error: fallbackError } = await supabase
           .from("users")
-          .select("id, email, full_name, avatar_url, role, twitter_handle, discord_tag")
+          .select("id, email, full_name, avatar_url, role, twitter_handle, discord_tag, latitude, longitude, city, country, show_location")
           .order("created_at", { ascending: false })
           .limit(1000);
 
@@ -94,6 +98,18 @@ export async function getAllCommunityMembers(): Promise<CommunityMember[]> {
         }
 
         return mapMembers(fallbackUsers || []);
+      }
+
+      if (isMissingLocationColumn) {
+        console.warn("⚠️ Colonnes de localisation absentes, requête sans latitude/longitude/show_location");
+        const { data: fallbackUsers2, error: fallbackError2 } = await supabase
+          .from("users")
+          .select("id, email, full_name, avatar_url, role, twitter_handle, discord_tag, community_score")
+          .order("created_at", { ascending: false })
+          .limit(1000);
+        if (!fallbackError2 && fallbackUsers2) {
+          return mapMembers(fallbackUsers2.map((r: any) => ({ ...r, latitude: null, longitude: null, city: null, country: null, show_location: false })));
+        }
       }
 
       // Vérifier si c'est une erreur RLS

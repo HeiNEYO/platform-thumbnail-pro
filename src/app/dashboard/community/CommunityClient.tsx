@@ -36,8 +36,8 @@ function mapMembersFromRows(rows: any[]): CommunityMember[] {
         discord_tag: discordTag,
         community_score: communityScore,
         role: (row.role || "member") as "member" | "admin" | "intervenant",
-        latitude: row.latitude ?? null,
-        longitude: row.longitude ?? null,
+        latitude: row.latitude != null ? Number(row.latitude) : null,
+        longitude: row.longitude != null ? Number(row.longitude) : null,
         city: row.city ?? null,
         country: row.country ?? null,
         show_location: row.show_location ?? false,
@@ -387,23 +387,14 @@ export function CommunityClient({ initialMembers }: { initialMembers: CommunityM
     );
   };
 
-  // Membres avec localisation activée pour la carte
-  console.log("🔍 Tous les membres:", members.length);
-  console.log("🔍 Détails de localisation:", members.map(m => ({
-    id: m.id,
-    name: m.full_name,
-    show_location: m.show_location,
-    latitude: m.latitude,
-    longitude: m.longitude,
-    city: m.city,
-    country: m.country
-  })));
-  
-  const membersWithLocation = members.filter(m => 
-    m.show_location && m.latitude && m.longitude
-  );
-  
-  console.log("✅ Membres avec localisation activée:", membersWithLocation.length);
+  // Membres avec localisation activée pour la carte (show_location = true + lat/lng valides)
+  const showLocationTruthy = (v: unknown) => v === true || v === "true" || v === 1;
+  const membersWithLocation = members.filter(m => {
+    const lat = m.latitude != null ? Number(m.latitude) : NaN;
+    const lng = m.longitude != null ? Number(m.longitude) : NaN;
+    const showOk = showLocationTruthy(m.show_location);
+    return showOk && !isNaN(lat) && !isNaN(lng) && lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180;
+  });
 
   return (
     <div className="space-y-6">
@@ -466,7 +457,7 @@ export function CommunityClient({ initialMembers }: { initialMembers: CommunityM
         <div className="space-y-4">
           {membersWithLocation.length > 0 ? (
             <>
-              <div className="flex items-center justify-between">
+              <div className="flex flex-wrap items-center justify-between gap-2">
                 <p className="text-white/70 text-sm">
                   {membersWithLocation.length} membre{membersWithLocation.length > 1 ? "s" : ""} visible{membersWithLocation.length > 1 ? "s" : ""} sur la carte
                 </p>
@@ -474,15 +465,27 @@ export function CommunityClient({ initialMembers }: { initialMembers: CommunityM
                   Activez l'affichage de votre localisation dans votre profil pour apparaître sur la carte
                 </p>
               </div>
+              {/* Diagnostic : vérifier que les données ont bien lat/lng */}
+              <div className="rounded-lg border border-white/10 bg-[#0a0a0a]/80 px-3 py-2 text-xs text-white/60">
+                Données reçues : {members.length} membre(s) au total. Affichés sur la carte : {membersWithLocation.length} (avec localisation activée et coordonnées valides).
+                {membersWithLocation.length > 0 && (
+                  <span className="block mt-1 text-white/50">
+                    Ex. {membersWithLocation[0].full_name || "Membre"} — {membersWithLocation[0].city || ""} {membersWithLocation[0].country || ""} ({Number(membersWithLocation[0].latitude)?.toFixed(2)}, {Number(membersWithLocation[0].longitude)?.toFixed(2)})
+                  </span>
+                )}
+              </div>
               <MembersMap members={membersWithLocation as any} />
             </>
           ) : (
             <div className="h-[600px] rounded-lg border border-white/10 bg-[#0a0a0a] flex flex-col items-center justify-center p-8 text-center">
               <MapPin className="h-12 w-12 text-white/30 mb-4" />
-              <h3 className="text-lg font-semibold text-white mb-2">Aucun membre visible</h3>
-              <p className="text-white/60 text-sm max-w-md">
+              <h3 className="text-lg font-semibold text-white mb-2">Aucun membre visible sur la carte</h3>
+              <p className="text-white/60 text-sm max-w-md mb-4">
                 Aucun membre n'a activé l'affichage de sa localisation pour le moment.
                 Activez cette option dans votre profil pour apparaître sur la carte !
+              </p>
+              <p className="text-white/40 text-xs max-w-md">
+                Données : {members.length} membre(s) chargé(s). Pour apparaître ici : Profil → Ville et Pays → cocher « Afficher ma localisation » → Enregistrer. Vérifiez aussi que le script <code className="bg-white/10 px-1 rounded">supabase-add-location-fields.sql</code> a été exécuté dans Supabase.
               </p>
             </div>
           )}

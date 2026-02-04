@@ -34,7 +34,7 @@ export default async function CommunityPage() {
     try {
       const { data: fallbackUsers, error: fallbackError } = await supabase
         .from("users")
-        .select("id, email, full_name, avatar_url, role")
+        .select("id, email, full_name, avatar_url, role, twitter_handle, discord_tag, latitude, longitude, city, country, show_location")
         .order("created_at", { ascending: false })
         .limit(100); // Limiter pour éviter les timeouts
       
@@ -44,10 +44,15 @@ export default async function CommunityPage() {
           full_name: row.full_name,
           email: row.email,
           avatar_url: row.avatar_url,
-          twitter_handle: null,
-          discord_tag: null,
+          twitter_handle: row.twitter_handle ?? null,
+          discord_tag: row.discord_tag ?? null,
           community_score: 0,
           role: (row.role || "member") as "member" | "admin" | "intervenant",
+          latitude: row.latitude != null ? Number(row.latitude) : null,
+          longitude: row.longitude != null ? Number(row.longitude) : null,
+          city: row.city ?? null,
+          country: row.country ?? null,
+          show_location: row.show_location ?? false,
         }));
       }
     } catch (fallbackErr) {
