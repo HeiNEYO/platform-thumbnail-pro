@@ -80,7 +80,7 @@ export default function RegisterPage() {
   };
 
   return (
-    <main className="min-h-screen flex flex-col lg:flex-row bg-[#0A0A0A]">
+    <main className="min-h-screen flex flex-col lg:flex-row bg-[#0f0f0f]">
       {/* Colonne gauche - Formulaire */}
       <AuthFormWrapper
         title="Holla, Bienvenue"

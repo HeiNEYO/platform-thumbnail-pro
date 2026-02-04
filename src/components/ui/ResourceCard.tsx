@@ -23,7 +23,7 @@ export function ResourceCard({ resource }: ResourceCardProps) {
       className="group block rounded-lg border border-white/10 bg-[#141414] overflow-hidden transition-all hover:border-white/20 hover:bg-[#1A1A1A]"
     >
       {resource.previewUrl && (
-        <div className="aspect-video bg-[#0A0A0A] overflow-hidden relative">
+        <div className="aspect-video bg-[#0f0f0f] overflow-hidden relative">
           <Image
             src={resource.previewUrl}
             alt={resource.titre}

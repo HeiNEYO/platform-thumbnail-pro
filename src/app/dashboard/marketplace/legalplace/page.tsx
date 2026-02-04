@@ -73,7 +73,7 @@ export default function LegalPlacePage() {
   return (
     <div className="space-y-8 animate-fade-in">
       {/* Hero Section - Image Header */}
-      <div className="relative h-[400px] rounded-lg border border-white/10 overflow-hidden bg-[#0a0a0a]">
+      <div className="relative h-[400px] rounded-lg border border-white/10 overflow-hidden bg-[#0f0f0f]">
         <div className="absolute inset-0 w-full h-full">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
@@ -135,7 +135,7 @@ export default function LegalPlacePage() {
             return (
               <div
                 key={offer.id}
-                className={`relative rounded-lg border bg-[#0a0a0a] overflow-hidden hover:border-white/20 transition-colors ${
+                className={`relative rounded-lg border bg-[#0f0f0f] overflow-hidden hover:border-white/20 transition-colors ${
                   isMicroEntreprise
                     ? "border-[#2563EB]"
                     : "border-white/10"

@@ -93,7 +93,7 @@ export function HeroBanner({ images, interval = 5000 }: HeroBannerProps) {
 
   if (images.length === 0) {
     return (
-      <div className="relative w-full h-[350px] md:h-[420px] rounded-[16px] bg-[#0A0A0A] border border-white/10 flex items-center justify-center">
+      <div className="relative w-full h-[350px] md:h-[420px] rounded-[16px] bg-[#0f0f0f] border border-white/10 flex items-center justify-center">
         <p className="text-white/50 text-sm">Aucune image disponible</p>
       </div>
     );
@@ -123,7 +123,7 @@ export function HeroBanner({ images, interval = 5000 }: HeroBannerProps) {
                   onError={() => setImageErrors((prev) => new Set(prev).add(prevIndex))}
                 />
               ) : (
-                <div className="absolute inset-0 bg-gradient-to-br from-[#0A0A0A] via-[#1A1A1A] to-[#0A0A0A] opacity-60"></div>
+                <div className="absolute inset-0 bg-gradient-to-br from-[#0f0f0f] via-[#1A1A1A] to-[#0f0f0f] opacity-60"></div>
               )}
               <div className="absolute inset-0 bg-black/60"></div>
             </div>
@@ -146,7 +146,7 @@ export function HeroBanner({ images, interval = 5000 }: HeroBannerProps) {
                 onError={() => setImageErrors((prev) => new Set(prev).add(currentIndex))}
               />
             ) : (
-              <div className="absolute inset-0 bg-gradient-to-br from-[#0A0A0A] via-[#1A1A1A] to-[#0A0A0A]"></div>
+              <div className="absolute inset-0 bg-gradient-to-br from-[#0f0f0f] via-[#1A1A1A] to-[#0f0f0f]"></div>
             )}
             
             {/* Masque d'opacité : sombre en bas (où sera le texte), clair en haut */}
@@ -165,7 +165,7 @@ export function HeroBanner({ images, interval = 5000 }: HeroBannerProps) {
             {/* Tag "What's new" en haut à droite */}
             <div className="absolute top-4 right-4 z-30">
               <div className="px-3 py-1.5 bg-white rounded-lg shadow-lg">
-                <span className="text-xs font-semibold text-[#0A0A0A]">What's new</span>
+                <span className="text-xs font-semibold text-[#0f0f0f]">What's new</span>
               </div>
             </div>
           </div>
@@ -186,7 +186,7 @@ export function HeroBanner({ images, interval = 5000 }: HeroBannerProps) {
                   onError={() => setImageErrors((prev) => new Set(prev).add(nextIndex))}
                 />
               ) : (
-                <div className="absolute inset-0 bg-gradient-to-br from-[#0A0A0A] via-[#1A1A1A] to-[#0A0A0A] opacity-60"></div>
+                <div className="absolute inset-0 bg-gradient-to-br from-[#0f0f0f] via-[#1A1A1A] to-[#0f0f0f] opacity-60"></div>
               )}
               <div className="absolute inset-0 bg-black/60"></div>
             </div>

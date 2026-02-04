@@ -154,7 +154,7 @@ function MembersMap({ members }: MembersMapProps) {
           html: `
             <div class="relative flex items-center justify-center">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" fill="#1D4ED8" stroke="#0a0a0a" stroke-width="1.5"/>
+                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" fill="#1D4ED8" stroke="#0f0f0f" stroke-width="1.5"/>
               </svg>
             </div>
           `,
@@ -199,7 +199,7 @@ function MembersMap({ members }: MembersMapProps) {
 
   if (!isMounted) {
     return (
-      <div className="h-[600px] rounded-lg border border-white/10 bg-[#0a0a0a] flex items-center justify-center">
+      <div className="h-[600px] rounded-lg border border-white/10 bg-[#0f0f0f] flex items-center justify-center">
         <div className="text-white/50">Chargement de la carte...</div>
       </div>
     );
@@ -209,7 +209,7 @@ function MembersMap({ members }: MembersMapProps) {
     <div className="relative">
       <div
         ref={mapContainerRef}
-        className="h-[600px] w-full rounded-lg border border-white/10 overflow-hidden bg-[#0a0a0a]"
+        className="h-[600px] w-full rounded-lg border border-white/10 overflow-hidden bg-[#0f0f0f]"
         style={{ zIndex: 1 }}
       />
       <style jsx global>{`
@@ -226,18 +226,18 @@ function MembersMap({ members }: MembersMapProps) {
           z-index: 1000 !important;
         }
         .leaflet-popup-content-wrapper {
-          background: #0a0a0a;
+          background: #0f0f0f;
           border: 1px solid rgba(255, 255, 255, 0.1);
           border-radius: 8px;
           box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
           color: white;
         }
         .leaflet-popup-tip {
-          background: #0a0a0a;
+          background: #0f0f0f;
           border: 1px solid rgba(255, 255, 255, 0.1);
         }
         .leaflet-container {
-          background: #0a0a0a;
+          background: #0f0f0f;
         }
         /* S'assurer que les tuiles sont visibles */
         .leaflet-tile-container img {

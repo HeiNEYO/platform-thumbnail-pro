@@ -60,7 +60,7 @@ export function NetflixStyleEpisodes({
         {scrollState.left && (
           <button
             onClick={() => scroll("left")}
-            className="absolute left-0 top-0 bottom-0 z-10 w-12 bg-gradient-to-r from-[#0a0a0a] to-transparent flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+            className="absolute left-0 top-0 bottom-0 z-10 w-12 bg-gradient-to-r from-[#0f0f0f] to-transparent flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
             aria-label="Défiler vers la gauche"
           >
             <ChevronLeft className="h-8 w-8 text-white" />
@@ -90,7 +90,7 @@ export function NetflixStyleEpisodes({
                   className="group/episode flex-shrink-0 w-[280px] bg-[#141414] rounded-lg overflow-hidden border border-white/10 hover:border-primary/50 transition-all duration-300 hover:scale-105"
                 >
                   {/* Image de l'épisode */}
-                  <div className="relative h-[160px] bg-gradient-to-br from-primary/20 to-[#0a0a0a] flex items-center justify-center">
+                  <div className="relative h-[160px] bg-gradient-to-br from-primary/20 to-[#0f0f0f] flex items-center justify-center">
                     {isCompleted ? (
                       <div className="absolute inset-0 bg-green-500/20 flex items-center justify-center">
                         <Check className="h-12 w-12 text-green-500" />
@@ -144,7 +144,7 @@ export function NetflixStyleEpisodes({
         {scrollState.right && (
           <button
             onClick={() => scroll("right")}
-            className="absolute right-0 top-0 bottom-0 z-10 w-12 bg-gradient-to-l from-[#0a0a0a] to-transparent flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+            className="absolute right-0 top-0 bottom-0 z-10 w-12 bg-gradient-to-l from-[#0f0f0f] to-transparent flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
             aria-label="Défiler vers la droite"
           >
             <ChevronRight className="h-8 w-8 text-white" />

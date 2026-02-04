@@ -39,7 +39,7 @@ export function NetflixStyleModuleCards({
             className="group/module bg-[#141414] rounded-lg overflow-hidden border border-white/10 hover:border-primary/50 transition-all duration-300 hover:scale-[1.02]"
           >
             {/* Image du module */}
-                    <div className="relative h-[200px] bg-gradient-to-br from-primary/20 to-[#0a0a0a] flex items-center justify-center">
+                    <div className="relative h-[200px] bg-gradient-to-br from-primary/20 to-[#0f0f0f] flex items-center justify-center">
                       {module.image_url ? (
                         // eslint-disable-next-line @next/next/no-img-element
                         <img

@@ -35,10 +35,10 @@ export default function MarketplacePage() {
               placeholder="Rechercher par mots-clés..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-white/20 bg-[#0a0a0a] text-white text-sm placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-colors"
+              className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-white/20 bg-[#0f0f0f] text-white text-sm placeholder:text-white/40 focus:outline-none focus:border-white/40 transition-colors"
             />
           </div>
-          <button className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-white/20 bg-[#0a0a0a] text-white text-sm hover:border-white/40 transition-colors">
+          <button className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-white/20 bg-[#0f0f0f] text-white text-sm hover:border-white/40 transition-colors">
             <Filter className="h-4 w-4" />
             <span>Filtres</span>
           </button>
@@ -57,7 +57,7 @@ export default function MarketplacePage() {
               className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium transition-all ${
                 isActive
                   ? "bg-white text-[#0a0a0a]"
-                  : "bg-[#0a0a0a] text-white/60 border border-white/20 hover:text-white/90 hover:border-white/30"
+                  : "bg-[#0f0f0f] text-white/60 border border-white/20 hover:text-white/90 hover:border-white/30"
               }`}
             >
               <Icon className="h-4 w-4" />
@@ -72,7 +72,7 @@ export default function MarketplacePage() {
         {/* LegalPlace Card */}
         <a
           href="/dashboard/marketplace/legalplace"
-          className="block rounded-lg border border-white/10 bg-[#0a0a0a] overflow-hidden hover:border-white/20 transition-colors"
+          className="block rounded-lg border border-white/10 bg-[#0f0f0f] overflow-hidden hover:border-white/20 transition-colors"
         >
           {/* Banner Area - Image */}
           <div className="relative h-[200px] overflow-hidden">
@@ -88,7 +88,7 @@ export default function MarketplacePage() {
           <div className="border-t border-white/10"></div>
 
           {/* Main Content Area */}
-          <div className="p-5 bg-[#0a0a0a]">
+          <div className="p-5 bg-[#0f0f0f]">
             <div className="flex items-start justify-between mb-3">
               <h3 className="text-lg font-bold text-white">LegalPlace</h3>
               <span className="px-2.5 py-1 rounded-full bg-white/10 text-white/80 text-xs font-medium">

@@ -2,9 +2,9 @@
 
 export function SiteSkeleton() {
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-white">
+    <div className="min-h-screen bg-[#0f0f0f] text-white">
       <div className="flex min-h-screen">
-        <section className="w-[240px] border-r border-[#1a1a1a] bg-[#0a0a0a]/70 p-4 space-y-4 animate-pulse">
+        <section className="w-[240px] border-r border-[#1a1a1a] bg-[#0f0f0f]/80 p-4 space-y-4 animate-pulse">
           {[...Array(5)].map((_, index) => (
             <div key={index} className="h-8 rounded-xl bg-gradient-to-r from-[#1f1f1f] to-[#0f0f0f]" />
           ))}

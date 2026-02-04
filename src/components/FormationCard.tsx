@@ -23,7 +23,7 @@ export function FormationCard({ module }: FormationCardProps) {
   return (
     <Link
       href={`/dashboard/modules/${module.id}`}
-      className="group relative block h-[280px] rounded-lg border border-white/10 overflow-hidden bg-[#0a0a0a] hover:border-primary/50 transition-all duration-300 hover:scale-[1.02]"
+      className="group relative block h-[280px] rounded-lg border border-white/10 overflow-hidden bg-[#0f0f0f] hover:border-primary/50 transition-all duration-300 hover:scale-[1.02]"
     >
       {/* Image de fond - 80% du rectangle */}
       <div className="absolute inset-0 w-full h-[80%]">
@@ -40,7 +40,7 @@ export function FormationCard({ module }: FormationCardProps) {
           />
         ) : (
           // Gradient par défaut si aucune image
-          <div className="w-full h-full bg-gradient-to-br from-primary/20 via-primary/10 to-[#0a0a0a]" />
+          <div className="w-full h-full bg-gradient-to-br from-primary/20 via-primary/10 to-[#0f0f0f]" />
         )}
       </div>
 

@@ -14,7 +14,7 @@ export const metadata: Metadata = {
   title: "Platform Thumbnail Pro - Formation en ligne",
   description: "Plateforme de membres pour votre formation en ligne",
   icons: {
-    icon: "/images/logo.png",
+    icon: "/images/logo.svg",
   },
 };
 

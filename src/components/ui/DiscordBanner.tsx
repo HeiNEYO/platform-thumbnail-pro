@@ -11,10 +11,10 @@ export function DiscordBanner() {
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 bg-white rounded flex items-center justify-center shrink-0">
             <div className="grid grid-cols-2 gap-0.5 p-1">
-              <div className="w-2 h-2 bg-[#0A0A0A] rounded-sm"></div>
-              <div className="w-2 h-2 bg-[#0A0A0A] rounded-sm"></div>
-              <div className="w-2 h-2 bg-[#0A0A0A] rounded-sm"></div>
-              <div className="w-2 h-2 bg-[#0A0A0A] rounded-sm"></div>
+              <div className="w-2 h-2 bg-[#0f0f0f] rounded-sm"></div>
+              <div className="w-2 h-2 bg-[#0f0f0f] rounded-sm"></div>
+              <div className="w-2 h-2 bg-[#0f0f0f] rounded-sm"></div>
+              <div className="w-2 h-2 bg-[#0f0f0f] rounded-sm"></div>
             </div>
           </div>
           <span className="text-white font-normal text-sm md:text-base">Thumbnail Pro</span>

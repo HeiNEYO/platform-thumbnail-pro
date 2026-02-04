@@ -76,7 +76,7 @@ function LoginForm() {
   const isDemoMode = process.env.NEXT_PUBLIC_DEV_MODE === "true" || process.env.NEXT_PUBLIC_DEMO_MODE === "true";
 
   return (
-    <main className="min-h-screen flex flex-col lg:flex-row bg-[#0A0A0A]">
+    <main className="min-h-screen flex flex-col lg:flex-row bg-[#0f0f0f]">
       {/* Colonne gauche - Formulaire */}
       <AuthFormWrapper
         title="Holla, Welcome Back"
@@ -180,7 +180,7 @@ function LoginForm() {
 export default function LoginPage() {
   return (
     <Suspense fallback={
-      <main className="min-h-screen flex items-center justify-center bg-[#0A0A0A]">
+      <main className="min-h-screen flex items-center justify-center bg-[#0f0f0f]">
         <div className="w-12 h-12 border-4 border-[#3B82F6]/20 border-t-[#3B82F6] rounded-full animate-spin" />
       </main>
     }>

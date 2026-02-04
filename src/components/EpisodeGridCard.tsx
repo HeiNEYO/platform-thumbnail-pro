@@ -88,7 +88,7 @@ export function EpisodeGridCard({
         className="relative block aspect-video overflow-hidden"
       >
         {/* Image de preview de la vid�o */}
-        <div className="relative w-full h-full bg-gradient-to-br from-[#1D4ED8]/20 to-[#0a0a0a]">
+        <div className="relative w-full h-full bg-gradient-to-br from-[#1D4ED8]/20 to-[#0f0f0f]">
           {thumbnailPath ? (
             <Image
               src={thumbnailPath}
