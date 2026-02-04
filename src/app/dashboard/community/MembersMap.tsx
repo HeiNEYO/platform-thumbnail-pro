@@ -41,7 +41,7 @@ function MembersMap({ members }: MembersMapProps) {
       
       try {
         tileLayer = L.default.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
-          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
+          attribution: false, // Masquer l'attribution
           maxZoom: 19,
           subdomains: "abcd",
           tileSize: 256,
@@ -57,7 +57,7 @@ function MembersMap({ members }: MembersMapProps) {
           if (mapRef.current) {
             mapRef.current.removeLayer(tileLayer);
             const osmLayer = L.default.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-              attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+              attribution: false, // Masquer l'attribution
               maxZoom: 19,
             });
             osmLayer.addTo(mapRef.current);
@@ -67,7 +67,7 @@ function MembersMap({ members }: MembersMapProps) {
         console.error("Erreur lors de la création du tile layer:", err);
         // Fallback vers OpenStreetMap
         const osmLayer = L.default.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+          attribution: false, // Masquer l'attribution
           maxZoom: 19,
         });
         osmLayer.addTo(map);
@@ -97,7 +97,7 @@ function MembersMap({ members }: MembersMapProps) {
   }, [isMounted]);
 
   useEffect(() => {
-    if (!isMounted || !mapRef.current || members.length === 0) return;
+    if (!isMounted || !mapRef.current) return;
 
     // Charger Leaflet dynamiquement
     import("leaflet").then((L) => {
@@ -109,16 +109,24 @@ function MembersMap({ members }: MembersMapProps) {
       });
       markersRef.current = [];
 
+      // Filtrer les membres avec localisation valide
+      const membersWithLocation = members.filter(m => 
+        m.latitude && m.longitude && 
+        !isNaN(Number(m.latitude)) && 
+        !isNaN(Number(m.longitude))
+      );
+
+      if (membersWithLocation.length === 0) {
+        console.log("Aucun membre avec localisation valide à afficher");
+        return;
+      }
+
       // Créer un groupe de marqueurs pour gérer les clusters si nécessaire
       const bounds = L.default.latLngBounds([]);
 
-      members.forEach((member) => {
-        if (!member.latitude || !member.longitude) return;
-
+      membersWithLocation.forEach((member) => {
         const lat = Number(member.latitude);
         const lng = Number(member.longitude);
-
-        if (isNaN(lat) || isNaN(lng)) return;
 
         // Créer une icône de localisation simple et sobre
         const locationIcon = L.default.divIcon({
@@ -160,7 +168,7 @@ function MembersMap({ members }: MembersMapProps) {
       });
 
       // Ajuster la vue pour voir tous les marqueurs
-      if (members.length > 0 && bounds.isValid()) {
+      if (membersWithLocation.length > 0 && bounds.isValid()) {
         mapRef.current.fitBounds(bounds, { padding: [50, 50] });
       }
     }).catch((err) => {
@@ -209,9 +217,19 @@ function MembersMap({ members }: MembersMapProps) {
         .leaflet-tile-pane {
           opacity: 1 !important;
         }
-        /* Rendre les contours des pays plus visibles avec un filtre léger */
+        /* Inverser les couleurs : océans = fond du site, pays = couleur légèrement différente */
         .leaflet-tile {
-          filter: brightness(1.2) contrast(1.1) !important;
+          filter: 
+            brightness(0.4) 
+            contrast(1.5) 
+            invert(0.85) 
+            hue-rotate(180deg) 
+            saturate(0.3) 
+            brightness(0.6) !important;
+        }
+        /* Masquer l'attribution OpenStreetMap */
+        .leaflet-control-attribution {
+          display: none !important;
         }
       `}</style>
     </div>
