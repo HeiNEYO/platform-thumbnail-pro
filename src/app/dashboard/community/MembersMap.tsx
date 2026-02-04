@@ -110,14 +110,32 @@ function MembersMap({ members }: MembersMapProps) {
       markersRef.current = [];
 
       // Filtrer les membres avec localisation valide
+      console.log("🔍 Membres reçus pour la carte:", members.length);
+      console.log("🔍 Détails des membres:", members.map(m => ({
+        id: m.id,
+        name: m.full_name,
+        show_location: m.show_location,
+        latitude: m.latitude,
+        longitude: m.longitude,
+        city: m.city,
+        country: m.country
+      })));
+
       const membersWithLocation = members.filter(m => 
         m.latitude && m.longitude && 
         !isNaN(Number(m.latitude)) && 
         !isNaN(Number(m.longitude))
       );
 
+      console.log("✅ Membres avec localisation valide:", membersWithLocation.length);
+      console.log("✅ Coordonnées:", membersWithLocation.map(m => ({
+        name: m.full_name,
+        lat: m.latitude,
+        lng: m.longitude
+      })));
+
       if (membersWithLocation.length === 0) {
-        console.log("Aucun membre avec localisation valide à afficher");
+        console.log("⚠️ Aucun membre avec localisation valide à afficher");
         return;
       }
 
@@ -127,6 +145,8 @@ function MembersMap({ members }: MembersMapProps) {
       membersWithLocation.forEach((member) => {
         const lat = Number(member.latitude);
         const lng = Number(member.longitude);
+
+        console.log(`📍 Création du marqueur pour ${member.full_name} à [${lat}, ${lng}]`);
 
         // Créer une icône de localisation simple et sobre
         const locationIcon = L.default.divIcon({
@@ -144,6 +164,7 @@ function MembersMap({ members }: MembersMapProps) {
         });
 
         const marker = L.default.marker([lat, lng], { icon: locationIcon }).addTo(mapRef.current!);
+        console.log(`✅ Marqueur créé et ajouté pour ${member.full_name}`);
 
         // Créer le contenu du popup sobre
         const popupContent = `

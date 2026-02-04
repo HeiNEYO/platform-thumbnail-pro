@@ -388,9 +388,22 @@ export function CommunityClient({ initialMembers }: { initialMembers: CommunityM
   };
 
   // Membres avec localisation activée pour la carte
+  console.log("🔍 Tous les membres:", members.length);
+  console.log("🔍 Détails de localisation:", members.map(m => ({
+    id: m.id,
+    name: m.full_name,
+    show_location: m.show_location,
+    latitude: m.latitude,
+    longitude: m.longitude,
+    city: m.city,
+    country: m.country
+  })));
+  
   const membersWithLocation = members.filter(m => 
     m.show_location && m.latitude && m.longitude
   );
+  
+  console.log("✅ Membres avec localisation activée:", membersWithLocation.length);
 
   return (
     <div className="space-y-6">
