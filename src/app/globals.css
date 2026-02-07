@@ -197,6 +197,22 @@ body {
   animation: skeleton-shimmer 1.5s ease-in-out infinite;
 }
 
+/* Fond auth : pointillés type ruche animés (noir + bleus plateforme) */
+.auth-bg-honeycomb {
+  background-color: #0a0a0a;
+  background-image: 
+    radial-gradient(circle at center, rgba(0, 68, 255, 0.2) 1.5px, transparent 1.5px),
+    radial-gradient(circle at center, rgba(107, 143, 255, 0.12) 1px, transparent 1px);
+  background-size: 28px 24px, 56px 48px;
+  background-position: 0 0, 14px 12px;
+  animation: auth-honeycomb-drift 25s linear infinite;
+}
+
+@keyframes auth-honeycomb-drift {
+  0% { background-position: 0 0, 14px 12px; }
+  100% { background-position: 28px 0, 42px 12px; }
+}
+
 @layer utilities {
   .text-balance {
     text-wrap: balance;

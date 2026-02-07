@@ -2,9 +2,10 @@
 
 import { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
-import { Mail, Lock, Eye, EyeOff, CheckCircle, ArrowRight } from "lucide-react";
+import { Lock, Eye, EyeOff, CheckCircle, ArrowRight } from "lucide-react";
 
 function LoginForm() {
   const [email, setEmail] = useState("");
@@ -69,29 +70,23 @@ function LoginForm() {
   const isDemoMode = process.env.NEXT_PUBLIC_DEV_MODE === "true" || process.env.NEXT_PUBLIC_DEMO_MODE === "true";
 
   return (
-    <main className="min-h-screen flex items-center justify-center bg-[#0f1419] relative overflow-hidden px-4">
-      {/* Fond avec reflets / speckles */}
-      <div className="absolute inset-0 bg-[#0f1419]" />
-      <div className="absolute inset-0 opacity-40">
-        <div className="absolute top-[10%] left-[15%] w-2 h-2 rounded-full bg-white/60" />
-        <div className="absolute top-[20%] right-[20%] w-1.5 h-1.5 rounded-full bg-white/50" />
-        <div className="absolute top-[40%] left-[25%] w-1 h-1 rounded-full bg-white/40" />
-        <div className="absolute top-[60%] right-[30%] w-2 h-2 rounded-full bg-white/50" />
-        <div className="absolute top-[75%] left-[20%] w-1.5 h-1.5 rounded-full bg-white/40" />
-        <div className="absolute top-[30%] right-[10%] w-1 h-1 rounded-full bg-white/30" />
-        <div className="absolute top-[55%] left-[10%] w-1 h-1 rounded-full bg-white/30" />
-      </div>
-
-      {/* Carte glassmorphism */}
-      <div className="relative w-full max-w-[420px] rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl shadow-2xl p-8 sm:p-10">
-        {/* Icône / logo en haut */}
+    <main className="min-h-screen flex items-center justify-center auth-bg-honeycomb relative overflow-hidden px-4">
+      {/* Carte glassmorphism - couleurs plateforme */}
+      <div className="relative w-full max-w-[420px] rounded-2xl border border-[#1a1a1a] bg-[#0a0a0a]/90 backdrop-blur-xl shadow-2xl p-8 sm:p-10">
+        {/* Logo Thumbnail Pro */}
         <div className="flex justify-center mb-6">
-          <div className="w-14 h-14 rounded-full border-2 border-white/30 bg-white/5 flex items-center justify-center">
-            <div className="w-4 h-4 rounded-full bg-white/60" />
-          </div>
+          <Link href="/" className="block">
+            <Image
+              src="/images/logo.svg"
+              alt="Thumbnail Pro"
+              width={56}
+              height={56}
+              className="shrink-0"
+            />
+          </Link>
         </div>
 
-        <h1 className="text-2xl sm:text-3xl font-bold text-white text-center mb-1">Welcome back</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold text-white text-center mb-1">Content de vous revoir</h1>
         <p className="text-sm text-white/60 text-center mb-8">Veuillez entrer vos informations pour vous connecter.</p>
 
         {isDemoMode && (
@@ -125,7 +120,7 @@ function LoginForm() {
               placeholder="votre@email.com"
               autoComplete="email"
               required
-              className="w-full pr-14 pl-4 py-3.5 rounded-xl border border-white/10 bg-white/5 text-white placeholder-white/40 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/30 transition-all text-base"
+              className="w-full pr-14 pl-4 py-3.5 rounded-xl border border-[#1a1a1a] bg-[#141414] text-white placeholder-white/40 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/30 transition-all text-base"
             />
             <button
               type="submit"
@@ -146,7 +141,7 @@ function LoginForm() {
               placeholder="••••••••••••"
               autoComplete="current-password"
               required
-              className="w-full pl-4 pr-12 py-3.5 rounded-xl border border-white/10 bg-white/5 text-white placeholder-white/40 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/30 transition-all text-base"
+              className="w-full pl-4 pr-12 py-3.5 rounded-xl border border-[#1a1a1a] bg-[#141414] text-white placeholder-white/40 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/30 transition-all text-base"
               suppressHydrationWarning
             />
             <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-2">
@@ -183,18 +178,18 @@ function LoginForm() {
             </Link>
           </div>
 
-          {/* Séparateur OR */}
+          {/* Séparateur */}
           <div className="flex items-center gap-4 mb-6">
-            <div className="flex-1 h-px bg-white/10" />
+            <div className="flex-1 h-px bg-[#1a1a1a]" />
             <span className="text-xs font-medium text-white/50 uppercase tracking-wider">Ou</span>
-            <div className="flex-1 h-px bg-white/10" />
+            <div className="flex-1 h-px bg-[#1a1a1a]" />
           </div>
 
-          {/* Bouton principal */}
+          {/* Bouton principal - primary plateforme */}
           <button
             type="submit"
             disabled={submitting}
-            className="w-full py-3.5 rounded-xl border border-white/10 bg-white/5 text-white font-medium flex items-center justify-center gap-2 hover:bg-white/10 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full py-3.5 rounded-xl bg-primary hover:bg-primary-hover text-white font-medium flex items-center justify-center gap-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed border border-primary/50"
           >
             {submitting ? (
               <>
@@ -216,7 +211,7 @@ function LoginForm() {
         {/* Footer */}
         <p className="text-center text-sm text-white/60 mt-8">
           Pas de compte ?{" "}
-          <Link href="/register" className="text-primary font-medium underline underline-offset-2 hover:text-primary-hover">
+          <Link href="/register" className="text-icon font-medium underline underline-offset-2 hover:text-primary transition-colors">
             Créer un compte
           </Link>
         </p>
@@ -228,7 +223,7 @@ function LoginForm() {
 export default function LoginPage() {
   return (
     <Suspense fallback={
-      <main className="min-h-screen flex items-center justify-center bg-[#0f1419]">
+      <main className="min-h-screen flex items-center justify-center auth-bg-honeycomb">
         <div className="w-12 h-12 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
       </main>
     }>

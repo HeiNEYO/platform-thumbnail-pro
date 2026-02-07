@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import Link from "next/link";
+import Image from "next/image";
 import { Mail, Lock, User, Eye, EyeOff, ArrowRight } from "lucide-react";
 
 export default function RegisterPage() {
@@ -74,25 +75,19 @@ export default function RegisterPage() {
   };
 
   return (
-    <main className="min-h-screen flex items-center justify-center bg-[#0f1419] relative overflow-hidden px-4">
-      {/* Fond avec reflets / speckles */}
-      <div className="absolute inset-0 bg-[#0f1419]" />
-      <div className="absolute inset-0 opacity-40">
-        <div className="absolute top-[10%] left-[15%] w-2 h-2 rounded-full bg-white/60" />
-        <div className="absolute top-[20%] right-[20%] w-1.5 h-1.5 rounded-full bg-white/50" />
-        <div className="absolute top-[40%] left-[25%] w-1 h-1 rounded-full bg-white/40" />
-        <div className="absolute top-[60%] right-[30%] w-2 h-2 rounded-full bg-white/50" />
-        <div className="absolute top-[75%] left-[20%] w-1.5 h-1.5 rounded-full bg-white/40" />
-        <div className="absolute top-[30%] right-[10%] w-1 h-1 rounded-full bg-white/30" />
-        <div className="absolute top-[55%] left-[10%] w-1 h-1 rounded-full bg-white/30" />
-      </div>
-
-      {/* Carte glassmorphism */}
-      <div className="relative w-full max-w-[420px] rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl shadow-2xl p-8 sm:p-10">
+    <main className="min-h-screen flex items-center justify-center auth-bg-honeycomb relative overflow-hidden px-4">
+      {/* Carte - couleurs plateforme */}
+      <div className="relative w-full max-w-[420px] rounded-2xl border border-[#1a1a1a] bg-[#0a0a0a]/90 backdrop-blur-xl shadow-2xl p-8 sm:p-10">
         <div className="flex justify-center mb-6">
-          <div className="w-14 h-14 rounded-full border-2 border-white/30 bg-white/5 flex items-center justify-center">
-            <div className="w-4 h-4 rounded-full bg-white/60" />
-          </div>
+          <Link href="/" className="block">
+            <Image
+              src="/images/logo.svg"
+              alt="Thumbnail Pro"
+              width={56}
+              height={56}
+              className="shrink-0"
+            />
+          </Link>
         </div>
 
         <h1 className="text-2xl sm:text-3xl font-bold text-white text-center mb-1">Bienvenue</h1>
@@ -119,7 +114,7 @@ export default function RegisterPage() {
               placeholder="Nom complet"
               autoComplete="name"
               required
-              className="w-full pl-11 pr-4 py-3.5 rounded-xl border border-white/10 bg-white/5 text-white placeholder-white/40 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/30 transition-all text-base"
+              className="w-full pl-11 pr-4 py-3.5 rounded-xl border border-[#1a1a1a] bg-[#141414] text-white placeholder-white/40 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/30 transition-all text-base"
             />
           </div>
 
@@ -137,7 +132,7 @@ export default function RegisterPage() {
               placeholder="votre@email.com"
               autoComplete="email"
               required
-              className="w-full pl-11 pr-4 py-3.5 rounded-xl border border-white/10 bg-white/5 text-white placeholder-white/40 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/30 transition-all text-base"
+              className="w-full pl-11 pr-4 py-3.5 rounded-xl border border-[#1a1a1a] bg-[#141414] text-white placeholder-white/40 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/30 transition-all text-base"
             />
           </div>
 
@@ -155,7 +150,7 @@ export default function RegisterPage() {
               placeholder="••••••••••••"
               autoComplete="new-password"
               required
-              className="w-full pl-11 pr-12 py-3.5 rounded-xl border border-white/10 bg-white/5 text-white placeholder-white/40 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/30 transition-all text-base"
+              className="w-full pl-11 pr-12 py-3.5 rounded-xl border border-[#1a1a1a] bg-[#141414] text-white placeholder-white/40 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/30 transition-all text-base"
               suppressHydrationWarning
             />
             <button
@@ -181,7 +176,7 @@ export default function RegisterPage() {
               placeholder="Confirmer le mot de passe"
               autoComplete="new-password"
               required
-              className="w-full pl-11 pr-12 py-3.5 rounded-xl border border-white/10 bg-white/5 text-white placeholder-white/40 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/30 transition-all text-base"
+              className="w-full pl-11 pr-12 py-3.5 rounded-xl border border-[#1a1a1a] bg-[#141414] text-white placeholder-white/40 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/30 transition-all text-base"
               suppressHydrationWarning
             />
             <button
@@ -193,18 +188,18 @@ export default function RegisterPage() {
             </button>
           </div>
 
-          {/* Séparateur OR */}
+          {/* Séparateur */}
           <div className="flex items-center gap-4 mb-6">
-            <div className="flex-1 h-px bg-white/10" />
+            <div className="flex-1 h-px bg-[#1a1a1a]" />
             <span className="text-xs font-medium text-white/50 uppercase tracking-wider">Ou</span>
-            <div className="flex-1 h-px bg-white/10" />
+            <div className="flex-1 h-px bg-[#1a1a1a]" />
           </div>
 
-          {/* Bouton */}
+          {/* Bouton - primary plateforme */}
           <button
             type="submit"
             disabled={submitting}
-            className="w-full py-3.5 rounded-xl border border-white/10 bg-white/5 text-white font-medium flex items-center justify-center gap-2 hover:bg-white/10 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full py-3.5 rounded-xl bg-primary hover:bg-primary-hover text-white font-medium flex items-center justify-center gap-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed border border-primary/50"
           >
             {submitting ? (
               <>
@@ -225,7 +220,7 @@ export default function RegisterPage() {
 
         <p className="text-center text-sm text-white/60 mt-8">
           Déjà un compte ?{" "}
-          <Link href="/login" className="text-primary font-medium underline underline-offset-2 hover:text-primary-hover">
+          <Link href="/login" className="text-icon font-medium underline underline-offset-2 hover:text-primary transition-colors">
             Se connecter
           </Link>
         </p>
