@@ -189,10 +189,10 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
                           }`}
                           onClick={() => setMobileMenuOpen(false)}
                         >
-                          {item.icon ? (
-                            <item.icon className={`h-4 w-4 ${active ? "text-icon" : ""}`} />
-                          ) : item.customIcon ? (
+                          {"customIcon" in item && item.customIcon ? (
                             <item.customIcon className={`h-4 w-4 ${active ? "text-icon" : ""}`} />
+                          ) : item.icon ? (
+                            <item.icon className={`h-4 w-4 ${active ? "text-icon" : ""}`} />
                           ) : null}
                           {item.label}
                         </Link>
@@ -260,7 +260,7 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
                               : "text-white/60 hover:text-white/90 hover:bg-[#141414]/50 px-3 transition-colors"
                           }`}
                         >
-                          {item.customIcon ? (
+                          {"customIcon" in item && item.customIcon ? (
                             <item.customIcon className={`h-4 w-4 shrink-0 ${active ? "text-icon" : ""}`} />
                           ) : item.icon ? (
                             <item.icon className={`h-4 w-4 shrink-0 ${active ? "text-icon" : ""}`} />
