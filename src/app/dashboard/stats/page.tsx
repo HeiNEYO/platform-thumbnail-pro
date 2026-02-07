@@ -50,7 +50,7 @@ export default async function StatsPage() {
         <div className="rounded-lg border border-card-border bg-black p-5">
           <div className="flex items-center gap-3">
             <div className="p-2 rounded-lg border border-card-border">
-              <Target className="h-5 w-5 text-primary" />
+              <Target className="h-5 w-5 text-icon" />
             </div>
             <div>
               <p className="text-2xl font-bold text-white">{progressPercent}%</p>
@@ -72,7 +72,7 @@ export default async function StatsPage() {
         <div className="rounded-lg border border-card-border bg-black p-5">
           <div className="flex items-center gap-3">
             <div className="p-2 rounded-lg border border-card-border">
-              <BookOpen className="h-5 w-5 text-primary" />
+              <BookOpen className="h-5 w-5 text-icon" />
             </div>
             <div>
               <p className="text-2xl font-bold text-white">{totalEpisodes}</p>
@@ -83,7 +83,7 @@ export default async function StatsPage() {
         <div className="rounded-lg border border-card-border bg-black p-5">
           <div className="flex items-center gap-3">
             <div className="p-2 rounded-lg border border-card-border">
-              <BarChart3 className="h-5 w-5 text-primary" />
+              <BarChart3 className="h-5 w-5 text-icon" />
             </div>
             <div>
               <p className="text-2xl font-bold text-white">{byModule.length}</p>
@@ -114,7 +114,7 @@ export default async function StatsPage() {
                 <div className="flex justify-between text-sm">
                   <Link
                     href={`/dashboard/modules/${m.moduleId}`}
-                    className="font-medium text-white hover:text-primary transition-colors truncate pr-2"
+                    className="font-medium text-white hover:text-icon transition-colors truncate pr-2"
                   >
                     {m.moduleTitle}
                   </Link>

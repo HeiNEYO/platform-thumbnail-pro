@@ -48,7 +48,7 @@ export function NetflixStyleModuleCards({
                           className="w-full h-full object-cover"
                         />
                       ) : (
-                        <Play className="h-16 w-16 text-white/30 group-hover/module:text-primary transition-colors" />
+                        <Play className="h-16 w-16 text-white/30 group-hover/module:text-icon transition-colors" />
                       )}
                       {/* Overlay au survol */}
                       <div className="absolute inset-0 bg-black/0 group-hover/module:bg-black/30 transition-colors" />
@@ -56,7 +56,7 @@ export function NetflixStyleModuleCards({
 
             {/* Contenu de la carte */}
             <div className="p-5">
-              <h3 className="text-lg font-semibold text-white group-hover/module:text-primary transition-colors mb-2 line-clamp-2">
+              <h3 className="text-lg font-semibold text-white group-hover/module:text-icon transition-colors mb-2 line-clamp-2">
                 {module.title}
               </h3>
               {module.description && (

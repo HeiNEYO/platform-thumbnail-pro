@@ -92,7 +92,7 @@ export function NotesListClient({
                     <button
                       type="button"
                       onClick={() => startEdit(note)}
-                      className="p-2 rounded-lg border border-card-border text-white/50 hover:text-primary hover:border-primary/50 transition-colors"
+                      className="p-2 rounded-lg border border-card-border text-white/50 hover:text-icon hover:border-icon/50 transition-colors"
                       title="Modifier"
                     >
                       <Pencil className="h-4 w-4" />
@@ -111,7 +111,7 @@ export function NotesListClient({
                     <button
                       type="button"
                       onClick={() => saveEdit(note.episode_id)}
-                      className="p-2 rounded-lg border border-primary text-primary hover:bg-primary/10 transition-colors"
+                      className="p-2 rounded-lg border border-icon text-icon hover:bg-icon/10/10 transition-colors"
                       title="Enregistrer"
                     >
                       <Check className="h-4 w-4" />

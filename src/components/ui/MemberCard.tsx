@@ -86,7 +86,7 @@ export function MemberCard({ member }: MemberCardProps) {
               href={`https://twitter.com/${member.twitter_handle.replace(/^@+/, "")}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-2 hover:text-primary transition-colors"
+              className="flex items-center gap-2 hover:text-icon transition-colors"
             >
               <Twitter className="h-4 w-4 shrink-0" />
               <span className="truncate">{member.twitter_handle}</span>
@@ -99,7 +99,7 @@ export function MemberCard({ member }: MemberCardProps) {
               href={`https://discord.com/users/${member.discord_tag.replace(/^@+/, "")}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-2 hover:text-primary transition-colors"
+              className="flex items-center gap-2 hover:text-icon transition-colors"
             >
               <DiscordIcon className="h-4 w-4 shrink-0" />
               <span className="truncate">{member.discord_tag}</span>

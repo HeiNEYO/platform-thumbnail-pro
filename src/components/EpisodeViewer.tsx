@@ -172,8 +172,8 @@ export function EpisodeViewer({
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 text-sm text-white/90 hover:text-white transition-colors group"
               >
-                <span className="group-hover:text-[#0044FF] transition-colors">{complementaryResource.title}</span>
-                <ExternalLink className="h-4 w-4 group-hover:text-[#0044FF] transition-colors" />
+                <span className="group-hover:text-icon transition-colors">{complementaryResource.title}</span>
+                <ExternalLink className="h-4 w-4 group-hover:text-icon transition-colors" />
               </a>
             </div>
           )}

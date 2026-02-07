@@ -96,7 +96,7 @@ export function NetflixStyleEpisodes({
                         <Check className="h-12 w-12 text-green-500" />
                       </div>
                     ) : (
-                      <Play className="h-12 w-12 text-white/30 group-hover/episode:text-primary transition-colors" />
+                      <Play className="h-12 w-12 text-white/30 group-hover/episode:text-icon transition-colors" />
                     )}
                     {/* Overlay au survol */}
                     <div className="absolute inset-0 bg-black/0 group-hover/episode:bg-black/30 transition-colors" />
@@ -109,7 +109,7 @@ export function NetflixStyleEpisodes({
                         className={`text-sm font-semibold line-clamp-2 flex-1 ${
                           isCompleted
                             ? "text-green-400 line-through"
-                            : "text-white group-hover/episode:text-primary"
+                            : "text-white group-hover/episode:text-icon"
                         } transition-colors`}
                       >
                         {episode.title}

@@ -34,7 +34,7 @@ export default function DiscordPage() {
       <div className="rounded-lg border border-card-border bg-black p-8">
         <div className="flex flex-col items-center text-center space-y-6">
           <div className="p-4 bg-black rounded-lg border border-card-border">
-            <DiscordIcon className="h-12 w-12 text-primary" />
+            <DiscordIcon className="h-12 w-12 text-icon" />
           </div>
           
           <div className="space-y-2">
@@ -63,19 +63,19 @@ export default function DiscordPage() {
         <h3 className="font-semibold text-white mb-3 text-sm">À propos du serveur</h3>
         <ul className="space-y-2 text-xs text-white/70">
           <li className="flex items-start gap-2">
-            <span className="text-primary mt-1">•</span>
+            <span className="text-icon mt-1">•</span>
             <span>Accès exclusif aux membres de la formation</span>
           </li>
           <li className="flex items-start gap-2">
-            <span className="text-primary mt-1">•</span>
+            <span className="text-icon mt-1">•</span>
             <span>Support et entraide entre membres</span>
           </li>
           <li className="flex items-start gap-2">
-            <span className="text-primary mt-1">•</span>
+            <span className="text-icon mt-1">•</span>
             <span>Annonces et mises à jour importantes</span>
           </li>
           <li className="flex items-start gap-2">
-            <span className="text-primary mt-1">•</span>
+            <span className="text-icon mt-1">•</span>
             <span>Partage de ressources et astuces</span>
           </li>
         </ul>

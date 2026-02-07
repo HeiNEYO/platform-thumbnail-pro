@@ -34,7 +34,7 @@ export function FavoritesListClient({
         </p>
         <Link
           href="/dashboard/modules"
-          className="inline-flex items-center gap-2 mt-4 text-sm font-semibold text-primary hover:opacity-90"
+          className="inline-flex items-center gap-2 mt-4 text-sm font-semibold text-icon hover:opacity-90"
         >
           <BookOpen className="h-4 w-4" />
           Voir les modules
@@ -77,9 +77,9 @@ export function FavoritesListClient({
           >
             <div className="p-2 rounded-lg border border-card-border shrink-0">
               {f.item_type === "episode" ? (
-                <BookOpen className="h-5 w-5 text-primary" />
+                <BookOpen className="h-5 w-5 text-icon" />
               ) : (
-                <FileText className="h-5 w-5 text-primary" />
+                <FileText className="h-5 w-5 text-icon" />
               )}
             </div>
             <div className="flex-1 min-w-0">
@@ -96,7 +96,7 @@ export function FavoritesListClient({
                   href={href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="p-2 rounded-lg border border-card-border text-white/70 hover:text-primary hover:border-primary/50 transition-colors"
+                  className="p-2 rounded-lg border border-card-border text-white/70 hover:text-icon hover:border-icon/50 transition-colors"
                   title="Ouvrir"
                 >
                   <ExternalLink className="h-4 w-4" />
@@ -104,7 +104,7 @@ export function FavoritesListClient({
               ) : (
                 <Link
                   href={href}
-                  className="p-2 rounded-lg border border-card-border text-white/70 hover:text-primary hover:border-primary/50 transition-colors"
+                  className="p-2 rounded-lg border border-card-border text-white/70 hover:text-icon hover:border-icon/50 transition-colors"
                   title="Ouvrir"
                 >
                   <ExternalLink className="h-4 w-4" />

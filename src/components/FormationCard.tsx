@@ -57,7 +57,7 @@ export function FormationCard({ module }: FormationCardProps) {
           <div className="flex items-center gap-4 text-sm text-white/80">
             {/* Nombre d'épisodes */}
             <div className="flex items-center gap-1.5">
-              <Play className="h-4 w-4 text-primary shrink-0" />
+              <Play className="h-4 w-4 text-icon shrink-0" />
               <span>{module.episodeCount} épisodes</span>
             </div>
 
@@ -71,7 +71,7 @@ export function FormationCard({ module }: FormationCardProps) {
 
             {/* Icône décorative */}
             <div className="ml-auto">
-              <Sparkles className="h-4 w-4 text-primary/60 shrink-0" />
+              <Sparkles className="h-4 w-4 text-icon/80 shrink-0" />
             </div>
           </div>
 
