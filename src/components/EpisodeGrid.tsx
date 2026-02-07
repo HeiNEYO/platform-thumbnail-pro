@@ -26,7 +26,7 @@ export function EpisodeGrid({
   };
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
       {episodes.length === 0 ? (
         <div className="col-span-full py-12 text-center text-white/50">
           Aucun épisode disponible
