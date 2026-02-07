@@ -8,7 +8,7 @@ import {
   Home, BookOpen, FolderOpen, User, LogOut, 
   HelpCircle, ShoppingBag, Bell,
   Heart, FileText, BarChart3, GraduationCap,
-  Compass, Menu, X, Users, Shield
+  Compass, Menu, X, Users, Shield, Megaphone
 } from "lucide-react";
 import { Suspense } from "react";
 import { RequireAuth } from "@/components/RequireAuth";
@@ -16,6 +16,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { UserAvatar } from "@/components/ui/UserAvatar";
 import { DiscountCodeModal } from "@/components/ui/DiscountCodeModal";
 import { DiscordIcon } from "@/components/ui/DiscordIcon";
+import { NewsPopover } from "@/components/ui/NewsPopover";
 import { SiteSkeleton } from "@/components/ui/SiteSkeleton";
 
 // Sections toujours ouvertes (organisées par catégorie)
@@ -60,6 +61,15 @@ const navSections = [
   },
 ];
 
+const adminNavSection = {
+  id: "admin",
+  label: "Admin",
+  icon: Shield,
+  items: [
+    { href: "/dashboard/admin/announcements", label: "Annonces", icon: Megaphone },
+  ],
+};
+
 const gradeConfig = {
   member: {
     label: "Membre",
@@ -103,8 +113,9 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
     <div className="min-h-screen flex flex-col bg-[#0a0a0a]">
       {/* Header Top Bar - Agrandi de 10% */}
       <header className="h-[61.6px] shrink-0 border-b border-sidebar-border bg-[#0a0a0a] flex items-center justify-between px-[22px]">
-        {/* Logo + Breadcrumbs */}
+        {/* News (pop) + Logo + Breadcrumbs */}
         <div className="flex items-center gap-[14px]">
+          <NewsPopover />
           <button
             className="lg:hidden inline-flex items-center justify-center rounded-full bg-white/5 p-2 text-white/70 hover:text-white hover:bg-white/10 transition-colors"
             aria-label="Ouvrir le menu"
@@ -155,7 +166,7 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
               </button>
             </div>
             <nav className="flex flex-1 flex-col space-y-3">
-              {navSections.map((section) => (
+              {(user?.role === "admin" ? [adminNavSection, ...navSections] : navSections).map((section) => (
                 <div key={`mobile-${section.id}`} className="space-y-2">
                   <div className="flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-white/50">
                     <section.icon className="h-4 w-4 text-white/50" />
@@ -222,7 +233,7 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
           <nav className="flex-1 p-3">
             {/* Sections toujours ouvertes */}
             <div className="space-y-3">
-              {navSections.map((section) => (
+              {(user?.role === "admin" ? [adminNavSection, ...navSections] : navSections).map((section) => (
                 <div key={section.id} className="mb-2">
                   {/* En-tête de section */}
                   <div className="flex items-center gap-3 px-3 py-2 mb-1">
