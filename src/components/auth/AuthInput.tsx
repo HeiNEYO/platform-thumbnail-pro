@@ -36,7 +36,7 @@ export function AuthInput({
         placeholder={placeholder}
         autoComplete={autoComplete}
         required={required}
-        className="w-full pl-12 pr-4 py-4 rounded-lg border border-[#2A2A2A] bg-[#1A1A1A] text-white placeholder-[#999999] focus:border-[#3B82F6] focus:outline-none focus:ring-2 focus:ring-[#3B82F6]/20 transition-all duration-300 text-base"
+        className="w-full pl-12 pr-4 py-4 rounded-lg border border-[#2A2A2A] bg-[#1A1A1A] text-white placeholder-[#999999] focus:border-[#0044FF] focus:outline-none focus:ring-2 focus:ring-[#0044FF]/20 transition-all duration-300 text-base"
         suppressHydrationWarning
       />
     </div>

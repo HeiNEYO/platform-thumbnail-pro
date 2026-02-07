@@ -112,7 +112,7 @@ export function EpisodeViewer({
                   type="button"
                   onClick={handleSaveNote}
                   disabled={noteSaving}
-                  className="px-4 py-2 rounded-lg border border-[#1D4ED8] hover:border-[#3B6FE8] text-white text-xs font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="px-4 py-2 rounded-lg border border-[#0044FF] hover:border-[#2255FF] text-white text-xs font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {noteSaving ? "Sauvegarde..." : "Sauvegarder"}
                 </button>
@@ -142,7 +142,7 @@ export function EpisodeViewer({
                 disabled={favoriteLoading}
                 className={`inline-flex items-center gap-1.5 mb-4 px-2.5 py-1 rounded-full border transition-all ${
                   isFavorite
-                    ? "text-[#1D4ED8] border-[#1D4ED8]/50 bg-[#1D4ED8]/10"
+                    ? "text-[#0044FF] border-[#0044FF]/50 bg-[#0044FF]/10"
                     : "text-white/70 border-white/20 bg-[#0A0A0A] hover:text-white hover:border-white/30"
                 }`}
               >
@@ -172,8 +172,8 @@ export function EpisodeViewer({
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 text-sm text-white/90 hover:text-white transition-colors group"
               >
-                <span className="group-hover:text-[#1D4ED8] transition-colors">{complementaryResource.title}</span>
-                <ExternalLink className="h-4 w-4 group-hover:text-[#1D4ED8] transition-colors" />
+                <span className="group-hover:text-[#0044FF] transition-colors">{complementaryResource.title}</span>
+                <ExternalLink className="h-4 w-4 group-hover:text-[#0044FF] transition-colors" />
               </a>
             </div>
           )}
@@ -207,7 +207,7 @@ export function EpisodeViewer({
               {nextEpisode && (
                 <Link
                   href={`/dashboard/modules/${moduleId}/episode/${nextEpisode.id}`}
-                  className="flex items-center gap-2 px-5 py-2.5 rounded-lg border border-[#1D4ED8] hover:border-[#3B6FE8] transition-all text-sm text-white font-medium flex-1 sm:flex-initial justify-center"
+                  className="flex items-center gap-2 px-5 py-2.5 rounded-lg border border-[#0044FF] hover:border-[#2255FF] transition-all text-sm text-white font-medium flex-1 sm:flex-initial justify-center"
                 >
                   <span>Suivant</span>
                   <ChevronRight className="h-4 w-4" />
@@ -223,7 +223,7 @@ export function EpisodeViewer({
             </h3>
             <Link
               href={`/dashboard/modules/${moduleId}`}
-              className="inline-flex items-center gap-2 text-sm text-white/90 hover:text-[#1D4ED8] transition-colors group"
+              className="inline-flex items-center gap-2 text-sm text-white/90 hover:text-[#0044FF] transition-colors group"
             >
               <span>Voir tous les épisodes</span>
               <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />

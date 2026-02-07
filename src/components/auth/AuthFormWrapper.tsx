@@ -54,7 +54,7 @@ export function AuthFormWrapper({
             {switchText}{" "}
             <Link
               href={switchLink}
-              className="text-[#3B82F6] font-semibold hover:text-[#60A5FA] transition-colors duration-300"
+              className="text-[#0044FF] font-semibold hover:text-[#3366FF] transition-colors duration-300"
             >
               {switchLinkText}
             </Link>

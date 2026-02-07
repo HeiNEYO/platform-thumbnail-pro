@@ -86,7 +86,7 @@ function LoginForm() {
         switchLinkText="Inscrivez-vous"
       >
         {isDemoMode && (
-          <div className="rounded-lg border border-[#3B82F6]/50 bg-[#3B82F6]/10 text-[#3B82F6] text-center text-sm font-medium px-4 py-3 mb-6">
+          <div className="rounded-lg border border-[#0044FF]/50 bg-[#0044FF]/10 text-[#0044FF] text-center text-sm font-medium px-4 py-3 mb-6">
             Mode démo : cliquez sur « Se connecter » pour accéder au dashboard (sans Supabase).
           </div>
         )}
@@ -129,7 +129,7 @@ function LoginForm() {
               placeholder="••••••••••••"
               autoComplete="current-password"
               required
-              className="w-full pl-12 pr-12 py-4 rounded-lg border border-[#2A2A2A] bg-[#1A1A1A] text-white placeholder-[#999999] focus:border-[#3B82F6] focus:outline-none focus:ring-2 focus:ring-[#3B82F6]/20 transition-all duration-300 text-base"
+              className="w-full pl-12 pr-12 py-4 rounded-lg border border-[#2A2A2A] bg-[#1A1A1A] text-white placeholder-[#999999] focus:border-[#0044FF] focus:outline-none focus:ring-2 focus:ring-[#0044FF]/20 transition-all duration-300 text-base"
               suppressHydrationWarning
             />
             <button
@@ -149,7 +149,7 @@ function LoginForm() {
                 type="checkbox"
                 checked={rememberMe}
                 onChange={(e) => setRememberMe(e.target.checked)}
-                className="h-4 w-4 rounded border-[#2A2A2A] bg-[#1A1A1A] text-[#3B82F6] focus:ring-2 focus:ring-[#3B82F6]/20 focus:ring-offset-0 cursor-pointer accent-[#3B82F6]"
+                className="h-4 w-4 rounded border-[#2A2A2A] bg-[#1A1A1A] text-[#0044FF] focus:ring-2 focus:ring-[#0044FF]/20 focus:ring-offset-0 cursor-pointer accent-[#0044FF]"
                 suppressHydrationWarning
               />
               <label htmlFor="rememberMe" className="ml-2 text-sm text-[#999999] cursor-pointer">
@@ -158,7 +158,7 @@ function LoginForm() {
             </div>
             <Link
               href="/forgot-password"
-              className="text-sm text-[#999999] hover:text-[#3B82F6] transition-colors duration-300"
+              className="text-sm text-[#999999] hover:text-[#0044FF] transition-colors duration-300"
             >
               Mot de passe oublié ?
             </Link>
@@ -181,7 +181,7 @@ export default function LoginPage() {
   return (
     <Suspense fallback={
       <main className="min-h-screen flex items-center justify-center bg-[#0A0A0A]">
-        <div className="w-12 h-12 border-4 border-[#3B82F6]/20 border-t-[#3B82F6] rounded-full animate-spin" />
+        <div className="w-12 h-12 border-4 border-[#0044FF]/20 border-t-[#0044FF] rounded-full animate-spin" />
       </main>
     }>
       <LoginForm />

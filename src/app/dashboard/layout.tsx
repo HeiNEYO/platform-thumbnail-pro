@@ -173,15 +173,15 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
                           prefetch={true}
                           className={`flex items-center gap-3 rounded-md py-1.5 text-sm font-normal ${
                             active
-                              ? "text-white bg-[#2563EB]/15 border-l-4 border-[#2563EB] pl-[9px] pr-3"
+                              ? "text-white bg-[#0044FF]/15 border-l-4 border-[#0044FF] pl-[9px] pr-3"
                               : "text-white/70 hover:bg-white/5 hover:text-white px-3 transition-colors"
                           }`}
                           onClick={() => setMobileMenuOpen(false)}
                         >
                           {item.icon ? (
-                            <item.icon className={`h-4 w-4 ${active ? "text-[#3B82F6]" : ""}`} />
+                            <item.icon className={`h-4 w-4 ${active ? "text-[#0044FF]" : ""}`} />
                           ) : item.customIcon ? (
-                            <item.customIcon className={`h-4 w-4 ${active ? "text-[#3B82F6]" : ""}`} />
+                            <item.customIcon className={`h-4 w-4 ${active ? "text-[#0044FF]" : ""}`} />
                           ) : null}
                           {item.label}
                         </Link>
@@ -245,14 +245,14 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
                           prefetch={true}
                           className={`relative flex items-center gap-3 py-1.5 text-sm rounded-md font-normal ${
                             active
-                              ? "text-white bg-[#2563EB]/15 border-l-4 border-[#2563EB] pl-[9px] pr-3"
+                              ? "text-white bg-[#0044FF]/15 border-l-4 border-[#0044FF] pl-[9px] pr-3"
                               : "text-white/60 hover:text-white/90 hover:bg-[#141414]/50 px-3 transition-colors"
                           }`}
                         >
                           {item.customIcon ? (
-                            <item.customIcon className={`h-4 w-4 shrink-0 ${active ? "text-[#3B82F6]" : ""}`} />
+                            <item.customIcon className={`h-4 w-4 shrink-0 ${active ? "text-[#0044FF]" : ""}`} />
                           ) : item.icon ? (
-                            <item.icon className={`h-4 w-4 shrink-0 ${active ? "text-[#3B82F6]" : ""}`} />
+                            <item.icon className={`h-4 w-4 shrink-0 ${active ? "text-[#0044FF]" : ""}`} />
                           ) : null}
                           <span className={active ? "text-white" : ""}>{item.label}</span>
                         </Link>

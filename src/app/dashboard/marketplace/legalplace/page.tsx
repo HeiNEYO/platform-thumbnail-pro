@@ -137,7 +137,7 @@ export default function LegalPlacePage() {
                 key={offer.id}
                 className={`relative rounded-lg border bg-[#0a0a0a] overflow-hidden hover:border-white/20 transition-colors ${
                   isMicroEntreprise
-                    ? "border-[#2563EB]"
+                    ? "border-[#0044FF]"
                     : "border-white/10"
                 }`}
                 style={
@@ -151,7 +151,7 @@ export default function LegalPlacePage() {
                 {/* Badge "Le plus choisi" pour Micro-entreprise */}
                 {isMicroEntreprise && (
                   <div className="absolute top-3 right-3 z-10">
-                    <div className="flex items-center gap-1.5 px-3 py-1.5 bg-[#2563EB] rounded-full border-2 border-white/20">
+                    <div className="flex items-center gap-1.5 px-3 py-1.5 bg-[#0044FF] rounded-full border-2 border-white/20">
                       <Users className="h-3.5 w-3.5 text-white" />
                       <span className="text-white text-xs font-semibold">Le plus choisi</span>
                     </div>

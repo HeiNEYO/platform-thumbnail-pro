@@ -15,7 +15,7 @@ export function AuthButton({ type, disabled = false, children, onClick }: AuthBu
       type={type}
       disabled={disabled}
       onClick={onClick}
-      className="w-full py-4 rounded-lg bg-[#3B82F6] hover:bg-[#2563EB] disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold text-base transition-all duration-300 hover:translate-y-[-2px] hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-[#3B82F6]/50"
+      className="w-full py-4 rounded-lg bg-[#0044FF] hover:bg-[#2255FF] disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold text-base transition-all duration-300 hover:translate-y-[-2px] hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-[#0044FF]/50"
     >
       {disabled ? (
         <span className="flex items-center justify-center gap-2">

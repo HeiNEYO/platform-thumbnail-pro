@@ -38,9 +38,11 @@
   --card-hover: #141414;
   --card-border: #1f1f1f;
   
-  /* Bleu Premium Principal */
-  --primary: #1D4ED8;
-  --primary-hover: #3B6FE8;
+  /* Bleu principal + secondaire (accent) */
+  --primary: #0044FF;
+  --primary-hover: #2255FF;
+  --secondary: #0044FF;
+  --secondary-hover: #3366FF;
   
   /* Sidebar - Gris foncé */
   --sidebar: #0a0a0a;
@@ -175,10 +177,10 @@ body {
 
 @keyframes shimmer-blue {
   0%, 100% {
-    border-color: rgba(37, 99, 235, 0.5);
+    border-color: rgba(0, 68, 255, 0.5);
   }
   50% {
-    border-color: rgba(37, 99, 235, 0.9);
+    border-color: rgba(0, 68, 255, 0.9);
   }
 }
 
@@ -199,6 +201,6 @@ body {
   }
   
   .bg-gradient-premium {
-    background: linear-gradient(135deg, #1D4ED8 0%, #3B6FE8 100%);
+    background: linear-gradient(135deg, #0044FF 0%, #3366FF 100%);
   }
 }

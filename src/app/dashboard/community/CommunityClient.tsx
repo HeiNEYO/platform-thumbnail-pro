@@ -404,7 +404,7 @@ export function CommunityClient({ initialMembers }: { initialMembers: CommunityM
           onClick={() => setActiveTab("list")}
           className={`flex items-center gap-2 px-4 py-3 text-sm font-medium transition-colors border-b-2 ${
             activeTab === "list"
-              ? "text-white border-[#1D4ED8]"
+              ? "text-white border-[#0044FF]"
               : "text-white/60 border-transparent hover:text-white/80"
           }`}
         >
@@ -415,14 +415,14 @@ export function CommunityClient({ initialMembers }: { initialMembers: CommunityM
           onClick={() => setActiveTab("map")}
           className={`flex items-center gap-2 px-4 py-3 text-sm font-medium transition-colors border-b-2 ${
             activeTab === "map"
-              ? "text-white border-[#1D4ED8]"
+              ? "text-white border-[#0044FF]"
               : "text-white/60 border-transparent hover:text-white/80"
           }`}
         >
           <MapPin className="h-4 w-4" />
           <span>Cartes membres</span>
           {membersWithLocation.length > 0 && (
-            <span className="ml-1 px-2 py-0.5 text-xs rounded-full bg-[#1D4ED8]/20 text-[#1D4ED8]">
+            <span className="ml-1 px-2 py-0.5 text-xs rounded-full bg-[#0044FF]/20 text-[#0044FF]">
               {membersWithLocation.length}
             </span>
           )}

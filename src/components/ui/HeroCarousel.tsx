@@ -38,14 +38,14 @@ export function HeroCarousel({ images, interval = 5000 }: HeroCarouselProps) {
 
   if (images.length === 0) {
     return (
-      <div className="relative w-full h-full min-h-[500px] rounded-[20px] bg-gradient-to-b from-[#3B82F6] via-[#2563EB] to-[#1E40AF] flex items-center justify-center">
+      <div className="relative w-full h-full min-h-[500px] rounded-[20px] bg-gradient-to-b from-[#0044FF] via-[#2255FF] to-[#0033CC] flex items-center justify-center">
         <p className="text-white/50">Aucune image disponible</p>
       </div>
     );
   }
 
   return (
-    <div className="relative w-full h-full min-h-[500px] lg:min-h-[600px] rounded-[20px] overflow-hidden bg-gradient-to-b from-[#3B82F6] via-[#2563EB] to-[#1E40AF] p-8 lg:p-10">
+    <div className="relative w-full h-full min-h-[500px] lg:min-h-[600px] rounded-[20px] overflow-hidden bg-gradient-to-b from-[#0044FF] via-[#2255FF] to-[#0033CC] p-8 lg:p-10">
       {/* Images du carrousel */}
       <div className="relative w-full h-full">
         {images.map((image, index) => {

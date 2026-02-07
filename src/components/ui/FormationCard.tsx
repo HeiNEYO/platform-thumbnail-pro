@@ -127,7 +127,7 @@ export function FormationCard({
         <div
           className={`w-full py-2 px-4 rounded-xl font-semibold text-xs md:text-sm text-center transition-all duration-300 flex items-center justify-center hover:brightness-75 hover:scale-[0.98] ${
             ctaStyle === "blue"
-              ? "bg-gradient-to-r from-[#1D4ED8] to-[#3B6FE8] text-white"
+              ? "bg-gradient-to-r from-[#0044FF] to-[#3366FF] text-white"
               : "bg-white text-[#0A0A0A]"
           }`}
         >

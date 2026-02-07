@@ -37,13 +37,6 @@ export function MemberCard({ member }: MemberCardProps) {
   const config = gradeConfig[role] || gradeConfig.member;
   const GradeIcon = config.icon;
 
-  // Debug : vérifier les handles (toujours actif pour debug)
-  console.log(`🔍 MemberCard [${displayName}]:`, {
-    id: member.id,
-    twitter: member.twitter_handle,
-    discord: member.discord_tag,
-  });
-
   return (
     <div 
       className="rounded-lg border border-card-border p-5 relative overflow-hidden scale-105"

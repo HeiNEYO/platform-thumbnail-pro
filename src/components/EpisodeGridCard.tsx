@@ -88,7 +88,7 @@ export function EpisodeGridCard({
         className="relative block aspect-video overflow-hidden"
       >
         {/* Image de preview de la vid?o */}
-        <div className="relative w-full h-full bg-gradient-to-br from-[#1D4ED8]/20 to-[#0a0a0a]">
+        <div className="relative w-full h-full bg-gradient-to-br from-[#0044FF]/20 to-[#0a0a0a]">
           {thumbnailPath ? (
             <Image
               src={thumbnailPath}
@@ -126,7 +126,7 @@ export function EpisodeGridCard({
           {/* Bouton CTA */}
           <Link
             href={`/dashboard/modules/${moduleId}/episode/${episode.id}`}
-            className="group/cta inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full border border-white/20 hover:bg-[#1D4ED8]/10 hover:border-[#1D4ED8] transition-all duration-300 text-white text-sm font-medium"
+            className="group/cta inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full border border-white/20 hover:bg-[#0044FF]/10 hover:border-[#0044FF] transition-all duration-300 text-white text-sm font-medium"
           >
             <span>Visionner</span>
             <ArrowRight className="h-3 w-3 group-hover/cta:translate-x-1 transition-transform" />

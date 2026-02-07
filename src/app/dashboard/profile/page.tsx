@@ -608,14 +608,28 @@ export default function ProfilePage() {
                 </div>
 
                 <div className="flex items-center gap-3">
-                  <input
-                    type="checkbox"
-                    id="showLocation"
-                    checked={showLocation}
-                    onChange={(e) => setShowLocation(e.target.checked)}
-                    className="w-4 h-4 rounded border-card-border bg-black text-primary focus:ring-2 focus:ring-primary/20 cursor-pointer"
-                  />
-                  <label htmlFor="showLocation" className="text-sm text-white/80 cursor-pointer">
+                  <button
+                    type="button"
+                    role="switch"
+                    aria-checked={showLocation}
+                    aria-label="Afficher ma localisation sur la carte des membres"
+                    onClick={() => setShowLocation(!showLocation)}
+                    className={`relative inline-flex h-7 w-12 shrink-0 rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:ring-offset-2 focus:ring-offset-[#0a0a0a] ${
+                      showLocation ? "bg-[#0044FF]" : "bg-[#3a3a3a]"
+                    }`}
+                  >
+                    <span
+                      className={`pointer-events-none inline-block h-6 w-6 rounded-full shadow-sm transition-transform duration-200 mt-0.5 ${
+                        showLocation
+                          ? "translate-x-5 ml-0.5 bg-white"
+                          : "translate-x-0.5 bg-[#a0a0a0]"
+                      }`}
+                    />
+                  </button>
+                  <label
+                    onClick={() => setShowLocation(!showLocation)}
+                    className="text-sm text-white/80 cursor-pointer select-none"
+                  >
                     Afficher ma localisation sur la carte des membres
                   </label>
                 </div>

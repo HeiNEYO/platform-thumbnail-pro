@@ -35,12 +35,12 @@ export function ResourceCard({ resource }: ResourceCardProps) {
       )}
       <div className="p-3 flex items-center justify-between">
         <div className="flex-1 min-w-0">
-          <p className="font-normal text-sm text-white group-hover:text-[#1D4ED8] transition-colors truncate">
+          <p className="font-normal text-sm text-white group-hover:text-[#0044FF] transition-colors truncate">
             {resource.titre}
           </p>
           <p className="text-xs text-white/50 capitalize mt-0.5">{resource.type}</p>
         </div>
-        <ExternalLink className="h-4 w-4 text-white/40 group-hover:text-[#1D4ED8] shrink-0 ml-2" />
+        <ExternalLink className="h-4 w-4 text-white/40 group-hover:text-[#0044FF] shrink-0 ml-2" />
       </div>
     </a>
   );

@@ -121,7 +121,7 @@ function MembersMap({ members }: MembersMapProps) {
       const gradeStyles: Record<string, { color: string; bg: string; border: string; label: string }> = {
         admin: { color: "#FF8282", bg: "rgba(255, 130, 130, 0.15)", border: "rgba(255, 130, 130, 0.4)", label: "Admin" },
         intervenant: { color: "#82FFBC", bg: "rgba(130, 255, 188, 0.15)", border: "rgba(130, 255, 188, 0.4)", label: "Intervenant" },
-        member: { color: "#82ACFF", bg: "rgba(130, 172, 255, 0.15)", border: "rgba(130, 172, 255, 0.4)", label: "Membre" },
+        member: { color: "#0044FF", bg: "rgba(0, 68, 255, 0.15)", border: "rgba(0, 68, 255, 0.4)", label: "Membre" },
       };
 
       membersWithLocation.forEach((member) => {

@@ -2,7 +2,7 @@
 
 export function AuthIllustration() {
   return (
-    <div className="w-full lg:w-1/2 h-[300px] lg:h-auto relative overflow-hidden bg-gradient-to-b from-[#3B82F6] via-[#2563EB] to-[#1E40AF]">
+    <div className="w-full lg:w-1/2 h-[300px] lg:h-auto relative overflow-hidden bg-gradient-to-b from-[#0044FF] via-[#2255FF] to-[#0033CC]">
       {/* Nuages décoratifs */}
       <div className="absolute inset-0 opacity-80">
         {/* Nuage 1 - Coin supérieur gauche */}

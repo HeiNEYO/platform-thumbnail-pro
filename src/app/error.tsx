@@ -39,7 +39,7 @@ export default function Error({
           href="/login"
           style={{
             padding: "0.5rem 1rem",
-            background: "#1D4ED8",
+            background: "#0044FF",
             color: "#fff",
             borderRadius: 8,
             fontSize: "0.875rem",
