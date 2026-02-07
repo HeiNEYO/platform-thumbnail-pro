@@ -56,9 +56,9 @@ export default async function DashboardHomePage() {
   const bannerImages = [
     {
       src: "/images/carousel/image1.png",
-      alt: "Homme entre Lamborghini et Audi R8 devant un château",
-      title: "DÉCOUVREZ LE 8LAB ECOSYSTEM : THE INFINITE",
-      subtitle: "Le début d'une nouvelle ère pour le e-commerce francophone.",
+      alt: "Thumbnail Pro - Nouvelle ère",
+      title: "THUMBNAIL PRO : UNE NOUVELLE ÈRE",
+      subtitle: "L'évolution de la création de miniatures. Découvrez la plateforme et maîtrisez l'art des thumbnails qui performent.",
     },
     {
       src: "/images/carousel/image2.png",
