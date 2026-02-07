@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
-import { Megaphone, Plus, Loader2, Send } from "lucide-react";
+import { Megaphone, Plus, Loader2, Send, Trash2 } from "lucide-react";
 
 interface Announcement {
   id: string;
@@ -27,6 +27,7 @@ export default function AdminAnnouncementsPage() {
   const [isImportant, setIsImportant] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const isAdmin = user?.role === "admin";
 
@@ -71,6 +72,25 @@ export default function AdminAnnouncementsPage() {
       setError("Erreur réseau.");
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!confirm("Supprimer cette annonce ?")) return;
+    setDeletingId(id);
+    setError("");
+    try {
+      const res = await fetch(`/api/announcements/${id}`, { method: "DELETE" });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setError(data.error || "Erreur lors de la suppression.");
+        return;
+      }
+      setList((prev) => prev.filter((a) => a.id !== id));
+    } catch {
+      setError("Erreur réseau.");
+    } finally {
+      setDeletingId(null);
     }
   };
 
@@ -178,10 +198,25 @@ export default function AdminAnnouncementsPage() {
                 className={`rounded-lg border p-4 ${a.is_important ? "border-primary/40 bg-primary/5" : "border-[#1a1a1a] bg-[#141414]"}`}
               >
                 <div className="flex items-start justify-between gap-2">
-                  <h3 className="font-medium text-white">{a.title}</h3>
-                  {a.is_important && (
-                    <span className="text-xs font-medium uppercase text-primary">Important</span>
-                  )}
+                  <div className="min-w-0 flex-1">
+                    <h3 className="font-medium text-white">{a.title}</h3>
+                    {a.is_important && (
+                      <span className="text-xs font-medium uppercase text-primary">Important</span>
+                    )}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => handleDelete(a.id)}
+                    disabled={deletingId === a.id}
+                    className="p-2 rounded-lg text-white/50 hover:text-red-400 hover:bg-red-500/10 transition-colors disabled:opacity-50"
+                    title="Supprimer l'annonce"
+                  >
+                    {deletingId === a.id ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Trash2 className="h-4 w-4" />
+                    )}
+                  </button>
                 </div>
                 <p className="text-sm text-white/60 mt-1 whitespace-pre-wrap">{a.content}</p>
                 <p className="text-xs text-white/40 mt-2">{formatDate(a.created_at)}</p>

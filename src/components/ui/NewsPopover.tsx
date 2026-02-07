@@ -12,9 +12,16 @@ interface Announcement {
   updated_at: string;
 }
 
+const NEWS_LAST_SEEN_KEY = "news_last_seen";
+
 function formatDate(iso: string) {
   const d = new Date(iso);
   return d.toLocaleDateString("fr-FR", { day: "numeric", month: "short", year: "numeric" });
+}
+
+function getStoredLastSeen(): string | null {
+  if (typeof window === "undefined") return null;
+  return window.localStorage.getItem(NEWS_LAST_SEEN_KEY);
 }
 
 interface NewsPopoverProps {
@@ -26,14 +33,42 @@ export function NewsPopover({ children }: NewsPopoverProps) {
   const [open, setOpen] = useState(false);
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [loading, setLoading] = useState(false);
+  const [lastSeen, setLastSeen] = useState<string | null>(null);
   const panelRef = useRef<HTMLDivElement>(null);
 
+  // Au montage : charger lastSeen depuis le storage
+  useEffect(() => {
+    setLastSeen(getStoredLastSeen());
+  }, []);
+
+  // Au montage : léger fetch pour savoir s'il y a du nouveau (badge)
+  useEffect(() => {
+    fetch("/api/announcements")
+      .then((r) => r.json())
+      .then((data) => {
+        const list = Array.isArray(data) ? data : [];
+        setAnnouncements((prev) => (prev.length ? prev : list));
+      })
+      .catch(() => {});
+  }, []);
+
+  // À l'ouverture : recharger et marquer comme vu
   useEffect(() => {
     if (!open) return;
     setLoading(true);
     fetch("/api/announcements")
       .then((r) => r.json())
-      .then((data) => setAnnouncements(Array.isArray(data) ? data : []))
+      .then((data) => {
+        const list = Array.isArray(data) ? data : [];
+        setAnnouncements(list);
+        const newest = list[0]?.created_at;
+        if (newest) {
+          try {
+            window.localStorage.setItem(NEWS_LAST_SEEN_KEY, newest);
+            setLastSeen(newest);
+          } catch {}
+        }
+      })
       .catch(() => setAnnouncements([]))
       .finally(() => setLoading(false));
   }, [open]);
@@ -50,7 +85,22 @@ export function NewsPopover({ children }: NewsPopoverProps) {
     }
   }, [open]);
 
-  const openToggle = () => setOpen((v) => !v);
+  const openToggle = () => {
+    setOpen((v) => {
+      const next = !v;
+      if (next) {
+        const newest = announcements[0]?.created_at ?? new Date().toISOString();
+        try {
+          window.localStorage.setItem(NEWS_LAST_SEEN_KEY, newest);
+          setLastSeen(newest);
+        } catch {}
+      }
+      return next;
+    });
+  };
+  const newestAt = announcements[0]?.created_at ?? "";
+  const hasUnread = announcements.length > 0 && (!lastSeen || newestAt > lastSeen);
+
   const trigger = children && isValidElement(children)
     ? cloneElement(children, { onClick: openToggle, "aria-label": "Voir les actualités" } as Record<string, unknown>)
     : (
@@ -66,7 +116,17 @@ export function NewsPopover({ children }: NewsPopoverProps) {
 
   return (
     <div className="relative" ref={panelRef}>
-      {trigger}
+      <div className="relative inline-flex">
+        {trigger}
+        {hasUnread && (
+          <span
+            className="absolute -top-0.5 -right-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-[#1a1a1a] border border-white/20 px-1 text-[10px] font-bold text-white shadow-sm"
+            aria-hidden
+          >
+            1
+          </span>
+        )}
+      </div>
 
       {open && (
         <div className="absolute right-0 top-full mt-1 z-50 w-[320px] sm:w-[380px] max-h-[min(70vh,420px)] overflow-hidden rounded-xl border border-[#1a1a1a] bg-[#0a0a0a] shadow-xl">
