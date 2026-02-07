@@ -26,7 +26,7 @@ export default {
           DEFAULT: "#0044FF",
           hover: "#2255FF",
         },
-        icon: "#1C59FF",
+        icon: "#6B8FFF",
         sidebar: {
           DEFAULT: "#000000",
           border: "#1a1a1a",

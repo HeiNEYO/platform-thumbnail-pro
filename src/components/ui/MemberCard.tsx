@@ -13,7 +13,7 @@ interface MemberCardProps {
 const gradeConfig = {
   member: {
     label: "Membre",
-    color: "#1C59FF", // 3e couleur (icônes / texte)
+    color: "#6B8FFF", // 3e couleur (icônes / texte, bleu clair lisible)
     bgColor: "rgba(0, 68, 255, 0.15)", // Couleur secondaire #0044FF en fond
     icon: Users,
   },

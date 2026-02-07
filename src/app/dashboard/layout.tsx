@@ -63,7 +63,7 @@ const navSections = [
 const gradeConfig = {
   member: {
     label: "Membre",
-    color: "#82ACFF",
+    color: "#6B8FFF",
     icon: Users,
   },
   intervenant: {

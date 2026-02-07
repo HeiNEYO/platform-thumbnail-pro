@@ -15,13 +15,10 @@ const sizeClasses = {
   lg: "h-24 w-24 text-2xl" 
 };
 
-function getInitials(name: string): string {
-  return name
-    .split(/\s+/)
-    .map((s) => s[0])
-    .join("")
-    .toUpperCase()
-    .slice(0, 2);
+/** Première lettre du prénom (premier mot) pour l'avatar par défaut */
+function getFirstLetter(name: string): string {
+  const firstWord = name.trim().split(/\s+/)[0];
+  return (firstWord?.[0] ?? "?").toUpperCase();
 }
 
 export function UserAvatar({ name, photo, size = "md", className = "" }: UserAvatarProps) {
@@ -40,9 +37,9 @@ export function UserAvatar({ name, photo, size = "md", className = "" }: UserAva
   }
   return (
     <div
-      className={`flex items-center justify-center rounded-full bg-indigo-600/30 text-indigo-300 font-medium ${s} ${className}`}
+      className={`flex items-center justify-center rounded-full bg-[#1a1a1a] text-white font-semibold border border-white/20 ${s} ${className}`}
     >
-      {getInitials(name)}
+      {getFirstLetter(name)}
     </div>
   );
 }
