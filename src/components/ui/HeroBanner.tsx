@@ -89,6 +89,7 @@ export function HeroBanner({ images, interval = 5000 }: HeroBannerProps) {
         cancelAnimationFrame(animationFrameRef.current);
       }
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- animateProgress/goToNext utilisent des refs
   }, [images.length, interval, currentIndex]);
 
   if (images.length === 0) {

@@ -36,10 +36,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Titre et contenu requis" }, { status: 400 });
     }
     const row: AnnouncementInsert = { title, content, is_important };
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { data, error } = await auth.supabase
       .from("announcements")
-      .insert(row as any)
+      .insert(row as never)
       .select("id, title, content, created_at, is_important, updated_at")
       .single();
     if (error) return NextResponse.json({ error: error.message }, { status: 500 });
