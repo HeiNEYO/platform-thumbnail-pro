@@ -3,11 +3,8 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { Mail, Lock, User, Eye, EyeOff } from "lucide-react";
-import { AuthFormWrapper } from "@/components/auth/AuthFormWrapper";
-import { AuthIllustration } from "@/components/auth/AuthIllustration";
-import { AuthInput } from "@/components/auth/AuthInput";
-import { AuthButton } from "@/components/auth/AuthButton";
+import Link from "next/link";
+import { Mail, Lock, User, Eye, EyeOff, ArrowRight } from "lucide-react";
 
 export default function RegisterPage() {
   const [fullName, setFullName] = useState("");
@@ -44,7 +41,6 @@ export default function RegisterPage() {
     try {
       const supabase = createClient();
 
-      // Créer le compte auth
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email: email.trim(),
         password,
@@ -69,8 +65,6 @@ export default function RegisterPage() {
         return;
       }
 
-      // Le profil dans la table users sera créé automatiquement par le trigger SQL
-      // Rediriger vers login avec message de succès
       router.push("/login?registered=true");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Une erreur inattendue s'est produite.");
@@ -80,51 +74,79 @@ export default function RegisterPage() {
   };
 
   return (
-    <main className="min-h-screen flex flex-col lg:flex-row bg-[#0A0A0A]">
-      {/* Colonne gauche - Formulaire */}
-      <AuthFormWrapper
-        title="Holla, Bienvenue"
-        subtitle="Créez votre compte et rejoignez-nous"
-        switchText="Déjà un compte ?"
-        switchLink="/login"
-        switchLinkText="Connectez-vous"
-      >
+    <main className="min-h-screen flex items-center justify-center bg-[#0f1419] relative overflow-hidden px-4">
+      {/* Fond avec reflets / speckles */}
+      <div className="absolute inset-0 bg-[#0f1419]" />
+      <div className="absolute inset-0 opacity-40">
+        <div className="absolute top-[10%] left-[15%] w-2 h-2 rounded-full bg-white/60" />
+        <div className="absolute top-[20%] right-[20%] w-1.5 h-1.5 rounded-full bg-white/50" />
+        <div className="absolute top-[40%] left-[25%] w-1 h-1 rounded-full bg-white/40" />
+        <div className="absolute top-[60%] right-[30%] w-2 h-2 rounded-full bg-white/50" />
+        <div className="absolute top-[75%] left-[20%] w-1.5 h-1.5 rounded-full bg-white/40" />
+        <div className="absolute top-[30%] right-[10%] w-1 h-1 rounded-full bg-white/30" />
+        <div className="absolute top-[55%] left-[10%] w-1 h-1 rounded-full bg-white/30" />
+      </div>
+
+      {/* Carte glassmorphism */}
+      <div className="relative w-full max-w-[420px] rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl shadow-2xl p-8 sm:p-10">
+        <div className="flex justify-center mb-6">
+          <div className="w-14 h-14 rounded-full border-2 border-white/30 bg-white/5 flex items-center justify-center">
+            <div className="w-4 h-4 rounded-full bg-white/60" />
+          </div>
+        </div>
+
+        <h1 className="text-2xl sm:text-3xl font-bold text-white text-center mb-1">Bienvenue</h1>
+        <p className="text-sm text-white/60 text-center mb-8">Créez votre compte et rejoignez-nous.</p>
+
+        {error && (
+          <div className="rounded-lg border border-red-500/30 bg-red-500/10 text-red-200 text-sm px-4 py-3 mb-6">
+            <p className="font-medium">{error}</p>
+          </div>
+        )}
+
         <form onSubmit={handleSubmit}>
-          {error && (
-            <div className="rounded-lg border border-red-500/30 bg-red-500/10 text-red-200 text-sm px-4 py-3 mb-6">
-              <p className="font-medium">{error}</p>
-            </div>
-          )}
+          {/* Nom complet */}
+          <label htmlFor="fullName" className="block text-sm font-medium text-white/90 mb-2">Nom complet</label>
+          <div className="relative mb-5">
+            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-white/50">
+              <User className="h-4 w-4" />
+            </span>
+            <input
+              id="fullName"
+              type="text"
+              value={fullName}
+              onChange={(e) => setFullName(e.target.value)}
+              placeholder="Nom complet"
+              autoComplete="name"
+              required
+              className="w-full pl-11 pr-4 py-3.5 rounded-xl border border-white/10 bg-white/5 text-white placeholder-white/40 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/30 transition-all text-base"
+            />
+          </div>
 
-          {/* Full Name Input */}
-          <AuthInput
-            id="fullName"
-            type="text"
-            value={fullName}
-            onChange={(e) => setFullName(e.target.value)}
-            placeholder="Nom complet"
-            icon={<User className="h-5 w-5" />}
-            autoComplete="name"
-            required
-          />
+          {/* Email */}
+          <label htmlFor="email" className="block text-sm font-medium text-white/90 mb-2">Email</label>
+          <div className="relative mb-5">
+            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-white/50">
+              <Mail className="h-4 w-4" />
+            </span>
+            <input
+              id="email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="votre@email.com"
+              autoComplete="email"
+              required
+              className="w-full pl-11 pr-4 py-3.5 rounded-xl border border-white/10 bg-white/5 text-white placeholder-white/40 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/30 transition-all text-base"
+            />
+          </div>
 
-          {/* Email Input */}
-          <AuthInput
-            id="email"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="votre@email.com"
-            icon={<Mail className="h-5 w-5" />}
-            autoComplete="email"
-            required
-          />
-
-          {/* Password Input */}
-          <div className="relative mb-6">
-            <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-[#999999] z-10">
-              <Lock className="h-5 w-5" />
-            </div>
+          {/* Mot de passe */}
+          <label htmlFor="password" className="block text-sm font-medium text-white/90 mb-2">Mot de passe</label>
+          <div className="relative mb-5">
+            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-white/50">
+              <Lock className="h-4 w-4" />
+            </span>
             <input
               id="password"
               type={showPassword ? "text" : "password"}
@@ -133,23 +155,24 @@ export default function RegisterPage() {
               placeholder="••••••••••••"
               autoComplete="new-password"
               required
-              className="w-full pl-12 pr-12 py-4 rounded-lg border border-[#2A2A2A] bg-[#1A1A1A] text-white placeholder-[#999999] focus:border-[#0044FF] focus:outline-none focus:ring-2 focus:ring-[#0044FF]/20 transition-all duration-300 text-base"
+              className="w-full pl-11 pr-12 py-3.5 rounded-xl border border-white/10 bg-white/5 text-white placeholder-white/40 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/30 transition-all text-base"
               suppressHydrationWarning
             />
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-4 top-1/2 transform -translate-y-1/2 text-[#999999] hover:text-white transition-colors"
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-white/50 hover:text-white transition-colors"
             >
-              {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+              {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
             </button>
           </div>
 
-          {/* Confirm Password Input */}
-          <div className="relative mb-8">
-            <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-[#999999] z-10">
-              <Lock className="h-5 w-5" />
-            </div>
+          {/* Confirmer mot de passe */}
+          <label htmlFor="confirmPassword" className="block text-sm font-medium text-white/90 mb-2">Confirmer le mot de passe</label>
+          <div className="relative mb-6">
+            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-white/50">
+              <Lock className="h-4 w-4" />
+            </span>
             <input
               id="confirmPassword"
               type={showConfirmPassword ? "text" : "password"}
@@ -158,27 +181,55 @@ export default function RegisterPage() {
               placeholder="Confirmer le mot de passe"
               autoComplete="new-password"
               required
-              className="w-full pl-12 pr-12 py-4 rounded-lg border border-[#2A2A2A] bg-[#1A1A1A] text-white placeholder-[#999999] focus:border-[#0044FF] focus:outline-none focus:ring-2 focus:ring-[#0044FF]/20 transition-all duration-300 text-base"
+              className="w-full pl-11 pr-12 py-3.5 rounded-xl border border-white/10 bg-white/5 text-white placeholder-white/40 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/30 transition-all text-base"
               suppressHydrationWarning
             />
             <button
               type="button"
               onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-              className="absolute right-4 top-1/2 transform -translate-y-1/2 text-[#999999] hover:text-white transition-colors"
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-white/50 hover:text-white transition-colors"
             >
-              {showConfirmPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+              {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
             </button>
           </div>
 
-          {/* Sign Up Button */}
-          <AuthButton type="submit" disabled={submitting}>
-            {submitting ? "Création..." : "S'inscrire"}
-          </AuthButton>
-        </form>
-      </AuthFormWrapper>
+          {/* Séparateur OR */}
+          <div className="flex items-center gap-4 mb-6">
+            <div className="flex-1 h-px bg-white/10" />
+            <span className="text-xs font-medium text-white/50 uppercase tracking-wider">Ou</span>
+            <div className="flex-1 h-px bg-white/10" />
+          </div>
 
-      {/* Colonne droite - Illustration */}
-      <AuthIllustration />
+          {/* Bouton */}
+          <button
+            type="submit"
+            disabled={submitting}
+            className="w-full py-3.5 rounded-xl border border-white/10 bg-white/5 text-white font-medium flex items-center justify-center gap-2 hover:bg-white/10 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {submitting ? (
+              <>
+                <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                </svg>
+                Création...
+              </>
+            ) : (
+              <>
+                S&apos;inscrire
+                <ArrowRight className="h-4 w-4" />
+              </>
+            )}
+          </button>
+        </form>
+
+        <p className="text-center text-sm text-white/60 mt-8">
+          Déjà un compte ?{" "}
+          <Link href="/login" className="text-primary font-medium underline underline-offset-2 hover:text-primary-hover">
+            Se connecter
+          </Link>
+        </p>
+      </div>
     </main>
   );
 }
