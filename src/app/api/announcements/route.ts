@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { getAnnouncements } from "@/lib/db/announcements";
+import type { Database } from "@/lib/supabase/database.types";
+
+type AnnouncementInsert = Database["public"]["Tables"]["announcements"]["Insert"];
 
 export async function GET() {
   try {
@@ -32,9 +35,11 @@ export async function POST(request: NextRequest) {
     if (!title || !content) {
       return NextResponse.json({ error: "Titre et contenu requis" }, { status: 400 });
     }
+    const row: AnnouncementInsert = { title, content, is_important };
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { data, error } = await auth.supabase
       .from("announcements")
-      .insert({ title, content, is_important })
+      .insert(row as any)
       .select("id, title, content, created_at, is_important, updated_at")
       .single();
     if (error) return NextResponse.json({ error: error.message }, { status: 500 });
