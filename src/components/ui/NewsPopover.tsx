@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
-import { Megaphone, X, Loader2 } from "lucide-react";
+import { useState, useEffect, useRef, cloneElement, isValidElement, type ReactElement } from "react";
+import { Bell, X, Loader2 } from "lucide-react";
 
 interface Announcement {
   id: string;
@@ -17,7 +17,12 @@ function formatDate(iso: string) {
   return d.toLocaleDateString("fr-FR", { day: "numeric", month: "short", year: "numeric" });
 }
 
-export function NewsPopover() {
+interface NewsPopoverProps {
+  /** Bouton déclencheur (ex. cloche). Si absent, un bouton par défaut est utilisé. */
+  children?: ReactElement;
+}
+
+export function NewsPopover({ children }: NewsPopoverProps) {
   const [open, setOpen] = useState(false);
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [loading, setLoading] = useState(false);
@@ -45,19 +50,26 @@ export function NewsPopover() {
     }
   }, [open]);
 
+  const openToggle = () => setOpen((v) => !v);
+  const trigger = children && isValidElement(children)
+    ? cloneElement(children, { onClick: openToggle, "aria-label": "Voir les actualités" } as Record<string, unknown>)
+    : (
+        <button
+          type="button"
+          onClick={openToggle}
+          className="inline-flex items-center justify-center w-9 h-9 rounded-lg text-white/70 hover:text-white hover:bg-white/10 transition-colors"
+          aria-label="Voir les actualités"
+        >
+          <Bell className="h-5 w-5" />
+        </button>
+      );
+
   return (
     <div className="relative" ref={panelRef}>
-      <button
-        type="button"
-        onClick={() => setOpen((v) => !v)}
-        className="inline-flex items-center justify-center w-9 h-9 rounded-lg text-white/70 hover:text-white hover:bg-white/10 transition-colors"
-        aria-label="Voir les actualités"
-      >
-        <Megaphone className="h-5 w-5" />
-      </button>
+      {trigger}
 
       {open && (
-        <div className="absolute left-0 top-full mt-1 z-50 w-[320px] sm:w-[380px] max-h-[min(70vh,420px)] overflow-hidden rounded-xl border border-[#1a1a1a] bg-[#0a0a0a] shadow-xl">
+        <div className="absolute right-0 top-full mt-1 z-50 w-[320px] sm:w-[380px] max-h-[min(70vh,420px)] overflow-hidden rounded-xl border border-[#1a1a1a] bg-[#0a0a0a] shadow-xl">
           <div className="flex items-center justify-between px-4 py-3 border-b border-[#1a1a1a]">
             <h3 className="text-sm font-semibold text-white">Actualités</h3>
             <button

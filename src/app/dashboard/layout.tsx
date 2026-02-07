@@ -113,9 +113,8 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
     <div className="min-h-screen flex flex-col bg-[#0a0a0a]">
       {/* Header Top Bar - Agrandi de 10% */}
       <header className="h-[61.6px] shrink-0 border-b border-sidebar-border bg-[#0a0a0a] flex items-center justify-between px-[22px]">
-        {/* News (pop) + Logo + Breadcrumbs */}
+        {/* Logo + Breadcrumbs */}
         <div className="flex items-center gap-[14px]">
-          <NewsPopover />
           <button
             className="lg:hidden inline-flex items-center justify-center rounded-full bg-white/5 p-2 text-white/70 hover:text-white hover:bg-white/10 transition-colors"
             aria-label="Ouvrir le menu"
@@ -142,9 +141,11 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
           <button className="hidden md:inline-flex referral-btn px-[15.4px] py-[6.6px] rounded-lg text-white text-[13.2px] font-medium relative overflow-hidden transition-all duration-200">
             Parraine un ami et gagne 200€
           </button>
-          <button className="p-[6.6px] text-white/70 hover:text-white transition-colors">
-            <Bell className="h-[19.8px] w-[19.8px]" />
-          </button>
+          <NewsPopover>
+            <button type="button" className="p-[6.6px] text-white/70 hover:text-white transition-colors">
+              <Bell className="h-[19.8px] w-[19.8px]" />
+            </button>
+          </NewsPopover>
         </div>
       </header>
 
