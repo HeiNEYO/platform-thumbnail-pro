@@ -69,7 +69,7 @@ export function ResourcesPageClient({
       </div>
 
       {/* Navigation Tabs - style marketplace */}
-      <div className="flex flex-wrap items-center gap-3">
+      <div className="flex flex-wrap items-center gap-2">
         {panels.map((panel) => {
           const Icon = panel.icon;
           const isActive = activePanel === panel.key;
@@ -77,7 +77,7 @@ export function ResourcesPageClient({
             <button
               key={panel.key}
               onClick={() => setActivePanel(panel.key)}
-              className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium transition-all ${
+              className={`flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-sm font-medium transition-all ${
                 isActive
                   ? "bg-white text-[#0a0a0a]"
                   : "bg-[#0a0a0a] text-white/60 border border-white/20 hover:text-white/90 hover:border-white/30"
