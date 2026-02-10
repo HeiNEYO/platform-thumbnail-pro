@@ -140,10 +140,12 @@ export default function AdminAnnouncementsPage() {
             </div>
           )}
           <div>
-            <label htmlFor="title" className="block text-sm font-medium text-white/90 mb-1">Titre</label>
+            <label htmlFor="announcement-title" className="block text-sm font-medium text-white/90 mb-1">Titre</label>
             <input
-              id="title"
+              id="announcement-title"
+              name="title"
               type="text"
+              autoComplete="off"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="Ex. Nouveau module : Introduction au graphisme"
@@ -151,9 +153,11 @@ export default function AdminAnnouncementsPage() {
             />
           </div>
           <div>
-            <label htmlFor="content" className="block text-sm font-medium text-white/90 mb-1">Contenu</label>
+            <label htmlFor="announcement-content" className="block text-sm font-medium text-white/90 mb-1">Contenu</label>
             <textarea
-              id="content"
+              id="announcement-content"
+              name="content"
+              autoComplete="off"
               value={content}
               onChange={(e) => setContent(e.target.value)}
               placeholder="Décrivez la nouvelle (nouveaux épisodes, nouveau module, etc.)..."

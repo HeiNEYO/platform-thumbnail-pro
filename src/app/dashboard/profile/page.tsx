@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { createClient } from "@/lib/supabase/client";
 import { UserAvatar } from "@/components/ui/UserAvatar";
-import { Save, Loader2, Upload, X, CheckCircle2, AlertCircle, MapPin, Search } from "lucide-react";
+import { Save, Loader2, Upload, X, CheckCircle2, AlertCircle, MapPin, Search, Locate } from "lucide-react";
 import type { UserRow } from "@/lib/supabase/database.types";
 
 export default function ProfilePage() {
@@ -16,8 +16,16 @@ export default function ProfilePage() {
   const [twitterHandle, setTwitterHandle] = useState("");
   const [city, setCity] = useState("");
   const [country, setCountry] = useState("");
+  const [latitude, setLatitude] = useState<number | null>(null);
+  const [longitude, setLongitude] = useState<number | null>(null);
   const [showLocation, setShowLocation] = useState(false);
-  const [searchingLocation, setSearchingLocation] = useState(false);
+  const [loadingGeo, setLoadingGeo] = useState(false);
+  const [addressSearch, setAddressSearch] = useState("");
+  const [addressSuggestions, setAddressSuggestions] = useState<Array<{ display_name: string; lat: string; lon: string; address?: Record<string, string> }>>([]);
+  const [showAddressDropdown, setShowAddressDropdown] = useState(false);
+  const [loadingSuggestions, setLoadingSuggestions] = useState(false);
+  const addressSearchRef = useRef<HTMLDivElement>(null);
+  const addressDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [xp, setXp] = useState(0);
   const [completedEvaluations, setCompletedEvaluations] = useState(0);
   const [saving, setSaving] = useState(false);
@@ -88,6 +96,8 @@ export default function ProfilePage() {
             setCity(location.city || "");
             setCountry(location.country || "");
             setShowLocation(location.show_location || false);
+            setLatitude(location.latitude != null ? Number(location.latitude) : null);
+            setLongitude(location.longitude != null ? Number(location.longitude) : null);
           }
         } catch (err) {
           console.warn("Impossible de charger les données de localisation :", err);
@@ -128,6 +138,98 @@ export default function ProfilePage() {
       loadProfileData();
     }
   }, [user, isDevMode, loadProfileData]);
+
+  const handleUseMyLocation = useCallback(() => {
+    if (!navigator.geolocation) {
+      setSaveMessage({ type: "error", text: "La géolocalisation n'est pas supportée par votre navigateur." });
+      setTimeout(() => setSaveMessage(null), 4000);
+      return;
+    }
+    setLoadingGeo(true);
+    setSaveMessage(null);
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const lat = position.coords.latitude;
+        const lon = position.coords.longitude;
+        try {
+          const res = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json&addressdetails=1`,
+            { headers: { "User-Agent": "ThumbnailPro/1.0" } }
+          );
+          const data = await res.json();
+          const addr = data?.address || {};
+          const cityVal = addr.city || addr.town || addr.village || addr.municipality || "";
+          const countryVal = addr.country || "";
+          setCity(cityVal);
+          setCountry(countryVal);
+          setLatitude(lat);
+          setLongitude(lon);
+          setShowLocation(true);
+        } catch (e) {
+          setCity("");
+          setCountry("");
+          setLatitude(lat);
+          setLongitude(lon);
+          setShowLocation(true);
+        } finally {
+          setLoadingGeo(false);
+        }
+      },
+      () => {
+        setLoadingGeo(false);
+        setSaveMessage({ type: "error", text: "Accès à la position refusé ou indisponible." });
+        setTimeout(() => setSaveMessage(null), 4000);
+      },
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
+    );
+  }, []);
+
+  useEffect(() => {
+    if (!addressSearch.trim()) {
+      setAddressSuggestions([]);
+      setShowAddressDropdown(false);
+      return;
+    }
+    if (addressDebounceRef.current) clearTimeout(addressDebounceRef.current);
+    addressDebounceRef.current = setTimeout(() => {
+      setLoadingSuggestions(true);
+      fetch(
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(addressSearch)}&addressdetails=1&limit=5`,
+        { headers: { "User-Agent": "ThumbnailPro/1.0" } }
+      )
+        .then((r) => r.json())
+        .then((data: Array<{ display_name: string; lat: string; lon: string; address?: Record<string, string> }>) => {
+          setAddressSuggestions(data || []);
+          setShowAddressDropdown(true);
+        })
+        .catch(() => setAddressSuggestions([]))
+        .finally(() => setLoadingSuggestions(false));
+    }, 400);
+    return () => {
+      if (addressDebounceRef.current) clearTimeout(addressDebounceRef.current);
+    };
+  }, [addressSearch]);
+
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (addressSearchRef.current && !addressSearchRef.current.contains(e.target as Node)) {
+        setShowAddressDropdown(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const selectAddressSuggestion = useCallback((item: { display_name: string; lat: string; lon: string; address?: Record<string, string> }) => {
+    const addr = item.address || {};
+    setCity(addr.city || addr.town || addr.village || addr.municipality || "");
+    setCountry(addr.country || "");
+    setLatitude(parseFloat(item.lat));
+    setLongitude(parseFloat(item.lon));
+    setAddressSearch(item.display_name);
+    setShowAddressDropdown(false);
+    setShowLocation(true);
+  }, []);
 
   const handleAvatarUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -306,38 +408,31 @@ export default function ProfilePage() {
       const cleanCity = city.trim() || null;
       const cleanCountry = country.trim() || null;
       
-      // Si la localisation est activée et qu'on a une ville ou un pays, géocoder
-      let latitude: number | null = null;
-      let longitude: number | null = null;
-      
-      if (showLocation && (cleanCity || cleanCountry)) {
+      let latToSave: number | null = latitude;
+      let lonToSave: number | null = longitude;
+      if (showLocation && (cleanCity || cleanCountry) && (latToSave == null || lonToSave == null)) {
         try {
           const query = [cleanCity, cleanCountry].filter(Boolean).join(", ");
           const response = await fetch(
             `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1`,
-            {
-              headers: {
-                "User-Agent": "ThumbnailPro/1.0",
-              },
-            }
+            { headers: { "User-Agent": "ThumbnailPro/1.0" } }
           );
           const data = await response.json();
           if (data && data.length > 0) {
-            latitude = parseFloat(data[0].lat);
-            longitude = parseFloat(data[0].lon);
+            latToSave = parseFloat(data[0].lat);
+            lonToSave = parseFloat(data[0].lon);
           }
         } catch (err) {
           console.warn("Erreur lors du géocodage:", err);
         }
       }
 
-      // Sauvegarder les données de localisation
       const locationUpdateData: any = {
         city: cleanCity,
         country: cleanCountry,
         show_location: showLocation,
-        latitude: showLocation ? latitude : null,
-        longitude: showLocation ? longitude : null,
+        latitude: showLocation ? latToSave : null,
+        longitude: showLocation ? lonToSave : null,
       };
       
       try {
@@ -577,12 +672,67 @@ export default function ProfilePage() {
                 <MapPin className="h-4 w-4 text-white/70" />
                 <h3 className="text-sm font-semibold text-white">Localisation</h3>
               </div>
-              
+
+              <p className="text-xs text-white/50 mb-3">
+                Autorisez l&apos;accès à votre position pour être localisé automatiquement, ou recherchez une adresse.
+              </p>
+
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-semibold text-white mb-2">
-                    Ville
-                  </label>
+                  <button
+                    type="button"
+                    onClick={handleUseMyLocation}
+                    disabled={loadingGeo}
+                    className="w-full flex items-center justify-center gap-2 rounded-lg border border-primary/50 bg-primary/10 text-primary px-4 py-3 text-sm font-medium hover:bg-primary/20 transition-colors disabled:opacity-50"
+                  >
+                    {loadingGeo ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Locate className="h-4 w-4" />
+                    )}
+                    {loadingGeo ? "Localisation en cours..." : "Utiliser ma position actuelle"}
+                  </button>
+                </div>
+
+                <div className="relative text-white/50 text-xs text-center">ou remplir manuellement</div>
+
+                <div ref={addressSearchRef} className="relative">
+                  <label className="block text-sm font-semibold text-white mb-2">Rechercher une adresse</label>
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/50" />
+                    <input
+                      type="text"
+                      value={addressSearch}
+                      onChange={(e) => setAddressSearch(e.target.value)}
+                      onFocus={() => addressSuggestions.length > 0 && setShowAddressDropdown(true)}
+                      className="w-full rounded-lg border border-card-border bg-black pl-10 pr-4 py-3 text-white text-sm placeholder-white/50 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+                      placeholder="Tapez une adresse, ville ou code postal..."
+                    />
+                    {loadingSuggestions && (
+                      <span className="absolute right-3 top-1/2 -translate-y-1/2">
+                        <Loader2 className="h-4 w-4 animate-spin text-white/50" />
+                      </span>
+                    )}
+                  </div>
+                  {showAddressDropdown && addressSuggestions.length > 0 && (
+                    <ul className="absolute z-20 mt-1 w-full rounded-lg border border-[#1a1a1a] bg-[#141414] py-1 shadow-xl max-h-48 overflow-y-auto">
+                      {addressSuggestions.map((item, i) => (
+                        <li key={i}>
+                          <button
+                            type="button"
+                            onClick={() => selectAddressSuggestion(item)}
+                            className="w-full text-left px-4 py-2.5 text-sm text-white/90 hover:bg-white/10 transition-colors"
+                          >
+                            {item.display_name}
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-white mb-2">Ville</label>
                   <input
                     type="text"
                     value={city}
@@ -594,9 +744,7 @@ export default function ProfilePage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-white mb-2">
-                    Pays
-                  </label>
+                  <label className="block text-sm font-semibold text-white mb-2">Pays</label>
                   <input
                     type="text"
                     value={country}
@@ -634,7 +782,7 @@ export default function ProfilePage() {
                   </label>
                 </div>
                 <p className="text-xs text-white/50">
-                  Votre position sera visible sur la carte de la communauté si vous activez cette option
+                  Votre position sera visible sur la carte de la communauté si vous activez cette option.
                 </p>
               </div>
             </div>
