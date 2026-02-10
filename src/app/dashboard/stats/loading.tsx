@@ -24,41 +24,41 @@ export default function StatsLoading() {
       {/* Prochaine étape */}
       <Skeleton className="h-28 rounded-2xl" />
 
-      {/* Activité heatmap */}
-      <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-6">
-        <Skeleton className="h-6 w-32 mb-4" />
-        <div className="flex gap-1">
-          <div className="flex flex-col gap-[3px] shrink-0 pt-6">
-            {[1, 2, 3, 4, 5, 6, 7].map((i) => (
-              <Skeleton key={i} className="h-[10px] w-6" />
-            ))}
+      {/* Activité + Progression globale */}
+      <div className="grid gap-6 lg:grid-cols-2">
+        <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-6">
+          <Skeleton className="h-6 w-32 mb-4" />
+          <div className="flex gap-1">
+            <div className="flex flex-col gap-[2px] shrink-0 pt-6">
+              {[1, 2, 3, 4, 5, 6, 7].map((i) => (
+                <Skeleton key={i} className="h-[10px] w-6" />
+              ))}
+            </div>
+            <div className="flex gap-[2px] flex-1">
+              {Array.from({ length: 26 }).map((_, col) => (
+                <div key={col} className="flex flex-col gap-[2px] shrink-0 flex-1 min-w-0">
+                  {[1, 2, 3, 4, 5, 6, 7].map((row) => (
+                    <Skeleton key={row} className="w-full h-[10px] rounded-[1px]" />
+                  ))}
+                </div>
+              ))}
+            </div>
           </div>
-          <div className="flex gap-[2px] flex-1">
-            {Array.from({ length: 26 }).map((_, col) => (
-              <div key={col} className="flex flex-col gap-[2px] shrink-0 flex-1 min-w-0">
-                {[1, 2, 3, 4, 5, 6, 7].map((row) => (
-                  <Skeleton key={row} className="w-full h-[10px] rounded-[1px]" />
-                ))}
-              </div>
-            ))}
+          <div className="flex gap-4 mt-3">
+            <Skeleton className="h-3 w-10" />
+            <div className="flex gap-[2px]">
+              {[1, 2, 3, 4, 5].map((i) => (
+                <Skeleton key={i} className="w-[10px] h-[10px] rounded-[2px]" />
+              ))}
+            </div>
+            <Skeleton className="h-3 w-10" />
           </div>
         </div>
-        <div className="flex gap-4 mt-3">
-          <Skeleton className="h-3 w-10" />
-          <div className="flex gap-[2px]">
-            {[1, 2, 3, 4, 5].map((i) => (
-              <Skeleton key={i} className="w-[10px] h-[10px] rounded-[2px]" />
-            ))}
-          </div>
-          <Skeleton className="h-3 w-10" />
+        <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-6">
+          <Skeleton className="h-6 w-40 mb-4" />
+          <Skeleton className="h-3 w-full rounded-full" />
+          <Skeleton className="h-4 w-24 mt-2" />
         </div>
-      </div>
-
-      {/* Progression globale */}
-      <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-6">
-        <Skeleton className="h-6 w-40 mb-4" />
-        <Skeleton className="h-3 w-full rounded-full" />
-        <Skeleton className="h-4 w-24 mt-2" />
       </div>
 
       {/* 2 colonnes */}
