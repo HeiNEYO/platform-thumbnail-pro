@@ -492,38 +492,37 @@ export default function ProfilePage() {
     }
   };
 
+  const inputClass = "w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white text-sm placeholder:text-white/40 focus:border-[#0044FF] focus:outline-none focus:ring-2 focus:ring-[#0044FF]/20 transition-all";
+
   return (
-    <div className="animate-fade-in max-w-5xl h-full flex flex-col">
-      <div className="mb-6">
-        <h1 className="text-[27px] font-bold mb-2 text-white">Profil</h1>
+    <div className="animate-fade-in max-w-5xl space-y-6">
+      <div>
+        <h1 className="text-[27px] font-bold text-white mb-2">Profil</h1>
         <p className="text-white/70 text-sm">Gérez vos informations personnelles</p>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2 flex-1 min-h-0">
+      <div className="grid gap-6 lg:grid-cols-2">
         {/* Colonne gauche - Identité et Stats */}
-        <div className="flex flex-col gap-6 min-h-0">
-          <div className="rounded-lg border border-card-border bg-black p-8 overflow-hidden flex-shrink-0">
+        <div className="space-y-6">
+          <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-6">
             <div className="flex flex-col items-center text-center">
-              <div className="mb-5 relative group">
-                <UserAvatar
-                  name={firstName || user?.email || ""}
-                  photo={avatarUrl}
-                  size="lg"
-                />
-                {/* Overlay pour upload */}
-                <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity rounded-full flex items-center justify-center cursor-pointer">
-                  <div className="flex flex-col items-center gap-2">
+              <div className="relative group mb-4">
+                <div className="relative">
+                  <UserAvatar
+                    name={firstName || user?.email || ""}
+                    photo={avatarUrl}
+                    size="lg"
+                  />
+                  <div className="absolute inset-0 rounded-full bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                     <Upload className="h-6 w-6 text-white" />
-                    <span className="text-xs text-white">Modifier</span>
                   </div>
+                  <button
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={uploading}
+                    className="absolute inset-0 rounded-full cursor-pointer disabled:cursor-not-allowed"
+                    aria-label="Changer la photo"
+                  />
                 </div>
-                {/* Bouton pour changer la photo */}
-                <button
-                  onClick={() => fileInputRef.current?.click()}
-                  disabled={uploading}
-                  className="absolute inset-0 opacity-0 cursor-pointer disabled:cursor-not-allowed"
-                  aria-label="Changer la photo de profil"
-                />
                 <input
                   ref={fileInputRef}
                   type="file"
@@ -532,181 +531,141 @@ export default function ProfilePage() {
                   className="hidden"
                   disabled={uploading}
                 />
-                {/* Bouton supprimer si photo existe */}
                 {avatarUrl && (
                   <button
                     onClick={handleRemoveAvatar}
                     disabled={uploading}
-                    className="absolute -top-2 -right-2 bg-error hover:bg-error/80 text-white rounded-full p-1.5 shadow-lg transition-colors disabled:opacity-50"
+                    className="absolute -top-1 -right-1 bg-red-500/90 hover:bg-red-500 text-white rounded-full p-1.5 transition-colors disabled:opacity-50 z-10"
                     aria-label="Supprimer la photo"
                   >
-                    <X className="h-4 w-4" />
+                    <X className="h-3.5 w-3.5" />
                   </button>
                 )}
               </div>
               {uploading && (
-                <div className="mb-2 text-xs text-white/70 flex items-center gap-2">
-                  <Loader2 className="h-3 w-3 animate-spin" />
-                  <span>Upload en cours...</span>
-                </div>
+                <p className="text-xs text-white/60 flex items-center justify-center gap-2 mb-2">
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                  Upload en cours...
+                </p>
               )}
               {uploadMessage && (
-                <div className={`mt-2 flex items-center gap-2 px-3 py-2 rounded-lg border text-xs ${
-                  uploadMessage.type === "success" 
-                    ? "bg-success/10 border-success/30 text-success" 
-                    : "bg-error/10 border-error/30 text-error"
+                <div className={`flex items-center gap-2 px-3 py-2 rounded-lg text-xs mb-3 ${
+                  uploadMessage.type === "success" ? "bg-emerald-500/10 text-emerald-400" : "bg-red-500/10 text-red-400"
                 }`}>
-                  {uploadMessage.type === "success" ? (
-                    <CheckCircle2 className="h-4 w-4 shrink-0" />
-                  ) : (
-                    <AlertCircle className="h-4 w-4 shrink-0" />
-                  )}
-                  <p className="font-medium">{uploadMessage.text}</p>
+                  {uploadMessage.type === "success" ? <CheckCircle2 className="h-4 w-4 shrink-0" /> : <AlertCircle className="h-4 w-4 shrink-0" />}
+                  <span>{uploadMessage.text}</span>
                 </div>
               )}
-              <h2 className="text-xl font-bold text-white break-words mb-2">
-                {firstName || "Utilisateur"}
-              </h2>
-              <p className="text-xs text-white/50 mb-4">
-                Cliquez sur la photo pour la modifier (max 4MB)
-              </p>
+              <h2 className="text-lg font-semibold text-white">{firstName || "Utilisateur"}</h2>
+              <p className="text-xs text-white/50 mt-1">Cliquez sur la photo pour modifier (max 4MB)</p>
             </div>
           </div>
 
           {/* Statistiques */}
-          <div className="rounded-lg border border-card-border bg-black p-8 overflow-hidden flex-1 flex flex-col min-h-0">
-            <h2 className="text-lg font-bold text-white mb-6 flex-shrink-0">Statistiques</h2>
-            
-            <div className="space-y-5 flex-1">
-              <div className="p-6 bg-sidebar-selected rounded-lg border border-card-border flex-shrink-0">
-                <div className="flex items-center justify-between mb-3">
-                  <p className="text-xs font-semibold text-white/70">XP accumulé</p>
-                  <span className="text-xs text-primary font-bold">{xp.toLocaleString()}</span>
-                </div>
-                <p className="text-3xl font-bold text-white break-words mb-2">{xp.toLocaleString()}</p>
-                <p className="text-xs text-white/50">Augmente avec votre progression</p>
+          <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-6">
+            <h2 className="text-base font-semibold text-white mb-4">Statistiques</h2>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="rounded-xl border border-white/10 bg-white/[0.02] p-4">
+                <p className="text-xs text-white/60 mb-1">XP accumulé</p>
+                <p className="text-2xl font-bold text-[#0044FF]">{xp.toLocaleString()}</p>
+                <p className="text-[11px] text-white/50 mt-1">Augmente avec votre progression</p>
               </div>
-
-              <div className="p-6 bg-sidebar-selected rounded-lg border border-card-border flex-shrink-0">
-                <div className="flex items-center justify-between mb-3">
-                  <p className="text-xs font-semibold text-white/70">Évaluations réussies</p>
-                  <span className="text-xs text-success font-bold">{completedEvaluations}</span>
-                </div>
-                <p className="text-3xl font-bold text-white break-words mb-2">{completedEvaluations}</p>
-                <p className="text-xs text-white/50">Système d&apos;évaluation à venir</p>
+              <div className="rounded-xl border border-white/10 bg-white/[0.02] p-4">
+                <p className="text-xs text-white/60 mb-1">Évaluations réussies</p>
+                <p className="text-2xl font-bold text-emerald-400">{completedEvaluations}</p>
+                <p className="text-[11px] text-white/50 mt-1">Système à venir</p>
               </div>
             </div>
           </div>
         </div>
 
         {/* Colonne droite - Informations personnelles */}
-        <div className="rounded-lg border border-card-border bg-black p-8 overflow-hidden flex flex-col min-h-0">
-          <h2 className="text-lg font-bold text-white mb-6 flex-shrink-0">Informations personnelles</h2>
+        <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-6">
+          <h2 className="text-base font-semibold text-white mb-5">Informations personnelles</h2>
           
-          <div className="space-y-6 flex-1 flex flex-col">
-            <div className="flex-shrink-0">
-              <label className="block text-sm font-semibold text-white mb-2">
-                Prénom
-              </label>
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-white/90 mb-1.5">Prénom</label>
               <input
                 type="text"
                 value={firstName}
                 onChange={(e) => setFirstName(e.target.value)}
-                className="w-full rounded-lg border border-card-border bg-black px-4 py-3 text-white text-sm placeholder-white/50 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+                className={inputClass}
                 placeholder="Votre prénom"
                 maxLength={50}
               />
             </div>
 
-            <div className="flex-shrink-0">
-              <label className="block text-sm font-semibold text-white mb-2">
-                Email du compte
-              </label>
+            <div>
+              <label className="block text-sm font-medium text-white/90 mb-1.5">Email</label>
               <input
                 type="email"
                 value={email}
                 disabled
-                className="w-full rounded-lg border border-card-border bg-black/50 px-4 py-3 text-white/50 text-sm cursor-not-allowed truncate"
+                className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white/50 text-sm cursor-not-allowed"
               />
-              <p className="text-xs text-white/50 mt-1.5">L&apos;email ne peut pas être modifié</p>
+              <p className="text-xs text-white/50 mt-1">Non modifiable</p>
             </div>
 
-            <div className="flex-shrink-0">
-              <label className="block text-sm font-semibold text-white mb-2">
-                @ X (Twitter)
-              </label>
-              <div className="relative">
-                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-white/70 text-sm">@</span>
-                <input
-                  type="text"
-                  value={twitterHandle}
-                  onChange={(e) => {
-                    const value = e.target.value.replace(/^@+/, "");
-                    setTwitterHandle(value);
-                  }}
-                  className="w-full rounded-lg border border-card-border bg-black pl-8 pr-4 py-3 text-white text-sm placeholder-white/50 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
-                  placeholder="votre_handle"
-                  maxLength={50}
-                />
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-white/90 mb-1.5">X (Twitter)</label>
+                <div className="relative">
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-white/50 text-sm">@</span>
+                  <input
+                    type="text"
+                    value={twitterHandle}
+                    onChange={(e) => setTwitterHandle(e.target.value.replace(/^@+/, ""))}
+                    className={`${inputClass} pl-8`}
+                    placeholder="handle"
+                    maxLength={50}
+                  />
+                </div>
               </div>
-              <p className="text-xs text-white/50 mt-1.5">Votre nom d&apos;utilisateur X/Twitter</p>
-            </div>
-
-            <div className="flex-shrink-0">
-              <label className="block text-sm font-semibold text-white mb-2">
-                @ Discord
-              </label>
-              <div className="relative">
-                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-white/70 text-sm">@</span>
-                <input
-                  type="text"
-                  value={discordTag}
-                  onChange={(e) => {
-                    const value = e.target.value.replace(/^@+/, "");
-                    setDiscordTag(value);
-                  }}
-                  className="w-full rounded-lg border border-card-border bg-black pl-8 pr-4 py-3 text-white text-sm placeholder-white/50 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
-                  placeholder="votre_tag#1234"
-                  maxLength={50}
-                />
+              <div>
+                <label className="block text-sm font-medium text-white/90 mb-1.5">Discord</label>
+                <div className="relative">
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-white/50 text-sm">@</span>
+                  <input
+                    type="text"
+                    value={discordTag}
+                    onChange={(e) => setDiscordTag(e.target.value.replace(/^@+/, ""))}
+                    className={`${inputClass} pl-8`}
+                    placeholder="tag#1234"
+                    maxLength={50}
+                  />
+                </div>
               </div>
-              <p className="text-xs text-white/50 mt-1.5">Votre tag Discord (ex: username#1234)</p>
             </div>
 
             {/* Section Localisation */}
-            <div className="flex-shrink-0 pt-4 border-t border-white/10">
-              <div className="flex items-center gap-2 mb-4">
-                <MapPin className="h-4 w-4 text-white/70" />
-                <h3 className="text-sm font-semibold text-white">Localisation</h3>
+            <div className="pt-5 mt-5 border-t border-white/10">
+              <div className="flex items-center gap-2 mb-3">
+                <MapPin className="h-4 w-4 text-white/60" />
+                <h3 className="text-sm font-medium text-white">Localisation</h3>
               </div>
 
-              <p className="text-xs text-white/50 mb-3">
-                Autorisez l&apos;accès à votre position pour être localisé automatiquement, ou recherchez une adresse.
+              <p className="text-xs text-white/50 mb-4">
+                Utilisez votre position ou recherchez une adresse pour apparaître sur la carte.
               </p>
 
               <div className="space-y-4">
-                <div>
-                  <button
-                    type="button"
-                    onClick={handleUseMyLocation}
-                    disabled={loadingGeo}
-                    className="w-full flex items-center justify-center gap-2 rounded-lg border border-primary/50 bg-primary/10 text-primary px-4 py-3 text-sm font-medium hover:bg-primary/20 transition-colors disabled:opacity-50"
-                  >
-                    {loadingGeo ? (
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                    ) : (
-                      <Locate className="h-4 w-4" />
-                    )}
-                    {loadingGeo ? "Localisation en cours..." : "Utiliser ma position actuelle"}
-                  </button>
-                </div>
+                <button
+                  type="button"
+                  onClick={handleUseMyLocation}
+                  disabled={loadingGeo}
+                  className="w-full flex items-center justify-center gap-2 rounded-xl border border-[#0044FF]/40 bg-[#0044FF]/10 text-[#0044FF] px-4 py-2.5 text-sm font-medium hover:bg-[#0044FF]/20 transition-colors disabled:opacity-50"
+                >
+                  {loadingGeo ? <Loader2 className="h-4 w-4 animate-spin" /> : <Locate className="h-4 w-4" />}
+                  {loadingGeo ? "Localisation..." : "Utiliser ma position"}
+                </button>
 
-                <div className="relative text-white/50 text-xs text-center">ou remplir manuellement</div>
+                <div className="relative text-white/40 text-xs text-center py-1">ou</div>
 
                 <div ref={addressSearchRef} className="relative">
-                  <label className="block text-sm font-semibold text-white mb-2">Rechercher une adresse</label>
+                  <label className="block text-sm font-medium text-white/90 mb-1.5">Rechercher une adresse</label>
                   <div className="relative">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/50" />
+                    <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-white/40" />
                     <input
                       type="text"
                       value={addressSearch}
@@ -717,8 +676,8 @@ export default function ProfilePage() {
                         setActiveSearchField("address");
                       }}
                       onFocus={() => setActiveSearchField("address")}
-                      className="w-full rounded-lg border border-card-border bg-black pl-10 pr-4 py-3 text-white text-sm placeholder-white/50 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
-                      placeholder="Tapez une adresse, ville ou code postal..."
+                      className={`${inputClass} pl-10`}
+                      placeholder="Adresse, ville ou code postal..."
                     />
                     {loadingSuggestions && activeSearchField === "address" && (
                       <span className="absolute right-3 top-1/2 -translate-y-1/2">
@@ -727,13 +686,13 @@ export default function ProfilePage() {
                     )}
                   </div>
                   {showAddressDropdown && addressSuggestions.length > 0 && activeSearchField === "address" && (
-                    <ul className="absolute z-20 mt-1 w-full rounded-lg border border-[#1a1a1a] bg-[#141414] py-1 shadow-xl max-h-48 overflow-y-auto">
+                    <ul className="absolute z-20 mt-1 w-full rounded-xl border border-white/10 bg-[#141414] py-1 shadow-xl max-h-48 overflow-y-auto">
                       {addressSuggestions.map((item, i) => (
                         <li key={i}>
                           <button
                             type="button"
                             onClick={() => selectAddressSuggestion(item)}
-                            className="w-full text-left px-4 py-2.5 text-sm text-white/90 hover:bg-white/10 transition-colors"
+                            className="w-full text-left px-4 py-2.5 text-sm text-white/90 hover:bg-white/5 transition-colors rounded-lg mx-1"
                           >
                             {item.display_name}
                           </button>
@@ -744,7 +703,7 @@ export default function ProfilePage() {
                 </div>
 
                 <div ref={cityRef} className="relative">
-                  <label className="block text-sm font-semibold text-white mb-2">Ville</label>
+                  <label className="block text-sm font-medium text-white/90 mb-1.5">Ville</label>
                   <div className="relative">
                     <input
                       type="text"
@@ -759,7 +718,7 @@ export default function ProfilePage() {
                         setActiveSearchField("city");
                         if (city.trim()) setLocationSearchQuery(city);
                       }}
-                      className="w-full rounded-lg border border-card-border bg-black px-4 py-3 text-white text-sm placeholder-white/50 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+                      className={inputClass}
                       placeholder="Paris"
                       maxLength={100}
                     />
@@ -770,13 +729,13 @@ export default function ProfilePage() {
                     )}
                   </div>
                   {showAddressDropdown && addressSuggestions.length > 0 && activeSearchField === "city" && (
-                    <ul className="absolute z-20 mt-1 w-full rounded-lg border border-[#1a1a1a] bg-[#141414] py-1 shadow-xl max-h-48 overflow-y-auto">
+                    <ul className="absolute z-20 mt-1 w-full rounded-xl border border-white/10 bg-[#141414] py-1 shadow-xl max-h-48 overflow-y-auto">
                       {addressSuggestions.map((item, i) => (
                         <li key={i}>
                           <button
                             type="button"
                             onClick={() => selectAddressSuggestion(item)}
-                            className="w-full text-left px-4 py-2.5 text-sm text-white/90 hover:bg-white/10 transition-colors"
+                            className="w-full text-left px-4 py-2.5 text-sm text-white/90 hover:bg-white/5 transition-colors rounded-lg mx-1"
                           >
                             {item.display_name}
                           </button>
@@ -787,7 +746,7 @@ export default function ProfilePage() {
                 </div>
 
                 <div ref={countryRef} className="relative">
-                  <label className="block text-sm font-semibold text-white mb-2">Pays</label>
+                  <label className="block text-sm font-medium text-white/90 mb-1.5">Pays</label>
                   <div className="relative">
                     <input
                       type="text"
@@ -802,7 +761,7 @@ export default function ProfilePage() {
                         setActiveSearchField("country");
                         if (country.trim()) setLocationSearchQuery(country);
                       }}
-                      className="w-full rounded-lg border border-card-border bg-black px-4 py-3 text-white text-sm placeholder-white/50 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+                      className={inputClass}
                       placeholder="France"
                       maxLength={100}
                     />
@@ -813,13 +772,13 @@ export default function ProfilePage() {
                     )}
                   </div>
                   {showAddressDropdown && addressSuggestions.length > 0 && activeSearchField === "country" && (
-                    <ul className="absolute z-20 mt-1 w-full rounded-lg border border-[#1a1a1a] bg-[#141414] py-1 shadow-xl max-h-48 overflow-y-auto">
+                    <ul className="absolute z-20 mt-1 w-full rounded-xl border border-white/10 bg-[#141414] py-1 shadow-xl max-h-48 overflow-y-auto">
                       {addressSuggestions.map((item, i) => (
                         <li key={i}>
                           <button
                             type="button"
                             onClick={() => selectAddressSuggestion(item)}
-                            className="w-full text-left px-4 py-2.5 text-sm text-white/90 hover:bg-white/10 transition-colors"
+                            className="w-full text-left px-4 py-2.5 text-sm text-white/90 hover:bg-white/5 transition-colors rounded-lg mx-1"
                           >
                             {item.display_name}
                           </button>
@@ -829,22 +788,20 @@ export default function ProfilePage() {
                   )}
                 </div>
 
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3 pt-1">
                   <button
                     type="button"
                     role="switch"
                     aria-checked={showLocation}
-                    aria-label="Afficher ma localisation sur la carte des membres"
+                    aria-label="Afficher ma localisation sur la carte"
                     onClick={() => setShowLocation(!showLocation)}
-                    className={`relative inline-flex h-7 w-12 shrink-0 rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:ring-offset-2 focus:ring-offset-[#0a0a0a] ${
-                      showLocation ? "bg-[#0044FF]" : "bg-[#3a3a3a]"
+                    className={`relative inline-flex h-6 w-11 shrink-0 rounded-full transition-colors ${
+                      showLocation ? "bg-[#0044FF]" : "bg-white/10"
                     }`}
                   >
                     <span
-                      className={`pointer-events-none inline-block h-6 w-6 rounded-full shadow-sm transition-transform duration-200 mt-0.5 ${
-                        showLocation
-                          ? "translate-x-5 ml-0.5 bg-white"
-                          : "translate-x-0.5 bg-[#a0a0a0]"
+                      className={`inline-block h-5 w-5 rounded-full bg-white shadow-sm transition-transform mt-0.5 ${
+                        showLocation ? "translate-x-5 ml-0.5" : "translate-x-0.5"
                       }`}
                     />
                   </button>
@@ -852,50 +809,38 @@ export default function ProfilePage() {
                     onClick={() => setShowLocation(!showLocation)}
                     className="text-sm text-white/80 cursor-pointer select-none"
                   >
-                    Afficher ma localisation sur la carte des membres
+                    Afficher sur la carte communauté
                   </label>
                 </div>
-                <p className="text-xs text-white/50">
-                  Votre position sera visible sur la carte de la communauté si vous activez cette option.
-                </p>
               </div>
             </div>
 
-            {/* Message de succès/erreur */}
             {saveMessage && (
-              <div className={`flex items-center gap-2 px-4 py-3 rounded-lg border ${
-                saveMessage.type === "success" 
-                  ? "bg-success/10 border-success/30 text-success" 
-                  : "bg-error/10 border-error/30 text-error"
+              <div className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm ${
+                saveMessage.type === "success" ? "bg-emerald-500/10 text-emerald-400" : "bg-red-500/10 text-red-400"
               }`}>
-                {saveMessage.type === "success" ? (
-                  <CheckCircle2 className="h-5 w-5 shrink-0" />
-                ) : (
-                  <AlertCircle className="h-5 w-5 shrink-0" />
-                )}
-                <p className="text-sm font-medium">{saveMessage.text}</p>
+                {saveMessage.type === "success" ? <CheckCircle2 className="h-4 w-4 shrink-0" /> : <AlertCircle className="h-4 w-4 shrink-0" />}
+                <span>{saveMessage.text}</span>
               </div>
             )}
 
-            <div className="mt-auto pt-4 flex-shrink-0">
-              <button
-                onClick={handleSave}
-                disabled={saving}
-                className="flex items-center justify-center gap-2 px-6 py-3 bg-gradient-premium hover:opacity-90 disabled:opacity-50 text-white font-semibold rounded-lg transition-opacity text-sm w-full"
-              >
-                {saving ? (
-                  <>
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                    Sauvegarde...
-                  </>
-                ) : (
-                  <>
-                    <Save className="h-4 w-4" />
-                    Enregistrer les modifications
-                  </>
-                )}
-              </button>
-            </div>
+            <button
+              onClick={handleSave}
+              disabled={saving}
+              className="flex items-center justify-center gap-2 px-6 py-3 bg-[#0044FF] hover:bg-[#0038cc] disabled:opacity-50 text-white font-medium rounded-xl transition-colors text-sm w-full mt-4"
+            >
+              {saving ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Sauvegarde...
+                </>
+              ) : (
+                <>
+                  <Save className="h-4 w-4" />
+                  Enregistrer
+                </>
+              )}
+            </button>
           </div>
         </div>
       </div>
