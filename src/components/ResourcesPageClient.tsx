@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Download } from "lucide-react";
+import { Download, FileImage, Palette, Type, Layers, Image as ImageIcon, Wrench, FolderOpen } from "lucide-react";
 import type { ResourceRow } from "@/lib/supabase/database.types";
 
 interface ResourcesPageClientProps {
@@ -11,15 +11,17 @@ interface ResourcesPageClientProps {
 }
 
 const panels = [
-  { key: "psd", name: "PSD Photoshop" },
-  { key: "textures", name: "Textures" },
-  { key: "fonts", name: "Polices d'écriture" },
-  { key: "palettes", name: "Palettes" },
-  { key: "templates", name: "Templates" },
-  { key: "images", name: "Images & Icônes" },
-  { key: "outils", name: "Outils" },
-  { key: "autres", name: "Autres" },
+  { key: "psd", name: "PSD Photoshop", icon: Layers },
+  { key: "textures", name: "Textures", icon: FileImage },
+  { key: "fonts", name: "Polices d'écriture", icon: Type },
+  { key: "palettes", name: "Palettes", icon: Palette },
+  { key: "templates", name: "Templates", icon: Layers },
+  { key: "images", name: "Images & Icônes", icon: ImageIcon },
+  { key: "outils", name: "Outils", icon: Wrench },
+  { key: "autres", name: "Autres", icon: FolderOpen },
 ];
+
+const PLACEHOLDER_COUNT = 8;
 
 export function ResourcesPageClient({
   resources,
@@ -45,54 +47,91 @@ export function ResourcesPageClient({
     a.title.localeCompare(b.title)
   );
 
+  const itemsToShow = useMemo(() => {
+    const placeholders = Array.from({ length: Math.max(0, PLACEHOLDER_COUNT - activeResources.length) }, (_, i) => ({
+      id: `placeholder-${activePanel}-${i}`,
+      isPlaceholder: true as const,
+    }));
+    return [
+      ...activeResources.map((r) => ({ ...r, isPlaceholder: false as const })),
+      ...placeholders,
+    ].slice(0, PLACEHOLDER_COUNT);
+  }, [activeResources, activePanel]);
+
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div className="space-y-7 animate-fade-in">
+      {/* Header - style marketplace */}
       <div>
         <h1 className="text-[27px] font-bold text-white mb-2">Ressources</h1>
         <p className="text-white/70 text-sm">
-          Téléchargez les fichiers par type de ressource.
+          Téléchargez les fichiers par type de ressource. Templates, polices, textures et outils pour vos thumbnails.
         </p>
       </div>
 
-      {/* Panels en ligne - sélection */}
-      <div className="flex flex-wrap gap-2">
-        {panels.map((panel) => (
-          <button
-            key={panel.key}
-            onClick={() => setActivePanel(panel.key)}
-            className={`px-4 py-2.5 rounded-xl text-sm font-medium transition-colors ${
-              activePanel === panel.key
-                ? "bg-white text-[#0a0a0a]"
-                : "bg-white/10 text-white/80 hover:bg-white/15 border border-white/10"
-            }`}
-          >
-            {panel.name}
-          </button>
-        ))}
+      {/* Navigation Tabs - style marketplace */}
+      <div className="flex flex-wrap items-center gap-3">
+        {panels.map((panel) => {
+          const Icon = panel.icon;
+          const isActive = activePanel === panel.key;
+          return (
+            <button
+              key={panel.key}
+              onClick={() => setActivePanel(panel.key)}
+              className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium transition-all ${
+                isActive
+                  ? "bg-white text-[#0a0a0a]"
+                  : "bg-[#0a0a0a] text-white/60 border border-white/20 hover:text-white/90 hover:border-white/30"
+              }`}
+            >
+              <Icon className="h-4 w-4" />
+              <span>{panel.name}</span>
+            </button>
+          );
+        })}
       </div>
 
-      {/* Grille 4 par ligne - éléments téléchargeables */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {activeResources.length > 0 ? (
-          activeResources.map((resource) => (
+      {/* Content Cards Grid - style marketplace */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        {itemsToShow.map((item) => {
+          if ("isPlaceholder" in item && item.isPlaceholder) {
+            return (
+              <div
+                key={item.id}
+                className="block rounded-lg border border-white/10 bg-[#0a0a0a] overflow-hidden"
+              >
+                <div className="relative h-[180px] overflow-hidden bg-gradient-to-br from-[#1a1a1a] via-[#151515] to-[#1a1a1a]" />
+                <div className="border-t border-white/10" />
+                <div className="p-5 bg-[#0a0a0a]">
+                  <p className="text-sm text-white/40 mb-3 text-center">À venir</p>
+                  <span className="flex items-center justify-center gap-2 w-full py-2.5 rounded-lg border border-white/20 bg-white/5 text-white/40 text-sm">
+                    <Download className="h-4 w-4" />
+                    Télécharger
+                  </span>
+                </div>
+              </div>
+            );
+          }
+          const resource = item as ResourceRow;
+          return (
             <div
               key={resource.id}
-              className="rounded-2xl overflow-hidden border border-white/10 bg-gradient-to-br from-white/5 via-white/[0.02] to-white/5"
+              className="block rounded-lg border border-white/10 bg-[#0a0a0a] overflow-hidden hover:border-white/20 transition-colors"
             >
-              <div className="aspect-square bg-gradient-to-br from-[#333] via-[#222] to-[#2a2a2a] flex items-center justify-center p-6">
+              <div className="relative h-[180px] overflow-hidden bg-gradient-to-br from-[#1a1a1a] via-[#151515] to-[#1a1a1a]">
                 {resource.preview_url ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
                     src={resource.preview_url}
                     alt={resource.title}
-                    className="w-full h-full object-contain"
+                    className="w-full h-full object-contain p-4"
                   />
                 ) : (
-                  <div className="w-full h-full bg-gradient-to-br from-white/[0.06] to-white/[0.02] rounded-lg" />
+                  <div className="w-full h-full bg-gradient-to-br from-white/[0.04] to-transparent" />
                 )}
               </div>
-              <div className="p-4 flex flex-col items-center gap-3">
-                <p className="text-sm font-medium text-white truncate w-full text-center">
+              <div className="border-t border-white/10" />
+              <div className="p-5 bg-[#0a0a0a]">
+                <p className="text-sm font-medium text-white truncate mb-3 text-center">
                   {resource.title}
                 </p>
                 {resource.url ? (
@@ -101,26 +140,21 @@ export function ResourcesPageClient({
                     target="_blank"
                     rel="noopener noreferrer"
                     download
-                    className="inline-flex items-center gap-2 rounded-lg border border-white/40 bg-white/10 px-4 py-2 text-sm font-medium text-white hover:bg-white/20 transition-colors"
+                    className="flex items-center justify-center gap-2 w-full py-2.5 bg-white text-[#0a0a0a] rounded-lg text-sm font-medium hover:bg-white/90 transition-colors"
                   >
                     <Download className="h-4 w-4" />
                     Télécharger
                   </a>
                 ) : (
-                  <span className="inline-flex items-center gap-2 rounded-lg border border-white/20 bg-white/5 px-4 py-2 text-sm font-medium text-white/50">
+                  <span className="flex items-center justify-center gap-2 w-full py-2.5 rounded-lg border border-white/20 bg-white/5 text-white/50 text-sm">
                     <Download className="h-4 w-4" />
                     Bientôt
                   </span>
                 )}
               </div>
             </div>
-          ))
-        ) : (
-          <div className="col-span-full py-16 text-center rounded-2xl border border-white/10 bg-white/[0.02]">
-            <p className="text-white/50 text-sm">Aucune ressource dans cette catégorie</p>
-            <p className="text-white/30 text-xs mt-1">Fichiers à venir</p>
-          </div>
-        )}
+          );
+        })}
       </div>
     </div>
   );
