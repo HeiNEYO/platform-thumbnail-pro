@@ -129,8 +129,11 @@ function MembersMap({ members }: MembersMapProps) {
         const lng = Number(member.longitude);
         const role = member.role || "member";
         const grade = gradeStyles[role] || gradeStyles.member;
+        const displayName = (member.full_name || member.email?.split("@")[0] || "Membre").replace(/</g, "&lt;");
+        const locationStr = [member.city, member.country].filter(Boolean).join(", ").replace(/</g, "&lt;");
+        const avatarUrl = member.avatar_url?.replace(/"/g, "&quot;") || "";
+        const initial = (member.full_name?.trim().split(/\s+/)[0]?.[0] || member.email?.[0] || "?").toUpperCase();
 
-        // Icône pin (location) en SVG, couleur selon le grade
         const pinIcon = L.default.divIcon({
           className: "map-pin-icon",
           html: `
@@ -148,14 +151,18 @@ function MembersMap({ members }: MembersMapProps) {
 
         const marker = L.default.marker([lat, lng], { icon: pinIcon }).addTo(mapRef.current!);
 
+        const avatarHtml = avatarUrl
+          ? `<img src="${avatarUrl}" alt="" style="width:48px;height:48px;border-radius:50%;object-fit:cover;border:2px solid ${grade.border};flex-shrink:0;" loading="lazy" />`
+          : `<div style="width:48px;height:48px;border-radius:50%;background:#1a1a1a;border:2px solid ${grade.border};color:#fff;font-size:18px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0;">${initial}</div>`;
+
         const popupContent = `
-          <div class="p-3 min-w-[180px]" style="background:#0a0a0a;color:#fff;border:1px solid rgba(255,255,255,0.1);border-radius:8px;">
-            <h3 class="font-semibold text-sm mb-1" style="color:#fff;">${(member.full_name || "Membre").replace(/</g, "&lt;")}</h3>
-            ${member.city || member.country 
-              ? `<p class="text-xs mb-2" style="color:rgba(255,255,255,0.6);">${[member.city, member.country].filter(Boolean).join(", ").replace(/</g, "&lt;")}</p>`
-              : ""
-            }
-            <span class="inline-block px-2 py-0.5 text-xs rounded" style="color:${grade.color};background:${grade.bg};border:1px solid ${grade.border}">${grade.label}</span>
+          <div class="map-popup-card" style="display:flex;align-items:center;gap:12px;padding:12px;min-width:220px;background:#0a0a0a;border:1px solid rgba(255,255,255,0.1);border-radius:12px;">
+            ${avatarHtml}
+            <div style="flex:1;min-width:0;">
+              <h3 style="margin:0 0 4px 0;font-size:14px;font-weight:600;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${displayName}</h3>
+              ${locationStr ? `<p style="margin:0 0 8px 0;font-size:12px;color:rgba(255,255,255,0.6);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${locationStr}</p>` : ""}
+              <span style="display:inline-block;padding:2px 8px;font-size:11px;font-weight:500;border-radius:6px;color:${grade.color};background:${grade.bg};border:1px solid ${grade.border}">${grade.label}</span>
+            </div>
           </div>
         `;
 
@@ -206,13 +213,21 @@ function MembersMap({ members }: MembersMapProps) {
         .leaflet-popup-content-wrapper {
           background: #0a0a0a;
           border: 1px solid rgba(255, 255, 255, 0.1);
-          border-radius: 8px;
-          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+          border-radius: 12px;
+          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
           color: white;
+          padding: 0;
+          overflow: hidden;
+        }
+        .leaflet-popup-content {
+          margin: 0;
         }
         .leaflet-popup-tip {
           background: #0a0a0a;
           border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .map-popup-card img {
+          display: block;
         }
         .leaflet-container {
           background: #0a0a0a;
