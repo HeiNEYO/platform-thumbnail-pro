@@ -1,15 +1,56 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
-import { getGlobalProgress, getProgressByModule } from "@/lib/db/progress";
+import {
+  getGlobalProgress,
+  getProgressByModule,
+  getStreak,
+  getRecentActivity,
+  getTotalTimeWatched,
+  getNextEpisode,
+  getWeeklyActivity,
+} from "@/lib/db/progress";
+import { getLevelFromProgress } from "@/lib/types";
 import { ProgressBar } from "@/components/ui/ProgressBar";
-import { BarChart3, BookOpen, CheckCircle, Target } from "lucide-react";
+import {
+  BarChart3,
+  BookOpen,
+  CheckCircle,
+  Target,
+  Flame,
+  Clock,
+  Play,
+  ChevronRight,
+  Trophy,
+  Zap,
+} from "lucide-react";
 
-// Force le rendu dynamique car on utilise cookies() pour l'authentification
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
+
+function formatDuration(minutes: number): string {
+  if (minutes < 60) return `${minutes} min`;
+  const h = Math.floor(minutes / 60);
+  const m = minutes % 60;
+  return m ? `${h}h${m.toString().padStart(2, "0")}` : `${h}h`;
+}
+
+function formatDateShort(iso: string): string {
+  const d = new Date(iso);
+  const today = new Date();
+  const diff = Math.floor((today.getTime() - d.getTime()) / (24 * 60 * 60 * 1000));
+  if (diff === 0) return "Aujourd'hui";
+  if (diff === 1) return "Hier";
+  if (diff < 7) return `Il y a ${diff} j`;
+  return d.toLocaleDateString("fr-FR", { day: "numeric", month: "short" });
+}
+
+function formatDayLabel(iso: string): string {
+  return new Date(iso).toLocaleDateString("fr-FR", { weekday: "short" }).slice(0, 2);
+}
 
 export default async function StatsPage() {
-  const isDevMode = process.env.NEXT_PUBLIC_DEV_MODE === "true" || process.env.NEXT_PUBLIC_DEMO_MODE === "true";
+  const isDevMode =
+    process.env.NEXT_PUBLIC_DEV_MODE === "true" || process.env.NEXT_PUBLIC_DEMO_MODE === "true";
   if (isDevMode) {
     return (
       <div className="animate-fade-in space-y-6">
@@ -25,76 +66,178 @@ export default async function StatsPage() {
 
   let progressPercent = 0;
   let byModule: Awaited<ReturnType<typeof getProgressByModule>> = [];
+  let streak = 0;
+  let recentActivity: Awaited<ReturnType<typeof getRecentActivity>> = [];
+  let totalMinutes = 0;
+  let nextEpisode: Awaited<ReturnType<typeof getNextEpisode>> = null;
+  let weeklyActivity: Awaited<ReturnType<typeof getWeeklyActivity>> = [];
   try {
-    const [percent, moduleStats] = await Promise.all([
+    const [
+      percent,
+      moduleStats,
+      streakVal,
+      recent,
+      minutes,
+      next,
+      weekly,
+    ] = await Promise.all([
       getGlobalProgress(authUser.id),
       getProgressByModule(authUser.id),
+      getStreak(authUser.id),
+      getRecentActivity(authUser.id, 6),
+      getTotalTimeWatched(authUser.id),
+      getNextEpisode(authUser.id),
+      getWeeklyActivity(authUser.id),
     ]);
     progressPercent = percent;
     byModule = moduleStats;
+    streak = streakVal;
+    recentActivity = recent;
+    totalMinutes = minutes;
+    nextEpisode = next;
+    weeklyActivity = weekly;
   } catch {
-    // Tables progress/episodes absentes ou erreur : afficher des zéros
+    // Tables absentes ou erreur : valeurs par défaut
   }
+
   const totalEpisodes = byModule.reduce((s, m) => s + m.total, 0);
   const completedEpisodes = byModule.reduce((s, m) => s + m.completed, 0);
+  const level = getLevelFromProgress(progressPercent);
+  const maxBar = Math.max(1, ...weeklyActivity.map((w) => w.count));
 
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div className="space-y-8 animate-fade-in">
       <div>
         <h1 className="text-[27px] font-bold text-white mb-2">Statistiques</h1>
-        <p className="text-white/70 text-sm">Votre progression et vos KPIs</p>
+        <p className="text-white/70 text-sm">Votre progression et vos KPIs pour suivre votre apprentissage</p>
       </div>
 
-      {/* KPIs */}
+      {/* Streak + Level - Hero cards */}
+      <div className="grid gap-4 sm:grid-cols-2">
+        <div className="group relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-orange-500/10 via-[#0a0a0a] to-[#0a0a0a] p-6 transition-all hover:border-orange-500/30">
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,rgba(249,115,22,0.15),transparent)]" />
+          <div className="relative flex items-center gap-4">
+            <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-orange-500/20 border border-orange-500/30">
+              <Flame className="h-7 w-7 text-orange-400" />
+            </div>
+            <div>
+              <p className="text-3xl font-bold text-white">{streak}</p>
+              <p className="text-sm text-white/70">jour{streak > 1 ? "s" : ""} d&apos;affilée</p>
+            </div>
+          </div>
+        </div>
+        <div className="group relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-violet-500/10 via-[#0a0a0a] to-[#0a0a0a] p-6 transition-all hover:border-violet-500/30">
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,rgba(139,92,246,0.15),transparent)]" />
+          <div className="relative flex items-center gap-4">
+            <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-violet-500/20 border border-violet-500/30">
+              <Trophy className="h-7 w-7 text-violet-400" />
+            </div>
+            <div>
+              <p className="text-xl font-bold text-white">{level}</p>
+              <p className="text-sm text-white/70">niveau actuel</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* KPIs - 4 cards */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <div className="rounded-lg border border-card-border bg-black p-5">
+        <div className="rounded-xl border border-white/10 bg-white/[0.02] p-5 backdrop-blur-sm transition-all hover:border-white/20 hover:bg-white/[0.04]">
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg border border-card-border">
-              <Target className="h-5 w-5 text-icon" />
+            <div className="p-2.5 rounded-xl bg-[#0044FF]/15 border border-[#0044FF]/30">
+              <Target className="h-5 w-5 text-[#0044FF]" />
             </div>
             <div>
               <p className="text-2xl font-bold text-white">{progressPercent}%</p>
-              <p className="text-xs text-white/70 font-medium">Progression globale</p>
+              <p className="text-xs text-white/60 font-medium">Progression globale</p>
             </div>
           </div>
         </div>
-        <div className="rounded-lg border border-card-border bg-black p-5">
+        <div className="rounded-xl border border-white/10 bg-white/[0.02] p-5 backdrop-blur-sm transition-all hover:border-white/20 hover:bg-white/[0.04]">
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg border border-card-border">
-              <CheckCircle className="h-5 w-5 text-success" />
+            <div className="p-2.5 rounded-xl bg-emerald-500/15 border border-emerald-500/30">
+              <CheckCircle className="h-5 w-5 text-emerald-400" />
             </div>
             <div>
               <p className="text-2xl font-bold text-white">{completedEpisodes}</p>
-              <p className="text-xs text-white/70 font-medium">Épisodes complétés</p>
+              <p className="text-xs text-white/60 font-medium">Épisodes complétés</p>
             </div>
           </div>
         </div>
-        <div className="rounded-lg border border-card-border bg-black p-5">
+        <div className="rounded-xl border border-white/10 bg-white/[0.02] p-5 backdrop-blur-sm transition-all hover:border-white/20 hover:bg-white/[0.04]">
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg border border-card-border">
-              <BookOpen className="h-5 w-5 text-icon" />
+            <div className="p-2.5 rounded-xl bg-amber-500/15 border border-amber-500/30">
+              <Clock className="h-5 w-5 text-amber-400" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-white">{totalEpisodes}</p>
-              <p className="text-xs text-white/70 font-medium">Épisodes au total</p>
+              <p className="text-2xl font-bold text-white">{formatDuration(totalMinutes)}</p>
+              <p className="text-xs text-white/60 font-medium">Temps estimé regardé</p>
             </div>
           </div>
         </div>
-        <div className="rounded-lg border border-card-border bg-black p-5">
+        <div className="rounded-xl border border-white/10 bg-white/[0.02] p-5 backdrop-blur-sm transition-all hover:border-white/20 hover:bg-white/[0.04]">
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg border border-card-border">
-              <BarChart3 className="h-5 w-5 text-icon" />
+            <div className="p-2.5 rounded-xl bg-cyan-500/15 border border-cyan-500/30">
+              <BookOpen className="h-5 w-5 text-cyan-400" />
             </div>
             <div>
               <p className="text-2xl font-bold text-white">{byModule.length}</p>
-              <p className="text-xs text-white/70 font-medium">Modules</p>
+              <p className="text-xs text-white/60 font-medium">Modules</p>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Barre globale */}
-      <div className="rounded-lg border border-card-border bg-black p-6">
+      {/* Prochain épisode - CTA */}
+      {nextEpisode && (
+        <div className="rounded-2xl border border-[#0044FF]/30 bg-gradient-to-r from-[#0044FF]/10 via-transparent to-transparent p-6">
+          <h2 className="text-sm font-semibold text-white/80 mb-2 flex items-center gap-2">
+            <Zap className="h-4 w-4 text-[#0044FF]" />
+            Prochaine étape
+          </h2>
+          <Link
+            href={`/dashboard/modules/${nextEpisode.module_id}/episode/${nextEpisode.episode_id}`}
+            className="group flex items-center justify-between gap-4 rounded-xl border border-white/10 bg-white/5 p-4 transition-all hover:border-[#0044FF]/50 hover:bg-[#0044FF]/10"
+          >
+            <div className="min-w-0 flex-1">
+              <p className="font-medium text-white truncate">{nextEpisode.episode_title}</p>
+              <p className="text-sm text-white/60 truncate">{nextEpisode.module_title}</p>
+            </div>
+            <span className="inline-flex items-center gap-1.5 rounded-lg bg-[#0044FF] px-4 py-2 text-sm font-medium text-white group-hover:bg-[#0038cc] transition-colors">
+              <Play className="h-4 w-4" />
+              Continuer
+              <ChevronRight className="h-4 w-4" />
+            </span>
+          </Link>
+        </div>
+      )}
+
+      {/* Activité hebdomadaire - mini graph */}
+      <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-6">
+        <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+          <BarChart3 className="h-5 w-5 text-white/80" />
+          Activité cette semaine
+        </h2>
+        <div className="flex items-end gap-2 h-24">
+          {weeklyActivity.map((w) => (
+            <div key={w.date} className="flex-1 flex flex-col items-center gap-1">
+              <div
+                className="w-full rounded-t-md bg-gradient-to-t from-[#0044FF]/60 to-[#0044FF]/30 transition-all duration-500 min-h-[4px]"
+                style={{
+                  height: `${Math.max(4, (w.count / maxBar) * 80)}%`,
+                }}
+              />
+              <span className="text-[10px] text-white/50">{formatDayLabel(w.date)}</span>
+            </div>
+          ))}
+        </div>
+        <p className="text-xs text-white/50 mt-2">
+          {weeklyActivity.reduce((s, w) => s + w.count, 0)} épisode{weeklyActivity.reduce((s, w) => s + w.count, 0) > 1 ? "s" : ""} cette semaine
+        </p>
+      </div>
+
+      {/* Progression globale */}
+      <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-6">
         <h2 className="text-lg font-bold text-white mb-4">Progression globale</h2>
         <ProgressBar value={progressPercent} showLabel />
         <p className="text-xs text-white/50 mt-2">
@@ -102,34 +245,56 @@ export default async function StatsPage() {
         </p>
       </div>
 
-      {/* Progression par module (graphiques en barres) */}
-      <div className="rounded-lg border border-card-border bg-black p-6">
-        <h2 className="text-lg font-bold text-white mb-4">Progression par module</h2>
-        <div className="space-y-4">
-          {byModule.length === 0 ? (
-            <p className="text-white/50 text-sm">Aucun module pour l&apos;instant.</p>
+      {/* 2 colonnes : Progression par module + Activité récente */}
+      <div className="grid gap-6 lg:grid-cols-2">
+        <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-6">
+          <h2 className="text-lg font-bold text-white mb-4">Progression par module</h2>
+          <div className="space-y-4">
+            {byModule.length === 0 ? (
+              <p className="text-white/50 text-sm">Aucun module pour l&apos;instant.</p>
+            ) : (
+              byModule.map((m) => (
+                <div key={m.moduleId} className="space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <Link
+                      href={`/dashboard/modules/${m.moduleId}`}
+                      className="font-medium text-white hover:text-[#0044FF] transition-colors truncate pr-2"
+                    >
+                      {m.moduleTitle}
+                    </Link>
+                    <span className="text-white/60 shrink-0">
+                      {m.completed}/{m.total} · {m.percent}%
+                    </span>
+                  </div>
+                  <div className="h-2 rounded-full bg-white/5 overflow-hidden">
+                    <div
+                      className="h-full rounded-full bg-gradient-to-r from-[#0044FF] to-[#3366FF] transition-all duration-500"
+                      style={{ width: `${m.percent}%` }}
+                    />
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+
+        <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-6">
+          <h2 className="text-lg font-bold text-white mb-4">Activité récente</h2>
+          {recentActivity.length === 0 ? (
+            <p className="text-white/50 text-sm">Aucun épisode complété récemment.</p>
           ) : (
-            byModule.map((m) => (
-              <div key={m.moduleId} className="space-y-2">
-                <div className="flex justify-between text-sm">
-                  <Link
-                    href={`/dashboard/modules/${m.moduleId}`}
-                    className="font-medium text-white hover:text-icon transition-colors truncate pr-2"
-                  >
-                    {m.moduleTitle}
-                  </Link>
-                  <span className="text-white/70 shrink-0">
-                    {m.completed}/{m.total} · {m.percent}%
-                  </span>
-                </div>
-                <div className="h-2 rounded-full bg-black border border-card-border overflow-hidden">
-                  <div
-                    className="h-full rounded-full bg-primary transition-all duration-500"
-                    style={{ width: `${m.percent}%` }}
-                  />
-                </div>
-              </div>
-            ))
+            <ul className="space-y-3">
+              {recentActivity.map((a) => (
+                <li key={a.episode_id} className="flex items-center gap-3 py-2 border-b border-white/5 last:border-0">
+                  <div className="h-2 w-2 rounded-full bg-emerald-500/80 shrink-0" />
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-medium text-white truncate">{a.episode_title}</p>
+                    <p className="text-xs text-white/50 truncate">{a.module_title}</p>
+                  </div>
+                  <span className="text-xs text-white/40 shrink-0">{formatDateShort(a.completed_at)}</span>
+                </li>
+              ))}
+            </ul>
           )}
         </div>
       </div>
