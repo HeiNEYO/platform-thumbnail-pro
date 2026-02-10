@@ -88,7 +88,7 @@ export default async function StatsPage() {
       getRecentActivity(authUser.id, 6),
       getTotalTimeWatched(authUser.id),
       getNextEpisode(authUser.id),
-      getActivityHeatmap(authUser.id, 14),
+      getActivityHeatmap(authUser.id, 26),
     ]);
     progressPercent = percent;
     byModule = moduleStats;
@@ -106,7 +106,7 @@ export default async function StatsPage() {
   const level = getLevelFromProgress(progressPercent);
   const maxHeatmap = Math.max(1, ...heatmapData.map((d) => d.count));
   const dayLabels = ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"];
-  const numWeeks = 14;
+  const numWeeks = 26;
   const grid: { count: number; date: string }[][] = Array.from({ length: 7 }, () =>
     Array.from({ length: numWeeks }, () => ({ count: 0, date: "" }))
   );
@@ -230,8 +230,8 @@ export default async function StatsPage() {
           Activité
         </h2>
         <div
-          className="w-full grid gap-[3px] min-h-[80px]"
-          style={{ gridTemplateColumns: `auto repeat(${numWeeks}, minmax(0, 1fr))`, gridTemplateRows: "repeat(7, minmax(12px, 1fr))" }}
+          className="w-full grid gap-[2px]"
+          style={{ gridTemplateColumns: `auto repeat(${numWeeks}, minmax(0, 1fr))`, gridTemplateRows: "repeat(7, 10px)" }}
         >
           {grid.map((row, rowIndex) => (
             <Fragment key={rowIndex}>
@@ -243,7 +243,7 @@ export default async function StatsPage() {
                 return (
                   <div
                     key={`${rowIndex}-${colIndex}`}
-                    className="aspect-square w-full min-w-0 rounded-[2px] bg-[#0044FF] transition-opacity hover:ring-1 hover:ring-white/30"
+                    className="w-full h-full min-w-0 rounded-[1px] bg-[#0044FF] transition-opacity hover:ring-1 hover:ring-white/30"
                     style={{ opacity }}
                     title={cell?.date ? `${formatHeatmapDate(cell.date)}${cell.count ? ` · ${cell.count} épisode${cell.count > 1 ? "s" : ""}` : ""}` : undefined}
                   />

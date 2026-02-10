@@ -33,11 +33,11 @@ export default function StatsLoading() {
               <Skeleton key={i} className="h-[10px] w-6" />
             ))}
           </div>
-          <div className="flex gap-[3px] flex-1">
-            {Array.from({ length: 14 }).map((_, col) => (
-              <div key={col} className="flex flex-col gap-[3px] shrink-0">
+          <div className="flex gap-[2px] flex-1">
+            {Array.from({ length: 26 }).map((_, col) => (
+              <div key={col} className="flex flex-col gap-[2px] shrink-0 flex-1 min-w-0">
                 {[1, 2, 3, 4, 5, 6, 7].map((row) => (
-                  <Skeleton key={row} className="w-[10px] h-[10px] rounded-[2px]" />
+                  <Skeleton key={row} className="w-full h-[10px] rounded-[1px]" />
                 ))}
               </div>
             ))}
