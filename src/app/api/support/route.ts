@@ -27,9 +27,11 @@ export async function GET(request: NextRequest) {
         .order("created_at", { ascending: true });
       if (msgError) return NextResponse.json({ error: msgError.message }, { status: 500 });
 
-      const { data: author } = await supabase.from("users").select("full_name, email").eq("id", ticket.user_id).single();
+      const ticketRow = ticket as { id: string; user_id: string; subject: string; status: string; created_at: string; updated_at: string };
+      const { data: authorData } = await supabase.from("users").select("full_name, email").eq("id", ticketRow.user_id).single();
+      const author = authorData as { full_name?: string | null; email?: string } | null;
       return NextResponse.json({
-        ticket: { ...ticket, author: author?.full_name || author?.email || "Membre" },
+        ticket: { ...ticketRow, author: author?.full_name || author?.email || "Membre" },
         messages: messages || [],
       });
     }
@@ -40,20 +42,26 @@ export async function GET(request: NextRequest) {
       .order("updated_at", { ascending: false });
     if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
+    type TicketRow = { id: string; user_id: string; subject: string; status: string; created_at: string; updated_at: string };
+    type LastMsgRow = { content?: string; created_at?: string; is_staff?: boolean } | null;
     const ticketsWithLast = await Promise.all(
       (tickets || []).map(async (t) => {
-        const { data: lastMsg } = await supabase
+        const row = t as TicketRow;
+        const { data: lastMsgData } = await supabase
           .from("support_messages")
           .select("content, created_at, is_staff")
-          .eq("ticket_id", t.id)
+          .eq("ticket_id", row.id)
           .order("created_at", { ascending: false })
           .limit(1)
           .single();
-        const { data: author } = await supabase.from("users").select("full_name, email").eq("id", t.user_id).single();
+        const lastMsg = lastMsgData as LastMsgRow;
+        const { data: authorData } = await supabase.from("users").select("full_name, email").eq("id", row.user_id).single();
+        const author = authorData as { full_name?: string | null; email?: string } | null;
+        const content = lastMsg?.content ?? "";
         return {
-          ...t,
-          last_message: lastMsg?.content ? lastMsg.content.slice(0, 80) + (lastMsg.content.length > 80 ? "…" : "") : null,
-          last_at: lastMsg?.created_at || t.updated_at,
+          ...row,
+          last_message: content ? content.slice(0, 80) + (content.length > 80 ? "…" : "") : null,
+          last_at: lastMsg?.created_at || row.updated_at,
           is_staff_reply: lastMsg?.is_staff ?? false,
           author: author?.full_name || author?.email || "Membre",
         };
@@ -100,14 +108,15 @@ export async function POST(request: NextRequest) {
       .single();
     if (ticketError || !newTicket) return NextResponse.json({ error: ticketError?.message || "Erreur création ticket" }, { status: 500 });
 
+    const newTicketRow = newTicket as { id: string };
     const { error: msgError } = await supabase.from("support_messages").insert({
-      ticket_id: newTicket.id,
+      ticket_id: newTicketRow.id,
       user_id: user.id,
       content: text,
       is_staff: false,
     } as never);
     if (msgError) return NextResponse.json({ error: msgError.message }, { status: 500 });
-    return NextResponse.json({ ok: true, ticket_id: newTicket.id });
+    return NextResponse.json({ ok: true, ticket_id: newTicketRow.id });
   } catch (e) {
     return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
   }
