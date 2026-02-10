@@ -12,6 +12,7 @@ import {
 } from "@/lib/db/progress";
 import { getLevelFromProgress } from "@/lib/types";
 import { ProgressBar } from "@/components/ui/ProgressBar";
+import { Fragment } from "react";
 import {
   BarChart3,
   BookOpen,
@@ -228,32 +229,28 @@ export default async function StatsPage() {
           <BarChart3 className="h-5 w-5 text-white/80" />
           Activité
         </h2>
-        <div className="flex gap-1 overflow-x-auto pb-2">
-          <div className="flex flex-col gap-1 shrink-0 pt-6">
-            {dayLabels.map((label) => (
-              <span key={label} className="text-[10px] text-white/50 h-[10px] flex items-center">
-                {label}
+        <div
+          className="w-full grid gap-[3px] min-h-[80px]"
+          style={{ gridTemplateColumns: `auto repeat(${numWeeks}, minmax(0, 1fr))`, gridTemplateRows: "repeat(7, minmax(12px, 1fr))" }}
+        >
+          {grid.map((row, rowIndex) => (
+            <Fragment key={rowIndex}>
+              <span className="text-[10px] text-white/50 flex items-center pr-2">
+                {dayLabels[rowIndex]}
               </span>
-            ))}
-          </div>
-          <div className="flex gap-[3px] overflow-x-auto min-w-0">
-            {grid[0].map((_, colIndex) => (
-              <div key={colIndex} className="flex flex-col gap-[3px] shrink-0">
-                {grid.map((row, rowIndex) => {
-                  const cell = row[colIndex];
-                  const opacity = cell?.count === 0 || !cell?.date ? 0.08 : 0.15 + (cell.count / maxHeatmap) * 0.85;
-                  return (
-                    <div
-                      key={`${rowIndex}-${colIndex}`}
-                      className="w-[10px] h-[10px] rounded-[2px] bg-[#0044FF] transition-opacity hover:ring-1 hover:ring-white/30"
-                      style={{ opacity }}
-                      title={cell?.date ? `${formatHeatmapDate(cell.date)}${cell.count ? ` · ${cell.count} épisode${cell.count > 1 ? "s" : ""}` : ""}` : undefined}
-                    />
-                  );
-                })}
-              </div>
-            ))}
-          </div>
+              {row.map((cell, colIndex) => {
+                const opacity = cell?.count === 0 || !cell?.date ? 0.08 : 0.15 + (cell.count / maxHeatmap) * 0.85;
+                return (
+                  <div
+                    key={`${rowIndex}-${colIndex}`}
+                    className="aspect-square w-full min-w-0 rounded-[2px] bg-[#0044FF] transition-opacity hover:ring-1 hover:ring-white/30"
+                    style={{ opacity }}
+                    title={cell?.date ? `${formatHeatmapDate(cell.date)}${cell.count ? ` · ${cell.count} épisode${cell.count > 1 ? "s" : ""}` : ""}` : undefined}
+                  />
+                );
+              })}
+            </Fragment>
+          ))}
         </div>
         <div className="flex items-center gap-4 mt-3">
           <span className="text-[10px] text-white/40">Moins</span>
