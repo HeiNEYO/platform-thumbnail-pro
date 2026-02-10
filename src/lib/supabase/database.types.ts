@@ -258,6 +258,58 @@ export interface Database {
           updated_at?: string;
         };
       };
+      support_tickets: {
+        Row: {
+          id: string;
+          user_id: string;
+          subject: string;
+          status: string;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          subject: string;
+          status?: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          subject?: string;
+          status?: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+      };
+      support_messages: {
+        Row: {
+          id: string;
+          ticket_id: string;
+          user_id: string;
+          content: string;
+          is_staff: boolean;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          ticket_id: string;
+          user_id: string;
+          content: string;
+          is_staff?: boolean;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          ticket_id?: string;
+          user_id?: string;
+          content?: string;
+          is_staff?: boolean;
+          created_at?: string;
+        };
+      };
     };
   };
 }
@@ -271,3 +323,5 @@ export type ResourceRow = Database["public"]["Tables"]["resources"]["Row"];
 export type AnnouncementRow = Database["public"]["Tables"]["announcements"]["Row"];
 export type FavoriteRow = Database["public"]["Tables"]["favorites"]["Row"];
 export type NoteRow = Database["public"]["Tables"]["notes"]["Row"];
+export type SupportTicketRow = Database["public"]["Tables"]["support_tickets"]["Row"];
+export type SupportMessageRow = Database["public"]["Tables"]["support_messages"]["Row"];
