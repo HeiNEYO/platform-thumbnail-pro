@@ -8,7 +8,7 @@ import {
   getRecentActivity,
   getTotalTimeWatched,
   getNextEpisode,
-  getWeeklyActivity,
+  getActivityHeatmap,
 } from "@/lib/db/progress";
 import { getLevelFromProgress } from "@/lib/types";
 import { ProgressBar } from "@/components/ui/ProgressBar";
@@ -44,8 +44,8 @@ function formatDateShort(iso: string): string {
   return d.toLocaleDateString("fr-FR", { day: "numeric", month: "short" });
 }
 
-function formatDayLabel(iso: string): string {
-  return new Date(iso).toLocaleDateString("fr-FR", { weekday: "short" }).slice(0, 2);
+function formatHeatmapDate(iso: string): string {
+  return new Date(iso).toLocaleDateString("fr-FR", { day: "numeric", month: "short", year: "numeric" });
 }
 
 export default async function StatsPage() {
@@ -70,7 +70,7 @@ export default async function StatsPage() {
   let recentActivity: Awaited<ReturnType<typeof getRecentActivity>> = [];
   let totalMinutes = 0;
   let nextEpisode: Awaited<ReturnType<typeof getNextEpisode>> = null;
-  let weeklyActivity: Awaited<ReturnType<typeof getWeeklyActivity>> = [];
+  let heatmapData: Awaited<ReturnType<typeof getActivityHeatmap>> = [];
   try {
     const [
       percent,
@@ -79,7 +79,7 @@ export default async function StatsPage() {
       recent,
       minutes,
       next,
-      weekly,
+      heatmap,
     ] = await Promise.all([
       getGlobalProgress(authUser.id),
       getProgressByModule(authUser.id),
@@ -87,7 +87,7 @@ export default async function StatsPage() {
       getRecentActivity(authUser.id, 6),
       getTotalTimeWatched(authUser.id),
       getNextEpisode(authUser.id),
-      getWeeklyActivity(authUser.id),
+      getActivityHeatmap(authUser.id, 14),
     ]);
     progressPercent = percent;
     byModule = moduleStats;
@@ -95,7 +95,7 @@ export default async function StatsPage() {
     recentActivity = recent;
     totalMinutes = minutes;
     nextEpisode = next;
-    weeklyActivity = weekly;
+    heatmapData = heatmap;
   } catch {
     // Tables absentes ou erreur : valeurs par défaut
   }
@@ -103,7 +103,17 @@ export default async function StatsPage() {
   const totalEpisodes = byModule.reduce((s, m) => s + m.total, 0);
   const completedEpisodes = byModule.reduce((s, m) => s + m.completed, 0);
   const level = getLevelFromProgress(progressPercent);
-  const maxBar = Math.max(1, ...weeklyActivity.map((w) => w.count));
+  const maxHeatmap = Math.max(1, ...heatmapData.map((d) => d.count));
+  const dayLabels = ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"];
+  const numWeeks = 14;
+  const grid: { count: number; date: string }[][] = Array.from({ length: 7 }, () =>
+    Array.from({ length: numWeeks }, () => ({ count: 0, date: "" }))
+  );
+  heatmapData.forEach(({ date, count }, i) => {
+    const weekIndex = Math.floor(i / 7);
+    const rowIndex = (new Date(date).getDay() + 6) % 7;
+    if (weekIndex < numWeeks) grid[rowIndex][weekIndex] = { count, date };
+  });
 
   return (
     <div className="space-y-8 animate-fade-in">
@@ -212,28 +222,52 @@ export default async function StatsPage() {
         </div>
       )}
 
-      {/* Activité hebdomadaire - mini graph */}
+      {/* Activité - heatmap type GitHub */}
       <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-6">
         <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
           <BarChart3 className="h-5 w-5 text-white/80" />
-          Activité cette semaine
+          Activité
         </h2>
-        <div className="flex items-end gap-2 h-24">
-          {weeklyActivity.map((w) => (
-            <div key={w.date} className="flex-1 flex flex-col items-center gap-1">
-              <div
-                className="w-full rounded-t-md bg-gradient-to-t from-[#0044FF]/60 to-[#0044FF]/30 transition-all duration-500 min-h-[4px]"
-                style={{
-                  height: `${Math.max(4, (w.count / maxBar) * 80)}%`,
-                }}
-              />
-              <span className="text-[10px] text-white/50">{formatDayLabel(w.date)}</span>
-            </div>
-          ))}
+        <div className="flex gap-1 overflow-x-auto pb-2">
+          <div className="flex flex-col gap-1 shrink-0 pt-6">
+            {dayLabels.map((label) => (
+              <span key={label} className="text-[10px] text-white/50 h-[10px] flex items-center">
+                {label}
+              </span>
+            ))}
+          </div>
+          <div className="flex gap-[3px] overflow-x-auto min-w-0">
+            {grid[0].map((_, colIndex) => (
+              <div key={colIndex} className="flex flex-col gap-[3px] shrink-0">
+                {grid.map((row, rowIndex) => {
+                  const cell = row[colIndex];
+                  const opacity = cell?.count === 0 || !cell?.date ? 0.08 : 0.15 + (cell.count / maxHeatmap) * 0.85;
+                  return (
+                    <div
+                      key={`${rowIndex}-${colIndex}`}
+                      className="w-[10px] h-[10px] rounded-[2px] bg-[#0044FF] transition-opacity hover:ring-1 hover:ring-white/30"
+                      style={{ opacity }}
+                      title={cell?.date ? `${formatHeatmapDate(cell.date)}${cell.count ? ` · ${cell.count} épisode${cell.count > 1 ? "s" : ""}` : ""}` : undefined}
+                    />
+                  );
+                })}
+              </div>
+            ))}
+          </div>
         </div>
-        <p className="text-xs text-white/50 mt-2">
-          {weeklyActivity.reduce((s, w) => s + w.count, 0)} épisode{weeklyActivity.reduce((s, w) => s + w.count, 0) > 1 ? "s" : ""} cette semaine
-        </p>
+        <div className="flex items-center gap-4 mt-3">
+          <span className="text-[10px] text-white/40">Moins</span>
+          <div className="flex gap-[2px]">
+            {[0, 1, 2, 3, 4].map((i) => (
+              <div
+                key={i}
+                className="w-[10px] h-[10px] rounded-[2px] bg-[#0044FF]"
+                style={{ opacity: i === 0 ? 0.1 : 0.2 + (i / 4) * 0.8 }}
+              />
+            ))}
+          </div>
+          <span className="text-[10px] text-white/40">Plus</span>
+        </div>
       </div>
 
       {/* Progression globale */}

@@ -254,3 +254,32 @@ export async function getWeeklyActivity(
     .sort((a, b) => a[0].localeCompare(b[0]))
     .map(([date, count]) => ({ date, count }));
 }
+
+/** Grille d'activité type GitHub : jours x semaines, count par jour (pour heatmap) */
+export async function getActivityHeatmap(
+  userId: string,
+  weeks = 14
+): Promise<{ date: string; count: number }[]> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("progress")
+    .select("completed_at")
+    .eq("user_id", userId);
+  const byDay = new Map<string, number>();
+  const totalDays = weeks * 7;
+  const today = new Date();
+  for (let i = totalDays - 1; i >= 0; i--) {
+    const d = new Date(today);
+    d.setDate(d.getDate() - i);
+    byDay.set(d.toISOString().slice(0, 10), 0);
+  }
+  if (!error && data?.length) {
+    for (const p of data as { completed_at: string }[]) {
+      const day = p.completed_at.slice(0, 10);
+      if (byDay.has(day)) byDay.set(day, (byDay.get(day) ?? 0) + 1);
+    }
+  }
+  return Array.from(byDay.entries())
+    .sort((a, b) => a[0].localeCompare(b[0]))
+    .map(([date, count]) => ({ date, count }));
+}

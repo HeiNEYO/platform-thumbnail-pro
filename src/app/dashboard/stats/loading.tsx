@@ -24,15 +24,34 @@ export default function StatsLoading() {
       {/* Prochaine étape */}
       <Skeleton className="h-28 rounded-2xl" />
 
-      {/* Activité hebdomadaire */}
+      {/* Activité heatmap */}
       <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-6">
-        <Skeleton className="h-6 w-48 mb-4" />
-        <div className="flex items-end gap-2 h-24">
-          {[1, 2, 3, 4, 5, 6, 7].map((i) => (
-            <Skeleton key={i} className="flex-1 rounded-t-md min-h-[20px]" style={{ height: `${20 + i * 8}%` }} />
-          ))}
+        <Skeleton className="h-6 w-32 mb-4" />
+        <div className="flex gap-1">
+          <div className="flex flex-col gap-[3px] shrink-0 pt-6">
+            {[1, 2, 3, 4, 5, 6, 7].map((i) => (
+              <Skeleton key={i} className="h-[10px] w-6" />
+            ))}
+          </div>
+          <div className="flex gap-[3px] flex-1">
+            {Array.from({ length: 14 }).map((_, col) => (
+              <div key={col} className="flex flex-col gap-[3px] shrink-0">
+                {[1, 2, 3, 4, 5, 6, 7].map((row) => (
+                  <Skeleton key={row} className="w-[10px] h-[10px] rounded-[2px]" />
+                ))}
+              </div>
+            ))}
+          </div>
         </div>
-        <Skeleton className="h-4 w-40 mt-2" />
+        <div className="flex gap-4 mt-3">
+          <Skeleton className="h-3 w-10" />
+          <div className="flex gap-[2px]">
+            {[1, 2, 3, 4, 5].map((i) => (
+              <Skeleton key={i} className="w-[10px] h-[10px] rounded-[2px]" />
+            ))}
+          </div>
+          <Skeleton className="h-3 w-10" />
+        </div>
       </div>
 
       {/* Progression globale */}
