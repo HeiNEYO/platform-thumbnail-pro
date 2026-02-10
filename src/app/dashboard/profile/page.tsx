@@ -24,7 +24,11 @@ export default function ProfilePage() {
   const [addressSuggestions, setAddressSuggestions] = useState<Array<{ display_name: string; lat: string; lon: string; address?: Record<string, string> }>>([]);
   const [showAddressDropdown, setShowAddressDropdown] = useState(false);
   const [loadingSuggestions, setLoadingSuggestions] = useState(false);
+  const [locationSearchQuery, setLocationSearchQuery] = useState("");
+  const [activeSearchField, setActiveSearchField] = useState<"address" | "city" | "country" | null>(null);
   const addressSearchRef = useRef<HTMLDivElement>(null);
+  const cityRef = useRef<HTMLDivElement>(null);
+  const countryRef = useRef<HTMLDivElement>(null);
   const addressDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [xp, setXp] = useState(0);
   const [completedEvaluations, setCompletedEvaluations] = useState(0);
@@ -185,7 +189,8 @@ export default function ProfilePage() {
   }, []);
 
   useEffect(() => {
-    if (!addressSearch.trim()) {
+    const query = locationSearchQuery.trim();
+    if (!query) {
       setAddressSuggestions([]);
       setShowAddressDropdown(false);
       return;
@@ -194,7 +199,7 @@ export default function ProfilePage() {
     addressDebounceRef.current = setTimeout(() => {
       setLoadingSuggestions(true);
       fetch(
-        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(addressSearch)}&addressdetails=1&limit=5`,
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&addressdetails=1&limit=5`,
         { headers: { "User-Agent": "ThumbnailPro/1.0" } }
       )
         .then((r) => r.json())
@@ -208,13 +213,15 @@ export default function ProfilePage() {
     return () => {
       if (addressDebounceRef.current) clearTimeout(addressDebounceRef.current);
     };
-  }, [addressSearch]);
+  }, [locationSearchQuery]);
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
-      if (addressSearchRef.current && !addressSearchRef.current.contains(e.target as Node)) {
-        setShowAddressDropdown(false);
-      }
+      const target = e.target as Node;
+      const inAddress = addressSearchRef.current?.contains(target);
+      const inCity = cityRef.current?.contains(target);
+      const inCountry = countryRef.current?.contains(target);
+      if (!inAddress && !inCity && !inCountry) setShowAddressDropdown(false);
     }
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
@@ -703,18 +710,23 @@ export default function ProfilePage() {
                     <input
                       type="text"
                       value={addressSearch}
-                      onChange={(e) => setAddressSearch(e.target.value)}
-                      onFocus={() => addressSuggestions.length > 0 && setShowAddressDropdown(true)}
+                      onChange={(e) => {
+                        const v = e.target.value;
+                        setAddressSearch(v);
+                        setLocationSearchQuery(v);
+                        setActiveSearchField("address");
+                      }}
+                      onFocus={() => setActiveSearchField("address")}
                       className="w-full rounded-lg border border-card-border bg-black pl-10 pr-4 py-3 text-white text-sm placeholder-white/50 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
                       placeholder="Tapez une adresse, ville ou code postal..."
                     />
-                    {loadingSuggestions && (
+                    {loadingSuggestions && activeSearchField === "address" && (
                       <span className="absolute right-3 top-1/2 -translate-y-1/2">
                         <Loader2 className="h-4 w-4 animate-spin text-white/50" />
                       </span>
                     )}
                   </div>
-                  {showAddressDropdown && addressSuggestions.length > 0 && (
+                  {showAddressDropdown && addressSuggestions.length > 0 && activeSearchField === "address" && (
                     <ul className="absolute z-20 mt-1 w-full rounded-lg border border-[#1a1a1a] bg-[#141414] py-1 shadow-xl max-h-48 overflow-y-auto">
                       {addressSuggestions.map((item, i) => (
                         <li key={i}>
@@ -731,28 +743,90 @@ export default function ProfilePage() {
                   )}
                 </div>
 
-                <div>
+                <div ref={cityRef} className="relative">
                   <label className="block text-sm font-semibold text-white mb-2">Ville</label>
-                  <input
-                    type="text"
-                    value={city}
-                    onChange={(e) => setCity(e.target.value)}
-                    className="w-full rounded-lg border border-card-border bg-black px-4 py-3 text-white text-sm placeholder-white/50 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
-                    placeholder="Paris"
-                    maxLength={100}
-                  />
+                  <div className="relative">
+                    <input
+                      type="text"
+                      value={city}
+                      onChange={(e) => {
+                        const v = e.target.value;
+                        setCity(v);
+                        setLocationSearchQuery(v);
+                        setActiveSearchField("city");
+                      }}
+                      onFocus={() => {
+                        setActiveSearchField("city");
+                        if (city.trim()) setLocationSearchQuery(city);
+                      }}
+                      className="w-full rounded-lg border border-card-border bg-black px-4 py-3 text-white text-sm placeholder-white/50 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+                      placeholder="Paris"
+                      maxLength={100}
+                    />
+                    {loadingSuggestions && activeSearchField === "city" && (
+                      <span className="absolute right-3 top-1/2 -translate-y-1/2">
+                        <Loader2 className="h-4 w-4 animate-spin text-white/50" />
+                      </span>
+                    )}
+                  </div>
+                  {showAddressDropdown && addressSuggestions.length > 0 && activeSearchField === "city" && (
+                    <ul className="absolute z-20 mt-1 w-full rounded-lg border border-[#1a1a1a] bg-[#141414] py-1 shadow-xl max-h-48 overflow-y-auto">
+                      {addressSuggestions.map((item, i) => (
+                        <li key={i}>
+                          <button
+                            type="button"
+                            onClick={() => selectAddressSuggestion(item)}
+                            className="w-full text-left px-4 py-2.5 text-sm text-white/90 hover:bg-white/10 transition-colors"
+                          >
+                            {item.display_name}
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
                 </div>
 
-                <div>
+                <div ref={countryRef} className="relative">
                   <label className="block text-sm font-semibold text-white mb-2">Pays</label>
-                  <input
-                    type="text"
-                    value={country}
-                    onChange={(e) => setCountry(e.target.value)}
-                    className="w-full rounded-lg border border-card-border bg-black px-4 py-3 text-white text-sm placeholder-white/50 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
-                    placeholder="France"
-                    maxLength={100}
-                  />
+                  <div className="relative">
+                    <input
+                      type="text"
+                      value={country}
+                      onChange={(e) => {
+                        const v = e.target.value;
+                        setCountry(v);
+                        setLocationSearchQuery(v);
+                        setActiveSearchField("country");
+                      }}
+                      onFocus={() => {
+                        setActiveSearchField("country");
+                        if (country.trim()) setLocationSearchQuery(country);
+                      }}
+                      className="w-full rounded-lg border border-card-border bg-black px-4 py-3 text-white text-sm placeholder-white/50 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+                      placeholder="France"
+                      maxLength={100}
+                    />
+                    {loadingSuggestions && activeSearchField === "country" && (
+                      <span className="absolute right-3 top-1/2 -translate-y-1/2">
+                        <Loader2 className="h-4 w-4 animate-spin text-white/50" />
+                      </span>
+                    )}
+                  </div>
+                  {showAddressDropdown && addressSuggestions.length > 0 && activeSearchField === "country" && (
+                    <ul className="absolute z-20 mt-1 w-full rounded-lg border border-[#1a1a1a] bg-[#141414] py-1 shadow-xl max-h-48 overflow-y-auto">
+                      {addressSuggestions.map((item, i) => (
+                        <li key={i}>
+                          <button
+                            type="button"
+                            onClick={() => selectAddressSuggestion(item)}
+                            className="w-full text-left px-4 py-2.5 text-sm text-white/90 hover:bg-white/10 transition-colors"
+                          >
+                            {item.display_name}
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
                 </div>
 
                 <div className="flex items-center gap-3">
