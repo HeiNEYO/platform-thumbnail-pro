@@ -10,34 +10,36 @@ export interface UserWithStats extends UserRow {
 
 export async function getAllUsers(): Promise<UserWithStats[]> {
   const supabase = await createClient();
-  const { data: usersData, error: usersError } = await supabase
-    .from("users")
-    .select("*")
-    .order("created_at", { ascending: false });
+  const [
+    { data: usersData, error: usersError },
+    { count: totalEpisodes },
+    { data: progressData },
+  ] = await Promise.all([
+    supabase.from("users").select("*").order("created_at", { ascending: false }),
+    supabase.from("episodes").select("*", { count: "exact", head: true }),
+    supabase.from("progress").select("user_id"),
+  ]);
   const users = (usersData ?? []) as UserRow[];
   if (usersError || !users.length) return [];
 
-  const { count: totalEpisodes } = await supabase
-    .from("episodes")
-    .select("*", { count: "exact", head: true });
-
-  const result: UserWithStats[] = [];
-  for (const u of users) {
-    if (u.role !== "member") continue;
-    const { count: completed } = await supabase
-      .from("progress")
-      .select("*", { count: "exact", head: true })
-      .eq("user_id", u.id);
-    const total = totalEpisodes ?? 0;
-    const progressPercent = total ? Math.round(((completed ?? 0) / total) * 100) : 0;
-    result.push({
-      ...u,
-      completed_episodes: completed ?? 0,
-      total_episodes: total,
-      progress_percent: progressPercent,
-    });
+  const total = totalEpisodes ?? 0;
+  const completedByUser = new Map<string, number>();
+  for (const p of progressData ?? []) {
+    const uid = (p as { user_id: string }).user_id;
+    completedByUser.set(uid, (completedByUser.get(uid) ?? 0) + 1);
   }
-  return result;
+
+  return users
+    .filter((u) => u.role === "member")
+    .map((u) => {
+      const completed = completedByUser.get(u.id) ?? 0;
+      return {
+        ...u,
+        completed_episodes: completed,
+        total_episodes: total,
+        progress_percent: total ? Math.round((completed / total) * 100) : 0,
+      };
+    });
 }
 
 export async function getUserStats(userId: string): Promise<{
@@ -47,51 +49,44 @@ export async function getUserStats(userId: string): Promise<{
   byModule: { moduleId: string; completed: number; total: number; percent: number }[];
 }> {
   const supabase = await createClient();
-  const { data: modulesData } = await supabase
-    .from("modules")
-    .select("id")
-    .order("order_index");
+  const [
+    { data: modulesData },
+    { data: episodesData },
+    { data: progressData },
+  ] = await Promise.all([
+    supabase.from("modules").select("id").order("order_index"),
+    supabase.from("episodes").select("id, module_id"),
+    supabase.from("progress").select("episode_id").eq("user_id", userId),
+  ]);
   const modules = (modulesData ?? []) as Pick<ModuleRow, "id">[];
-  const { count: totalEpisodes } = await supabase
-    .from("episodes")
-    .select("*", { count: "exact", head: true });
-  const { count: completedTotal } = await supabase
-    .from("progress")
-    .select("*", { count: "exact", head: true })
-    .eq("user_id", userId);
+  const episodes = (episodesData ?? []) as { id: string; module_id: string }[];
+  const completedSet = new Set((progressData ?? []).map((p: { episode_id: string }) => p.episode_id));
 
-  const byModule: { moduleId: string; completed: number; total: number; percent: number }[] = [];
-  for (const m of modules) {
-    const { count: modTotal } = await supabase
-      .from("episodes")
-      .select("*", { count: "exact", head: true })
-      .eq("module_id", m.id);
-    const { data: episodeRows } = await supabase
-      .from("episodes")
-      .select("id")
-      .eq("module_id", m.id);
-    const episodeIds = (episodeRows ?? []).map((e: { id: string }) => e.id);
-    const { count: modCompleted } = await supabase
-      .from("progress")
-      .select("*", { count: "exact", head: true })
-      .eq("user_id", userId)
-      .in("episode_id", episodeIds);
-    const total = modTotal ?? 0;
-    const completed = modCompleted ?? 0;
-    byModule.push({
+  const episodesByModule = new Map<string, string[]>();
+  for (const ep of episodes) {
+    const arr = episodesByModule.get(ep.module_id) ?? [];
+    arr.push(ep.id);
+    episodesByModule.set(ep.module_id, arr);
+  }
+
+  const totalEpisodes = episodes.length;
+  const completedTotal = completedSet.size;
+  const byModule = modules.map((m) => {
+    const episodeIds = episodesByModule.get(m.id) ?? [];
+    const total = episodeIds.length;
+    const completed = episodeIds.filter((id) => completedSet.has(id)).length;
+    return {
       moduleId: m.id,
       completed,
       total,
       percent: total ? Math.round((completed / total) * 100) : 0,
-    });
-  }
+    };
+  });
 
   return {
-    completedEpisodes: completedTotal ?? 0,
-    totalEpisodes: totalEpisodes ?? 0,
-    progressPercent: totalEpisodes
-      ? Math.round(((completedTotal ?? 0) / totalEpisodes) * 100)
-      : 0,
+    completedEpisodes: completedTotal,
+    totalEpisodes,
+    progressPercent: totalEpisodes ? Math.round((completedTotal / totalEpisodes) * 100) : 0,
     byModule,
   };
 }

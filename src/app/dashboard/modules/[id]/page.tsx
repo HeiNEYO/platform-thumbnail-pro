@@ -2,9 +2,8 @@ import { redirect, notFound } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { getModuleById } from "@/lib/db/modules";
-import { getEpisodesByModule } from "@/lib/db/episodes";
+import { getEpisodesByModule, getCompletedEpisodeIds } from "@/lib/db/episodes";
 import { getModuleProgress } from "@/lib/db/modules";
-import { isEpisodeCompleted } from "@/lib/db/episodes";
 import { EpisodeGrid } from "@/components/EpisodeGrid";
 import { Video, Users, Clock } from "lucide-react";
 
@@ -30,10 +29,11 @@ export default async function ModuleDetailPage({
 
   if (!module) notFound();
 
-  const progressPercent = await getModuleProgress(authUser.id, moduleId);
-  const completedFlags = await Promise.all(
-    episodes.map((ep) => isEpisodeCompleted(authUser.id, ep.id))
-  );
+  const [progressPercent, completedSet] = await Promise.all([
+    getModuleProgress(authUser.id, moduleId),
+    getCompletedEpisodeIds(authUser.id, episodes.map((ep) => ep.id)),
+  ]);
+  const completedFlags = episodes.map((ep) => completedSet.has(ep.id));
 
   // Récupérer les informations de Corentin (instructeur pour tous les modules)
   const { data: corentinProfile } = await supabase

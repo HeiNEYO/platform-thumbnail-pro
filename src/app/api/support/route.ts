@@ -42,31 +42,49 @@ export async function GET(request: NextRequest) {
       .order("updated_at", { ascending: false });
     if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
+    const ticketList = tickets ?? [];
+    if (ticketList.length === 0) return NextResponse.json([]);
+
     type TicketRow = { id: string; user_id: string; subject: string; status: string; created_at: string; updated_at: string };
-    type LastMsgRow = { content?: string; created_at?: string; is_staff?: boolean } | null;
-    const ticketsWithLast = await Promise.all(
-      (tickets || []).map(async (t) => {
-        const row = t as TicketRow;
-        const { data: lastMsgData } = await supabase
-          .from("support_messages")
-          .select("content, created_at, is_staff")
-          .eq("ticket_id", row.id)
-          .order("created_at", { ascending: false })
-          .limit(1)
-          .single();
-        const lastMsg = lastMsgData as LastMsgRow;
-        const { data: authorData } = await supabase.from("users").select("full_name, email").eq("id", row.user_id).single();
-        const author = authorData as { full_name?: string | null; email?: string } | null;
-        const content = lastMsg?.content ?? "";
-        return {
-          ...row,
-          last_message: content ? content.slice(0, 80) + (content.length > 80 ? "…" : "") : null,
-          last_at: lastMsg?.created_at || row.updated_at,
-          is_staff_reply: lastMsg?.is_staff ?? false,
-          author: author?.full_name || author?.email || "Membre",
-        };
-      })
+    const ticketIds = ticketList.map((t) => (t as TicketRow).id);
+    const userIds = [...new Set(ticketList.map((t) => (t as TicketRow).user_id))];
+
+    const [
+      { data: allMessages },
+      { data: authorsData },
+    ] = await Promise.all([
+      supabase
+        .from("support_messages")
+        .select("ticket_id, content, created_at, is_staff")
+        .in("ticket_id", ticketIds)
+        .order("created_at", { ascending: false }),
+      supabase.from("users").select("id, full_name, email").in("id", userIds),
+    ]);
+
+    const lastMsgByTicket = new Map<string, { content: string; created_at: string; is_staff: boolean }>();
+    for (const m of allMessages ?? []) {
+      const row = m as { ticket_id: string; content: string; created_at: string; is_staff: boolean };
+      if (!lastMsgByTicket.has(row.ticket_id)) lastMsgByTicket.set(row.ticket_id, row);
+    }
+    const authorMap = new Map(
+      (authorsData ?? []).map((a: { id: string; full_name?: string | null; email?: string }) => [
+        a.id,
+        a.full_name || a.email || "Membre",
+      ])
     );
+
+    const ticketsWithLast = ticketList.map((t) => {
+      const row = t as TicketRow;
+      const lastMsg = lastMsgByTicket.get(row.id);
+      const content = lastMsg?.content ?? "";
+      return {
+        ...row,
+        last_message: content ? content.slice(0, 80) + (content.length > 80 ? "…" : "") : null,
+        last_at: lastMsg?.created_at || row.updated_at,
+        is_staff_reply: lastMsg?.is_staff ?? false,
+        author: authorMap.get(row.user_id) ?? "Membre",
+      };
+    });
     return NextResponse.json(ticketsWithLast);
   } catch (e) {
     return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });

@@ -16,26 +16,26 @@ export async function getFavoritesWithDetails(userId: string): Promise<FavoriteW
   if (error) return [];
 
   const list = (favs ?? []) as FavoriteRow[];
-  const result: FavoriteWithDetails[] = [];
-  for (const f of list) {
-    const item: FavoriteWithDetails = { ...f, episode: null, resource: null };
-    if (f.item_type === "episode" && f.episode_id) {
-      const { data: ep } = await supabase
-        .from("episodes")
-        .select("id, title, module_id")
-        .eq("id", f.episode_id)
-        .single();
-      item.episode = ep as FavoriteWithDetails["episode"];
-    }
-    if (f.item_type === "resource" && f.resource_id) {
-      const { data: res } = await supabase
-        .from("resources")
-        .select("id, title, category, type, url")
-        .eq("id", f.resource_id)
-        .single();
-      item.resource = res as FavoriteWithDetails["resource"];
-    }
-    result.push(item);
-  }
-  return result;
+  if (list.length === 0) return [];
+
+  const episodeIds = [...new Set(list.filter((f) => f.item_type === "episode" && f.episode_id).map((f) => f.episode_id!))];
+  const resourceIds = [...new Set(list.filter((f) => f.item_type === "resource" && f.resource_id).map((f) => f.resource_id!))];
+
+  const [episodesRes, resourcesRes] = await Promise.all([
+    episodeIds.length > 0
+      ? supabase.from("episodes").select("id, title, module_id").in("id", episodeIds)
+      : { data: [] },
+    resourceIds.length > 0
+      ? supabase.from("resources").select("id, title, category, type, url").in("id", resourceIds)
+      : { data: [] },
+  ]);
+
+  const epMap = new Map((episodesRes.data ?? []).map((e) => [e.id, e]));
+  const resMap = new Map((resourcesRes.data ?? []).map((r) => [r.id, r]));
+
+  return list.map((f) => ({
+    ...f,
+    episode: f.item_type === "episode" && f.episode_id ? (epMap.get(f.episode_id) ?? null) : null,
+    resource: f.item_type === "resource" && f.resource_id ? (resMap.get(f.resource_id) ?? null) : null,
+  }));
 }

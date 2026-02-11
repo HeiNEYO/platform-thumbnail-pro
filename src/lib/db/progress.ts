@@ -37,44 +37,41 @@ export type ModuleProgressStat = {
   percent: number;
 };
 
-/** Côté serveur : stats par module pour graphiques */
+/** Côté serveur : stats par module pour graphiques (optimisé, pas de N+1) */
 export async function getProgressByModule(userId: string): Promise<ModuleProgressStat[]> {
   const supabase = await createClient();
-  const { data: modulesData } = await supabase
-    .from("modules")
-    .select("id, title")
-    .order("order_index", { ascending: true });
+  const [
+    { data: modulesData },
+    { data: episodesData },
+    { data: progressData },
+  ] = await Promise.all([
+    supabase.from("modules").select("id, title").order("order_index", { ascending: true }),
+    supabase.from("episodes").select("id, module_id"),
+    supabase.from("progress").select("episode_id").eq("user_id", userId),
+  ]);
   const modules = (modulesData ?? []) as { id: string; title: string }[];
-  const result: ModuleProgressStat[] = [];
-  for (const m of modules) {
-    const { count: total } = await supabase
-      .from("episodes")
-      .select("*", { count: "exact", head: true })
-      .eq("module_id", m.id);
-    const { data: episodeRows } = await supabase
-      .from("episodes")
-      .select("id")
-      .eq("module_id", m.id);
-    const episodeIds = (episodeRows ?? []).map((e: { id: string }) => e.id);
-    let completed = 0;
-    if (episodeIds.length > 0) {
-      const { count } = await supabase
-        .from("progress")
-        .select("*", { count: "exact", head: true })
-        .eq("user_id", userId)
-        .in("episode_id", episodeIds);
-      completed = count ?? 0;
-    }
-    const totalNum = total ?? 0;
-    result.push({
+  const episodes = (episodesData ?? []) as { id: string; module_id: string }[];
+  const completedSet = new Set(
+    (progressData ?? []).map((p: { episode_id: string }) => p.episode_id)
+  );
+  const episodesByModule = new Map<string, { id: string }[]>();
+  for (const ep of episodes) {
+    const arr = episodesByModule.get(ep.module_id) ?? [];
+    arr.push({ id: ep.id });
+    episodesByModule.set(ep.module_id, arr);
+  }
+  return modules.map((m) => {
+    const episodeIds = episodesByModule.get(m.id) ?? [];
+    const total = episodeIds.length;
+    const completed = episodeIds.filter((e) => completedSet.has(e.id)).length;
+    return {
       moduleId: m.id,
       moduleTitle: m.title,
       completed,
-      total: totalNum,
-      percent: totalNum ? Math.round((completed / totalNum) * 100) : 0,
-    });
-  }
-  return result;
+      total,
+      percent: total ? Math.round((completed / total) * 100) : 0,
+    };
+  });
 }
 
 /** Série de jours consécutifs avec au moins un épisode complété */
@@ -122,7 +119,7 @@ export type RecentActivityItem = {
   completed_at: string;
 };
 
-/** Derniers épisodes complétés avec titres */
+/** Derniers épisodes complétés avec titres (optimisé, pas de N+1) */
 export async function getRecentActivity(
   userId: string,
   limit = 8
@@ -135,27 +132,33 @@ export async function getRecentActivity(
     .order("completed_at", { ascending: false })
     .limit(limit);
   if (error || !progressData?.length) return [];
-  const items: RecentActivityItem[] = [];
-  for (const p of progressData as { episode_id: string; completed_at: string }[]) {
-    const { data: ep } = await supabase
-      .from("episodes")
-      .select("id, title, module_id")
-      .eq("id", p.episode_id)
-      .single();
-    if (!ep) continue;
-    const { data: mod } = await supabase
-      .from("modules")
-      .select("title")
-      .eq("id", (ep as { module_id: string }).module_id)
-      .single();
-    items.push({
-      episode_id: p.episode_id,
-      episode_title: (ep as { title: string }).title,
-      module_title: (mod as { title: string } | null)?.title ?? "Module",
-      completed_at: p.completed_at,
-    });
-  }
-  return items;
+  const prog = progressData as { episode_id: string; completed_at: string }[];
+  const episodeIds = [...new Set(prog.map((p) => p.episode_id))];
+  const { data: episodesData } = await supabase
+    .from("episodes")
+    .select("id, title, module_id")
+    .in("id", episodeIds);
+  const episodes = (episodesData ?? []) as { id: string; title: string; module_id: string }[];
+  const moduleIds = [...new Set(episodes.map((e) => e.module_id))];
+  const { data: modulesData } = await supabase
+    .from("modules")
+    .select("id, title")
+    .in("id", moduleIds);
+  const modules = (modulesData ?? []) as { id: string; title: string }[];
+  const modMap = new Map(modules.map((m) => [m.id, m.title]));
+  const epMap = new Map(episodes.map((e) => [e.id, e]));
+  return prog
+    .map((p) => {
+      const ep = epMap.get(p.episode_id);
+      if (!ep) return null;
+      return {
+        episode_id: p.episode_id,
+        episode_title: ep.title,
+        module_title: modMap.get(ep.module_id) ?? "Module",
+        completed_at: p.completed_at,
+      };
+    })
+    .filter((x): x is RecentActivityItem => x !== null);
 }
 
 /** Temps total estimé (durée des épisodes complétés) en minutes */
@@ -189,33 +192,28 @@ export type NextEpisodeItem = {
   module_title: string;
 };
 
-/** Prochain épisode à regarder (premier non complété dans l'ordre) */
+/** Prochain épisode à regarder (premier non complété dans l'ordre, optimisé) */
 export async function getNextEpisode(userId: string): Promise<NextEpisodeItem | null> {
   const supabase = await createClient();
-  const { data: episodes } = await supabase
-    .from("episodes")
-    .select("id, title, module_id, order_index")
-    .order("order_index", { ascending: true });
-  const { data: progress } = await supabase
-    .from("progress")
-    .select("episode_id")
-    .eq("user_id", userId);
-  const completed = new Set(
-    (progress ?? []).map((p: { episode_id: string }) => p.episode_id)
-  );
+  const [
+    { data: episodes },
+    { data: progress },
+    { data: modules },
+  ] = await Promise.all([
+    supabase.from("episodes").select("id, title, module_id, order_index").order("order_index", { ascending: true }),
+    supabase.from("progress").select("episode_id").eq("user_id", userId),
+    supabase.from("modules").select("id, title"),
+  ]);
+  const completed = new Set((progress ?? []).map((p: { episode_id: string }) => p.episode_id));
+  const modMap = new Map((modules ?? []).map((m: { id: string; title: string }) => [m.id, m.title]));
   for (const ep of episodes ?? []) {
     const e = ep as { id: string; title: string; module_id: string };
     if (!completed.has(e.id)) {
-      const { data: mod } = await supabase
-        .from("modules")
-        .select("title")
-        .eq("id", e.module_id)
-        .single();
       return {
         episode_id: e.id,
         episode_title: e.title,
         module_id: e.module_id,
-        module_title: (mod as { title: string } | null)?.title ?? "Module",
+        module_title: modMap.get(e.module_id) ?? "Module",
       };
     }
   }

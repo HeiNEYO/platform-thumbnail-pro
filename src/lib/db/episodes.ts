@@ -66,3 +66,23 @@ export async function isEpisodeCompleted(
     return false;
   }
 }
+
+/** Batch : récupère les IDs des épisodes complétés (une requête) */
+export async function getCompletedEpisodeIds(
+  userId: string,
+  episodeIds: string[]
+): Promise<Set<string>> {
+  if (episodeIds.length === 0) return new Set();
+  try {
+    const supabase = await createClient();
+    const { data } = await supabase
+      .from("progress")
+      .select("episode_id")
+      .eq("user_id", userId)
+      .in("episode_id", episodeIds);
+    return new Set((data ?? []).map((p: { episode_id: string }) => p.episode_id));
+  } catch (err) {
+    console.error("Erreur dans getCompletedEpisodeIds:", err);
+    return new Set();
+  }
+}

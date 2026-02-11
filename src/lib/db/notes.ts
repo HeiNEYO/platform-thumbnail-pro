@@ -30,16 +30,18 @@ export async function getNotesWithEpisodes(userId: string): Promise<NoteWithEpis
   if (error) return [];
 
   const list = (notes ?? []) as NoteRow[];
-  const result: NoteWithEpisode[] = [];
-  for (const n of list) {
-    const item: NoteWithEpisode = { ...n, episode: null };
-    const { data: ep } = await supabase
-      .from("episodes")
-      .select("id, title, module_id")
-      .eq("id", n.episode_id)
-      .single();
-    item.episode = ep as NoteWithEpisode["episode"];
-    result.push(item);
-  }
-  return result;
+  if (list.length === 0) return [];
+
+  const episodeIds = [...new Set(list.map((n) => n.episode_id).filter(Boolean))] as string[];
+  const { data: episodesData } = await supabase
+    .from("episodes")
+    .select("id, title, module_id")
+    .in("id", episodeIds);
+  const episodes = (episodesData ?? []) as Pick<EpisodeRow, "id" | "title" | "module_id">[];
+  const epMap = new Map(episodes.map((e) => [e.id, e]));
+
+  return list.map((n) => ({
+    ...n,
+    episode: (n.episode_id ? epMap.get(n.episode_id) : null) ?? null,
+  }));
 }
