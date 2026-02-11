@@ -30,8 +30,12 @@ export async function getFavoritesWithDetails(userId: string): Promise<FavoriteW
       : { data: [] },
   ]);
 
-  const epMap = new Map((episodesRes.data ?? []).map((e) => [e.id, e]));
-  const resMap = new Map((resourcesRes.data ?? []).map((r) => [r.id, r]));
+  type EpShape = Pick<EpisodeRow, "id" | "title" | "module_id">;
+  type ResShape = Pick<ResourceRow, "id" | "title" | "category" | "type" | "url">;
+  const episodesData = (episodesRes.data ?? []) as EpShape[];
+  const resourcesData = (resourcesRes.data ?? []) as ResShape[];
+  const epMap = new Map(episodesData.map((e) => [e.id, e]));
+  const resMap = new Map(resourcesData.map((r) => [r.id, r]));
 
   return list.map((f) => ({
     ...f,
