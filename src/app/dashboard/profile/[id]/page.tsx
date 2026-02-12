@@ -32,12 +32,19 @@ export default async function PublicProfilePage({
     redirect("/login");
   }
 
-  // Récupérer le profil de l'utilisateur ciblé
-  const { data: profileData, error } = await supabase
-    .from("users")
-    .select("id, email, full_name, avatar_url, discord_tag, twitter_handle, community_score, created_at")
-    .eq("id", userId)
-    .single();
+  const [
+    { data: profileData, error },
+    progressResult,
+    { count: completedEpisodes },
+  ] = await Promise.all([
+    supabase
+      .from("users")
+      .select("id, email, full_name, avatar_url, discord_tag, twitter_handle, community_score, created_at")
+      .eq("id", userId)
+      .single(),
+    getGlobalProgress(userId).catch(() => 0),
+    supabase.from("progress").select("episode_id", { count: "exact", head: true }).eq("user_id", userId),
+  ]);
 
   if (error || !profileData) {
     notFound();
@@ -55,20 +62,7 @@ export default async function PublicProfilePage({
   };
 
   const displayName = profile.full_name || profile.email.split("@")[0];
-  
-  // Récupérer la progression
-  let progressPercent = 0;
-  try {
-    progressPercent = await getGlobalProgress(userId);
-  } catch {
-    // Ignore les erreurs
-  }
-
-  // Compter les épisodes complétés
-  const { count: completedEpisodes } = await supabase
-    .from("progress")
-    .select("episode_id", { count: "exact", head: true })
-    .eq("user_id", userId);
+  const progressPercent = progressResult;
 
   const isOwnProfile = currentUser.id === userId;
 

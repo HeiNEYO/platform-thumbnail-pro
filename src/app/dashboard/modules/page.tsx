@@ -40,10 +40,12 @@ export default async function ModulesPage() {
       redirect("/login");
     }
 
-    // Récupérer tous les modules avec leurs statistiques en une seule requête optimisée
-    const modulesWithStats = await getModulesWithStats(authUser.id);
+    const [modulesWithStats, { count: intervenantsCount }, { data: allEpisodesData }] = await Promise.all([
+      getModulesWithStats(authUser.id),
+      supabase.from("users").select("*", { count: "exact", head: true }).in("role", ["admin", "intervenant"]),
+      supabase.from("episodes").select("duration"),
+    ]);
 
-    // Si aucun module, afficher un message
     if (!modulesWithStats || modulesWithStats.length === 0) {
       return (
         <div className="space-y-7 animate-fade-in">
@@ -74,22 +76,9 @@ export default async function ModulesPage() {
       );
     }).sort((a, b) => a.order_index - b.order_index); // Trier par order_index pour avoir le bon ordre
 
-    // Calculer les statistiques globales de la formation (tous les modules)
     const totalEpisodes = modulesWithStats.reduce((sum, m) => sum + m.episodeCount, 0);
     const totalCompleted = modulesWithStats.reduce((sum, m) => sum + m.completedCount, 0);
-    const globalProgress = totalEpisodes > 0 ? Math.round((totalCompleted / totalEpisodes) * 100) : 0;
 
-    // Compter les intervenants (utilisateurs avec rôle admin ou intervenant)
-    const { count: intervenantsCount } = await supabase
-      .from("users")
-      .select("*", { count: "exact", head: true })
-      .in("role", ["admin", "intervenant"]);
-
-    // Calculer la durée totale de tous les épisodes
-    const { data: allEpisodesData } = await supabase
-      .from("episodes")
-      .select("duration");
-    
     const allEpisodes = (allEpisodesData || []) as Pick<EpisodeRow, "duration">[];
     
     const totalDuration = allEpisodes.reduce((total, ep) => {

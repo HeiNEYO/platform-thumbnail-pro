@@ -3,7 +3,6 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { getModuleById } from "@/lib/db/modules";
 import { getEpisodesByModule, getCompletedEpisodeIds } from "@/lib/db/episodes";
-import { getModuleProgress } from "@/lib/db/modules";
 import { EpisodeGrid } from "@/components/EpisodeGrid";
 import { Video, Users, Clock } from "lucide-react";
 
@@ -29,27 +28,23 @@ export default async function ModuleDetailPage({
 
   if (!module) notFound();
 
-  const [progressPercent, completedSet] = await Promise.all([
-    getModuleProgress(authUser.id, moduleId),
+  const [completedSet, { data: corentinProfile }, { count: intervenantsCount }] = await Promise.all([
     getCompletedEpisodeIds(authUser.id, episodes.map((ep) => ep.id)),
+    supabase
+      .from("users")
+      .select("full_name, avatar_url")
+      .or("full_name.ilike.%Corentin%,email.ilike.%corentin%")
+      .limit(1)
+      .maybeSingle(),
+    supabase.from("users").select("*", { count: "exact", head: true }).in("role", ["admin", "intervenant"]),
   ]);
+
   const completedFlags = episodes.map((ep) => completedSet.has(ep.id));
-
-  // Récupérer les informations de Corentin (instructeur pour tous les modules)
-  const { data: corentinProfile } = await supabase
-    .from("users")
-    .select("full_name, avatar_url")
-    .or("full_name.ilike.%Corentin%,email.ilike.%corentin%")
-    .limit(1)
-    .maybeSingle();
-
+  const progressPercent =
+    episodes.length > 0
+      ? Math.round((completedFlags.filter(Boolean).length / episodes.length) * 100)
+      : 0;
   const corentinData = corentinProfile as { full_name: string | null; avatar_url: string | null } | null;
-
-  // Compter les intervenants (utilisateurs avec rôle admin ou intervenant)
-  const { count: intervenantsCount } = await supabase
-    .from("users")
-    .select("*", { count: "exact", head: true })
-    .in("role", ["admin", "intervenant"]);
 
   // Calculer la durée totale des épisodes du module
   const totalDuration = episodes.reduce((total, ep) => {

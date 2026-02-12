@@ -4,6 +4,7 @@ import { getModuleById } from "@/lib/db/modules";
 import { getEpisodeById, isEpisodeCompleted } from "@/lib/db/episodes";
 import { getEpisodesByModule } from "@/lib/db/episodes";
 import { getNoteForEpisode } from "@/lib/db/notes";
+import { getVideoUrl } from "@/lib/video-urls";
 import { EpisodeViewer } from "@/components/EpisodeViewer";
 
 // Force le rendu dynamique car on utilise cookies() pour l'authentification
@@ -32,6 +33,11 @@ export default async function EpisodePage({
 
   if (!module || !episode || episode.module_id !== moduleId) notFound();
 
+  const episodeWithVideo = {
+    ...episode,
+    video_url: getVideoUrl(episode),
+  };
+
   // Récupérer les informations de Corentin (instructeur pour tous les modules)
   const { data: corentinProfile } = await supabase
     .from("users")
@@ -55,7 +61,7 @@ export default async function EpisodePage({
   return (
     <div className="space-y-6">
       <EpisodeViewer
-        episode={episode}
+        episode={episodeWithVideo}
         moduleId={moduleId}
         completed={completed}
         userId={authUser.id}
