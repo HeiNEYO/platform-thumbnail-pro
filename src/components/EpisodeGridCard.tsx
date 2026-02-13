@@ -5,6 +5,7 @@ import Image from "next/image";
 import { ArrowRight } from "lucide-react";
 import type { EpisodeRow } from "@/lib/supabase/database.types";
 import { UserAvatar } from "./ui/UserAvatar";
+import { getVideoUrl, getBunnyThumbnailUrl } from "@/lib/video-urls";
 
 interface EpisodeGridCardProps {
   episode: EpisodeRow;
@@ -15,7 +16,7 @@ interface EpisodeGridCardProps {
   instructorAvatar?: string;
 }
 
-// Mapping des titres d'?pisodes vers les miniatures
+// Mapping des titres d'épisodes vers les miniatures (fallback quand pas de video_url Bunny)
 const getThumbnailPath = (title: string): string | null => {
   const titleLower = title.toLowerCase();
   
@@ -78,7 +79,10 @@ export function EpisodeGridCard({
   };
 
   const duration = formatDuration(episode.duration);
-  const thumbnailPath = getThumbnailPath(episode.title);
+  // Priorité : miniature Bunny dérivée de video_url, sinon mapping par titre
+  const videoUrl = getVideoUrl(episode);
+  const bunnyThumbnail = getBunnyThumbnailUrl(videoUrl);
+  const thumbnailPath = bunnyThumbnail ?? getThumbnailPath(episode.title);
 
   return (
     <div className="overflow-hidden rounded-[20px] border border-white/10">
