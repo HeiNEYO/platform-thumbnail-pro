@@ -91,18 +91,37 @@ export function EpisodeGridCard({
         href={`/dashboard/modules/${moduleId}/episode/${episode.id}`}
         className="relative block aspect-video overflow-hidden"
       >
-        {/* Image de preview de la vid?o */}
+        {/* Image de preview de la vidéo */}
         <div className="relative w-full h-full bg-gradient-to-br from-[#0044FF]/20 to-[#0a0a0a]">
           {thumbnailPath ? (
-            <Image
-              src={thumbnailPath}
-              alt={episode.title}
-              fill
-              className="object-cover"
-            />
+            bunnyThumbnail ? (
+              <>
+                <img
+                  src={thumbnailPath}
+                  alt={episode.title}
+                  className="absolute inset-0 w-full h-full object-cover"
+                  loading="lazy"
+                  onError={(e) => {
+                    e.currentTarget.style.display = "none";
+                    const fallback = e.currentTarget.nextElementSibling as HTMLElement;
+                    if (fallback) fallback.classList.remove("hidden");
+                  }}
+                />
+                <div className="hidden w-full h-full flex items-center justify-center absolute inset-0 bg-gradient-to-br from-[#0044FF]/20 to-[#0a0a0a]">
+                  <div className="text-white/30 text-sm">Miniature à ajouter</div>
+                </div>
+              </>
+            ) : (
+              <Image
+                src={thumbnailPath}
+                alt={episode.title}
+                fill
+                className="object-cover"
+              />
+            )
           ) : (
             <div className="w-full h-full flex items-center justify-center">
-              <div className="text-white/30 text-sm">Miniature ? ajouter</div>
+              <div className="text-white/30 text-sm">Miniature à ajouter</div>
             </div>
           )}
         </div>

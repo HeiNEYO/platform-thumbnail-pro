@@ -12,12 +12,18 @@ export function getVideoUrl(
 /**
  * Extrait l'URL de la miniature Bunny CDN à partir d'une video_url Bunny Stream.
  * Format: https://player.mediadelivery.net/embed/{libraryId}/{videoId}
- * → https://vz-{libraryId}.b-cdn.net/{videoId}/thumbnail.jpg
+ * Bunny Stream: https://{pull_zone}.b-cdn.net/{videoId}/thumbnail.jpg
+ *
+ * Si les miniatures ne s'affichent pas, vérifie dans ton dashboard Bunny (Stream > ta librairie)
+ * l'URL du pull zone (ex: vz-597170-frh). Tu peux la définir dans .env.local :
+ * NEXT_PUBLIC_BUNNY_PULL_ZONE=vz-597170-frh
  */
 export function getBunnyThumbnailUrl(videoUrl: string | null | undefined): string | null {
   if (!videoUrl?.trim() || !videoUrl.includes("mediadelivery.net")) return null;
   const m = videoUrl.match(/mediadelivery\.net\/embed\/(\d+)\/([a-f0-9-]+)/i);
   if (!m) return null;
   const [, libraryId, videoId] = m;
-  return `https://vz-${libraryId}.b-cdn.net/${videoId}/thumbnail.jpg`;
+  const pullZone =
+    process.env.NEXT_PUBLIC_BUNNY_PULL_ZONE?.trim() || `vz-${libraryId}`;
+  return `https://${pullZone}.b-cdn.net/${videoId}/thumbnail.jpg`;
 }

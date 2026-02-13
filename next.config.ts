@@ -11,7 +11,7 @@ const nextConfig: NextConfig = {
       {
         protocol: "https",
         hostname: "*.b-cdn.net",
-        pathname: "/**/thumbnail.jpg",
+        pathname: "/**",
       },
     ],
   },
