@@ -5,7 +5,6 @@ import Image from "next/image";
 import { ArrowRight } from "lucide-react";
 import type { EpisodeRow } from "@/lib/supabase/database.types";
 import { UserAvatar } from "./ui/UserAvatar";
-import { getVideoUrl, getBunnyThumbnailUrl } from "@/lib/video-urls";
 
 interface EpisodeGridCardProps {
   episode: EpisodeRow;
@@ -16,7 +15,7 @@ interface EpisodeGridCardProps {
   instructorAvatar?: string;
 }
 
-// Mapping des titres d'épisodes vers les miniatures (fallback quand pas de video_url Bunny)
+// Mapping des titres d'épisodes vers les miniatures
 const getThumbnailPath = (title: string): string | null => {
   const titleLower = title.toLowerCase();
   
@@ -79,10 +78,7 @@ export function EpisodeGridCard({
   };
 
   const duration = formatDuration(episode.duration);
-  // Priorité : miniature Bunny dérivée de video_url, sinon mapping par titre
-  const videoUrl = getVideoUrl(episode);
-  const bunnyThumbnail = getBunnyThumbnailUrl(videoUrl);
-  const thumbnailPath = bunnyThumbnail ?? getThumbnailPath(episode.title);
+  const thumbnailPath = getThumbnailPath(episode.title);
 
   return (
     <div className="overflow-hidden rounded-[20px] border border-white/10">
@@ -94,31 +90,12 @@ export function EpisodeGridCard({
         {/* Image de preview de la vidéo */}
         <div className="relative w-full h-full bg-gradient-to-br from-[#0044FF]/20 to-[#0a0a0a]">
           {thumbnailPath ? (
-            bunnyThumbnail ? (
-              <>
-                <img
-                  src={thumbnailPath}
-                  alt={episode.title}
-                  className="absolute inset-0 w-full h-full object-cover"
-                  loading="lazy"
-                  onError={(e) => {
-                    e.currentTarget.style.display = "none";
-                    const fallback = e.currentTarget.nextElementSibling as HTMLElement;
-                    if (fallback) fallback.classList.remove("hidden");
-                  }}
-                />
-                <div className="hidden w-full h-full flex items-center justify-center absolute inset-0 bg-gradient-to-br from-[#0044FF]/20 to-[#0a0a0a]">
-                  <div className="text-white/30 text-sm">Miniature à ajouter</div>
-                </div>
-              </>
-            ) : (
-              <Image
-                src={thumbnailPath}
-                alt={episode.title}
-                fill
-                className="object-cover"
-              />
-            )
+            <Image
+              src={thumbnailPath}
+              alt={episode.title}
+              fill
+              className="object-cover"
+            />
           ) : (
             <div className="w-full h-full flex items-center justify-center">
               <div className="text-white/30 text-sm">Miniature à ajouter</div>
