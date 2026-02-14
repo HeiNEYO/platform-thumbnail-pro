@@ -6,9 +6,9 @@ import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { 
   Home, BookOpen, FolderOpen, User, LogOut, 
-  HelpCircle, ShoppingBag, Bell,
+  ShoppingBag, Bell,
   Heart, FileText, BarChart3, GraduationCap,
-  Compass, Menu, X, Users, Shield, Megaphone, MessageCircle
+  Compass, Menu, X, Users, Shield, Megaphone
 } from "lucide-react";
 import { Suspense } from "react";
 import { RequireAuth } from "@/components/RequireAuth";
@@ -67,7 +67,6 @@ const adminNavSection = {
   icon: Shield,
   items: [
     { href: "/dashboard/admin/announcements", label: "Annonces", icon: Megaphone },
-    { href: "/dashboard/admin/support", label: "Support", icon: MessageCircle },
   ],
 };
 
@@ -205,14 +204,6 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
               ))}
             </nav>
             <div className="pt-4 border-t border-sidebar-border">
-              <Link
-                href="/dashboard/support"
-                className="flex items-center gap-3 text-sm font-normal text-white/70 hover:text-white"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                <HelpCircle className="h-4 w-4" />
-                Support
-              </Link>
               <button
                 onClick={() => {
                   setShowDiscountModal(true);
@@ -279,13 +270,6 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
 
           {/* Footer Sidebar */}
           <div className="p-3 border-t border-sidebar-border space-y-1">
-            <Link
-              href="/dashboard/support"
-              className="flex items-center gap-3 px-3 py-2.5 text-sm font-normal text-white/70 hover:text-white hover:bg-[#141414] rounded-md transition-all duration-150"
-            >
-              <HelpCircle className="h-5 w-5 shrink-0 text-white/60" />
-              <span>Support</span>
-            </Link>
             <button
               onClick={() => setShowDiscountModal(true)}
               className="w-full flex items-center gap-3 px-3 py-2.5 text-sm font-normal text-white/70 hover:text-white hover:bg-[#141414] rounded-md transition-all duration-150 text-left"
