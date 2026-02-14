@@ -10,8 +10,8 @@ UPDATE episodes SET video_url = 'https://player.mediadelivery.net/embed/597170/5
 -- Épisode 2.1 · Comprendre les filtres (2.1.mp4)
 UPDATE episodes SET video_url = 'https://player.mediadelivery.net/embed/597170/5bd09b31-c850-42dd-95f3-c431d91f8744' WHERE title = '2.1 · Comprendre les filtres' AND module_id IN (SELECT id FROM modules WHERE title = '2 • Les Bases');
 
--- Épisode 3 · Toutes les propriétés Photoshop dont vous aurez besoin (3.mp4) — MANQUANT dans la liste fournie
--- UPDATE episodes SET video_url = '...' WHERE title = '3 · Toutes les propriétés Photoshop dont vous aurez besoin' ...
+-- Épisode 3 · Toutes les propriétés Photoshop dont vous aurez besoin (3.mp4)
+UPDATE episodes SET video_url = 'https://player.mediadelivery.net/embed/597170/2f71db0d-dea8-42c5-bc17-101f7d418beb' WHERE title = '3 · Toutes les propriétés Photoshop dont vous aurez besoin' AND module_id IN (SELECT id FROM modules WHERE title = '2 • Les Bases');
 
 -- Épisode 4 · Qu'est-ce qu'une bonne composition (4.mp4)
 UPDATE episodes SET video_url = 'https://player.mediadelivery.net/embed/597170/7a6d97f5-244b-42ba-b2f5-03052c625255' WHERE title = '4 · Qu''est-ce qu''une bonne composition' AND module_id IN (SELECT id FROM modules WHERE title = '2 • Les Bases');

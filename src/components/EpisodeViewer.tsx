@@ -91,25 +91,29 @@ export function EpisodeViewer({
         {/* Conteneur unifié pour vidéo et notes */}
         <div className="flex flex-col lg:flex-row border border-white/10 rounded-xl overflow-hidden bg-[#0A0A0A]">
           {/* Lecteur vidéo principal - Bunny Stream ou Vimeo via episode.video_url */}
-          <div className="relative w-full lg:flex-1 aspect-video bg-[#0A0A0A] overflow-hidden border-r-0 lg:border-r border-white/10">
-            <iframe
-              src={
-                episode.video_url
-                  ? episode.video_url.includes("mediadelivery.net") || episode.video_url.includes("player.vimeo.com")
+          <div className="relative w-full lg:flex-1 aspect-video bg-[#0A0A0A] overflow-hidden border-r-0 lg:border-r border-white/10 flex items-center justify-center">
+            {episode.video_url?.trim() ? (
+              <iframe
+                src={
+                  episode.video_url.includes("mediadelivery.net") || episode.video_url.includes("player.vimeo.com")
                     ? episode.video_url
                     : (() => {
-                        const m = episode.video_url!.match(/vimeo\.com\/(?:video\/)?(\d+)/);
+                        const m = episode.video_url.match(/vimeo\.com\/(?:video\/)?(\d+)/);
                         return m
                           ? `https://player.vimeo.com/video/${m[1]}?autoplay=0&controls=1&title=0&byline=0&portrait=0`
                           : episode.video_url;
                       })()
-                  : "https://player.vimeo.com/video/1104426446?autoplay=0&controls=1&title=0&byline=0&portrait=0"
-              }
-              className="w-full h-full"
-              allow="autoplay; fullscreen; picture-in-picture"
-              allowFullScreen
-              title={episode.title}
-            />
+                }
+                className="w-full h-full"
+                allow="autoplay; fullscreen; picture-in-picture"
+                allowFullScreen
+                title={episode.title}
+              />
+            ) : (
+              <p className="text-white/60 text-center px-6">
+                Le contenu sera prochainement ajouté
+              </p>
+            )}
           </div>
 
           {/* Panneau de notes à droite */}
