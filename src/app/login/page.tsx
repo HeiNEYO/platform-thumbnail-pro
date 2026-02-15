@@ -119,7 +119,7 @@ function LoginForm() {
                   placeholder="Votre adresse email"
                   autoComplete="email"
                   required
-                  className="w-full px-4 py-3.5 rounded-xl border-biseau-top bg-white/5 text-white placeholder-white/40 focus:outline-none focus:ring-1 focus:ring-primary/30 transition-all text-base"
+                  className="w-full px-4 py-3.5 rounded-xl border-biseau-top bg-white/5 text-white placeholder-white/40 focus:outline-none transition-all text-base"
                 />
               </div>
 
@@ -145,13 +145,13 @@ function LoginForm() {
                     placeholder="Votre mot de passe"
                     autoComplete="current-password"
                     required
-                    className="w-full px-4 py-3.5 pr-12 rounded-xl border-biseau-top bg-white/5 text-white placeholder-white/40 focus:outline-none focus:ring-1 focus:ring-primary/30 transition-all text-base"
+                    className="w-full px-4 py-3.5 pr-12 rounded-xl border-biseau-top bg-white/5 text-white placeholder-white/40 focus:outline-none transition-all text-base"
                     suppressHydrationWarning
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-white/50 hover:text-white transition-colors"
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-white/50 hover:text-white transition-colors focus:outline-none"
                   >
                     {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                   </button>
@@ -166,7 +166,7 @@ function LoginForm() {
                   role="switch"
                   aria-checked={rememberMe}
                   onClick={() => setRememberMe(!rememberMe)}
-                  className={`relative inline-flex h-7 w-12 shrink-0 cursor-pointer rounded-full transition-all duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary/50 focus:ring-offset-2 focus:ring-offset-[#0d0d0d] ${
+                  className={`relative inline-flex h-7 w-12 shrink-0 cursor-pointer rounded-full transition-all duration-200 ease-in-out focus:outline-none ${
                     rememberMe
                       ? "border-biseau-top-primary bg-primary"
                       : "border-biseau-top bg-white/5"
@@ -184,7 +184,7 @@ function LoginForm() {
               <button
                 type="submit"
                 disabled={submitting}
-                className="w-full py-4 rounded-xl border-biseau-top-primary bg-primary hover:bg-primary-hover text-white font-semibold flex items-center justify-center gap-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full py-4 rounded-xl border-biseau-top-primary bg-primary hover:bg-primary-hover text-white font-semibold flex items-center justify-center gap-2 transition-all focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {submitting ? (
                   <>
