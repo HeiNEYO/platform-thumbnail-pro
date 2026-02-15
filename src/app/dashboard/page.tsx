@@ -82,7 +82,7 @@ export default async function DashboardHomePage() {
           Bonjour {displayName}
         </h1>
         <p className="text-sm md:text-base text-[#999999]">
-          Bienvenue dans le laboratoire. Chaque connexion vous rapproche du prochain palier. Let's grind.
+          Votre espace pour maîtriser l'art des miniatures. Formez-vous à votre rythme et boostez vos clics.
         </p>
       </div>
 

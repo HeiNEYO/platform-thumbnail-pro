@@ -3,7 +3,7 @@
 import { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { Lock, Eye, EyeOff, CheckCircle, ArrowRight } from "lucide-react";
 
@@ -17,13 +17,6 @@ function LoginForm() {
   const [submitting, setSubmitting] = useState(false);
   const { user, signIn } = useAuth();
   const router = useRouter();
-  const searchParams = useSearchParams();
-
-  useEffect(() => {
-    if (searchParams.get("registered") === "true") {
-      setSuccess("Compte créé avec succès ! Vérifiez votre email pour confirmer votre compte.");
-    }
-  }, [searchParams]);
 
   useEffect(() => {
     if (user) router.replace("/dashboard");
@@ -210,10 +203,7 @@ function LoginForm() {
 
         {/* Footer */}
         <p className="text-center text-sm text-white/60 mt-8">
-          Pas de compte ?{" "}
-          <Link href="/register" className="text-icon font-medium underline underline-offset-2 hover:text-primary transition-colors">
-            Créer un compte
-          </Link>
+          Accès réservé aux membres ayant acheté la formation.
         </p>
       </div>
     </main>

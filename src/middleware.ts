@@ -69,8 +69,8 @@ export async function middleware(request: NextRequest) {
       }
     }
 
-    // Rediriger vers dashboard si déjà connecté et sur login/register
-    if ((pathname === "/login" || pathname === "/register") && session) {
+    // Rediriger vers dashboard si déjà connecté et sur login
+    if (pathname === "/login" && session) {
       return NextResponse.redirect(new URL("/dashboard", request.url));
     }
 
@@ -81,5 +81,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/", "/dashboard/:path*", "/admin/:path*", "/login", "/register"],
+  matcher: ["/", "/dashboard/:path*", "/admin/:path*", "/login"],
 };
