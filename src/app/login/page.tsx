@@ -264,7 +264,7 @@ function LoginForm() {
       </div>
 
       {/* Panneau droit - Pattern Louis Vuitton */}
-      <div className="hidden lg:flex lg:w-[52%] min-h-screen relative bg-gradient-to-br from-[#0f172a] via-[#1e1b4b] to-[#312e81]">
+      <div className="hidden lg:flex lg:w-[52%] min-h-screen relative bg-gradient-to-b from-black to-[#000d3f]">
         <LogoPattern />
       </div>
     </main>
