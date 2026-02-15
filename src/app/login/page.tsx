@@ -210,8 +210,43 @@ function LoginForm() {
         </div>
       </div>
 
-      {/* Panneau droit */}
-      <div className="hidden lg:flex lg:w-[52%] min-h-screen relative bg-gradient-to-b from-black to-[#000d3f]" />
+      {/* Panneau droit - dégradé + texte style Key Sharer */}
+      <div className="hidden lg:flex lg:w-[52%] min-h-screen relative overflow-hidden">
+        {/* Dégradé bleu : lumineux en haut → sombre en bas */}
+        <div
+          className="absolute inset-0"
+          style={{
+            background: "linear-gradient(to bottom, rgba(0, 68, 255, 0.4) 0%, rgba(0, 26, 102, 0.6) 25%, #000d3f 70%, #000000 100%)",
+          }}
+        />
+        {/* Grille subtile de croix (+) */}
+        <div
+          className="absolute inset-0"
+          style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg width='32' height='32' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M16 6v20M6 16h20' stroke='white' stroke-width='0.5' fill='none' opacity='0.12'/%3E%3C/svg%3E")`,
+            backgroundSize: "32px 32px",
+          }}
+        />
+        {/* Contenu texte */}
+        <div className="relative z-10 flex flex-col justify-between p-10 lg:p-14 w-full">
+          <Link href="/" className="flex items-center gap-3">
+            <Image src="/images/logo.svg" alt="Thumbnail Pro" width={40} height={40} className="shrink-0" />
+            <span className="text-xl font-semibold text-white">Thumbnail Pro</span>
+          </Link>
+          <div className="pb-4">
+            <h2 className="text-3xl lg:text-4xl xl:text-5xl font-bold text-white leading-tight tracking-tight">
+              Vos miniatures.
+              <br />
+              Vos clics.
+              <br />
+              Votre succès.
+            </h2>
+            <p className="mt-6 text-base lg:text-lg text-white/80 font-normal max-w-md leading-relaxed">
+              Prenez le contrôle de vos créations, maîtrisez l&apos;art des thumbnails qui performent et développez votre audience.
+            </p>
+          </div>
+        </div>
+      </div>
     </main>
   );
 }
