@@ -24,15 +24,15 @@ interface FormationCardProps {
 const cardConfig = {
   formation: {
     icon: BookOpen,
-    imagePath: "/images/formations/polaris.png",
+    imagePath: "/images/formations/formation.png",
   },
   plateforme: {
     icon: Play,
-    imagePath: "/images/formations/cours-videos.png",
+    imagePath: "/images/formations/plateforme.png",
   },
   communaute: {
     icon: FileText,
-    imagePath: "/images/formations/ateliers.png",
+    imagePath: "/images/formations/communaute.png",
   },
 };
 
