@@ -41,7 +41,7 @@ export function MemberCard({ member }: MemberCardProps) {
     <div 
       className="rounded-lg border border-card-border p-5 relative overflow-hidden scale-105"
       style={{
-        background: "linear-gradient(135deg, rgba(10, 10, 10, 0.75) 0%, rgba(36, 36, 36, 0.78) 100%)",
+        background: "linear-gradient(135deg, rgba(10, 10, 10, 0.45) 0%, rgba(36, 36, 36, 0.48) 100%)",
       }}
     >
       {/* En-tête avec identifiant et titre */}
