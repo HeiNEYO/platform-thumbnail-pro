@@ -17,11 +17,22 @@ function ForgotPasswordForm() {
   const [isRecovery, setIsRecovery] = useState(false);
 
   useEffect(() => {
-    const hash = typeof window !== "undefined" ? window.location.hash : "";
-    const params = new URLSearchParams(hash.replace("#", ""));
-    if (params.get("type") === "recovery") {
+    if (typeof window === "undefined") return;
+    // 1. Vérifier l'URL : Supabase met type=recovery dans le hash (#access_token=...&type=recovery)
+    const hashParams = new URLSearchParams(window.location.hash.replace("#", ""));
+    const searchParams = new URLSearchParams(window.location.search.replace("?", ""));
+    if (hashParams.get("type") === "recovery" || searchParams.get("type") === "recovery") {
       setIsRecovery(true);
+      return;
     }
+    // 2. Fallback : écouter l'event PASSWORD_RECOVERY (Supabase peut traiter l'URL de façon asynchrone)
+    const supabase = createClient();
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+      if (event === "PASSWORD_RECOVERY") {
+        setIsRecovery(true);
+      }
+    });
+    return () => subscription.unsubscribe();
   }, []);
 
   const handleRequestReset = async (e: React.FormEvent) => {

@@ -34,7 +34,7 @@ export function createClient() {
       auth: {
         persistSession: true,
         autoRefreshToken: true,
-        detectSessionInUrl: false,
+        detectSessionInUrl: true, // requis pour le flow "mot de passe oublié" (tokens dans l'URL)
         // Ne pas utiliser localStorage pour éviter les problèmes de synchronisation avec les cookies
         storage: undefined,
       },
