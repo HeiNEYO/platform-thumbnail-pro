@@ -212,13 +212,8 @@ function LoginForm() {
 
       {/* Panneau droit - dégradé blanc → bleu sombre + texte */}
       <div className="hidden lg:flex lg:w-[52%] min-h-screen relative overflow-hidden">
-        {/* Dégradé : blanc lumineux en haut → bleu sombre en bas (style Key Sharer) */}
-        <div
-          className="absolute inset-0"
-          style={{
-            background: "linear-gradient(to bottom, #ffffff 0%, rgba(255,255,255,0.85) 8%, rgba(200,220,255,0.5) 20%, rgba(0, 68, 255, 0.25) 35%, rgba(0, 26, 102, 0.6) 55%, #000d3f 80%, #000000 100%)",
-          }}
-        />
+        {/* Dégradé : noir en haut → bleu sombre en bas */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black to-[#000d3f]" />
         {/* Grille subtile de croix (+) */}
         <div
           className="absolute inset-0"
