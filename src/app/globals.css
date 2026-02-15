@@ -222,3 +222,31 @@ body {
     background: linear-gradient(135deg, #0044FF 0%, #3366FF 100%);
   }
 }
+
+/* Animations logos login - flottement léger */
+@keyframes logo-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+@keyframes logo-float-slow {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+@keyframes logo-float-reverse {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(6px); }
+}
+
+.animate-logo-float {
+  animation: logo-float 4s ease-in-out infinite;
+}
+
+.animate-logo-float-slow {
+  animation: logo-float-slow 5s ease-in-out infinite;
+}
+
+.animate-logo-float-reverse {
+  animation: logo-float-reverse 4.5s ease-in-out infinite;
+}
