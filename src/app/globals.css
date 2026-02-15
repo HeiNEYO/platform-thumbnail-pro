@@ -126,6 +126,8 @@ body {
   background: #0a0a0a;
   position: relative;
   border-radius: 8px;
+  /* Contre-rotation pour garder le texte fixe pendant que l'effet tourne */
+  animation: referral-border-spin 4s linear infinite reverse;
 }
 
 .referral-btn::after {
