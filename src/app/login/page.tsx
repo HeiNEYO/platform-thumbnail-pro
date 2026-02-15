@@ -221,16 +221,26 @@ function LoginForm() {
                 </div>
               </div>
 
-              {/* Remember me - discret */}
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={rememberMe}
-                  onChange={(e) => setRememberMe(e.target.checked)}
-                  className="h-4 w-4 rounded border-white/20 bg-white/5 text-primary focus:ring-primary/30 accent-primary"
-                  suppressHydrationWarning
-                />
-                <span className="text-sm text-white/60">Se souvenir de moi</span>
+              {/* Remember me - toggle style localisation */}
+              <label className="flex items-center justify-between cursor-pointer group">
+                <span className="text-sm text-white/60 group-hover:text-white/80 transition-colors">Se souvenir de moi</span>
+                <button
+                  type="button"
+                  role="switch"
+                  aria-checked={rememberMe}
+                  onClick={() => setRememberMe(!rememberMe)}
+                  className={`relative inline-flex h-7 w-12 shrink-0 cursor-pointer rounded-full border transition-all duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary/50 focus:ring-offset-2 focus:ring-offset-[#0d0d0d] ${
+                    rememberMe
+                      ? "border-primary/50 bg-primary"
+                      : "border-white/10 bg-white/5"
+                  }`}
+                >
+                  <span
+                    className={`pointer-events-none absolute top-1 h-5 w-5 rounded-full bg-white shadow-md transition-all duration-200 ease-in-out ${
+                      rememberMe ? "left-7" : "left-1"
+                    }`}
+                  />
+                </button>
               </label>
 
               {/* Bouton */}
