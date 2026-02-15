@@ -31,8 +31,11 @@ function ForgotPasswordForm() {
     setSubmitting(true);
     try {
       const supabase = createClient();
-      const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || (typeof window !== "undefined" ? window.location.origin : "");
-      const redirectTo = `${baseUrl.replace(/\/$/, "")}/reset-password`;
+      // URL de redirection : en prod on force l'URL exacte pour éviter tout souci
+      const isProd = typeof window !== "undefined" && window.location.hostname.includes("vercel.app");
+      const redirectTo = isProd
+        ? "https://platform-thumbnail-pro.vercel.app/reset-password"
+        : `${(process.env.NEXT_PUBLIC_SITE_URL || (typeof window !== "undefined" ? window.location.origin : "http://localhost:3000")).replace(/\/$/, "")}/reset-password`;
       const { error: err } = await supabase.auth.resetPasswordForEmail(email.trim(), { redirectTo });
 
       if (err) {
