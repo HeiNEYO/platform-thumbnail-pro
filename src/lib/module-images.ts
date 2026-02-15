@@ -1,11 +1,15 @@
 /**
- * Images de fallback pour les modules (quand image_url est null en base)
+ * Miniatures des modules (image locale prioritaire)
  */
-const MODULE_IMAGES: Record<string, string> = {
-  "1 • Les Outils": "/images/modules/module-1-les-outils.png",
-};
+const MODULE_1_IMAGE = "/images/modules/module-1-les-outils.png";
+
+function isModule1LesOutils(title: string): boolean {
+  const t = title.toLowerCase();
+  return t.includes("outils") && /^1[\s.•]/.test(title);
+}
 
 export function getModuleImageUrl(imageUrl: string | null, title: string): string | null {
-  if (imageUrl) return imageUrl;
-  return MODULE_IMAGES[title] ?? null;
+  // Module 1 Les Outils : toujours utiliser notre image
+  if (isModule1LesOutils(title)) return MODULE_1_IMAGE;
+  return imageUrl || null;
 }
