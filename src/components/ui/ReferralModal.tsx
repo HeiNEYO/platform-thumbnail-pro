@@ -40,10 +40,11 @@ export function ReferralModal({ isOpen, onClose }: ReferralModalProps) {
           <h2 className="text-xl font-bold text-white mb-2">
             Parraine un ami
           </h2>
-          <p className="text-white/60 text-sm mb-6">
-            Gagnez 200€ pour chaque ami qui rejoint la formation
+          <p className="text-white/70 text-sm mb-6 leading-relaxed">
+            Le système d&apos;affiliation vous permettra de gagner 200€ par personne qui rejoindra la formation avec votre lien, et vous offrira un apprentissage dans les meilleures conditions.
           </p>
           <div className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-amber-500/15 border border-amber-500/30 text-amber-400 text-sm font-medium">
+            <span>⏳</span>
             Bientôt disponible
           </div>
         </div>
