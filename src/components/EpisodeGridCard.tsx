@@ -15,11 +15,16 @@ interface EpisodeGridCardProps {
   instructorAvatar?: string;
 }
 
+// Épisodes sans miniature (afficher le placeholder)
+const NO_THUMBNAIL_PREFIXES = ["7 ·", "12 ·", "14 ·", "16 ·", "18 ·", "19.2 ·"];
+
 // Mapping des titres d'épisodes vers les miniatures
 const getThumbnailPath = (title: string): string | null => {
+  if (NO_THUMBNAIL_PREFIXES.some((p) => title.includes(p))) return null;
+
   const titleLower = title.toLowerCase();
   
-  // Mapping bas? sur les mots-cl?s dans les titres
+  // Mapping basé sur les mots-clés dans les titres
   if (titleLower.includes("d?placement") || titleLower.includes("d?placements")) {
     return "/images/episodes/1-outils-deplacements.png";
   }

@@ -25,6 +25,9 @@ export function getEpisodeThumbnail(
 
   // Sinon, chercher par mots-clés dans le titre (fallback)
   if (episodeTitle) {
+    const noThumbnailPrefixes = ["7 ·", "12 ·", "14 ·", "16 ·", "18 ·", "19.2 ·"];
+    if (noThumbnailPrefixes.some((p) => episodeTitle.includes(p))) return null;
+
     const titleLower = episodeTitle.toLowerCase();
     
     // Mapping basé sur les mots-clés
