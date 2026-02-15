@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getModulesWithStats } from "@/lib/db/modules";
+import { getModuleImageUrl } from "@/lib/module-images";
 import { BookOpen, Video, Users, Clock } from "lucide-react";
 import { NetflixStyleModuleCards } from "@/components/NetflixStyleModuleCards";
 import type { EpisodeRow } from "@/lib/supabase/database.types";
@@ -102,8 +103,8 @@ export default async function ModulesPage() {
       ? `${hours}h ${minutes}min`
       : `${minutes}min`;
 
-    // Trouver le module principal (celui avec l'image, généralement le premier)
-    const mainModule = modulesWithStats.find((m) => m.image_url) || modulesWithStats[0];
+    // Trouver le module principal (celui avec l'image ou fallback, généralement le premier)
+    const mainModule = modulesWithStats.find((m) => getModuleImageUrl(m.image_url, m.title)) || modulesWithStats[0];
 
     return (
       <div className="space-y-7 animate-fade-in">
@@ -122,10 +123,10 @@ export default async function ModulesPage() {
             <div className="relative h-[450px] rounded-lg border border-white/10 overflow-hidden bg-[#0a0a0a]">
               {/* Image de fond - pleine hauteur */}
               <div className="absolute inset-0 w-full h-full">
-                {mainModule.image_url ? (
+                {getModuleImageUrl(mainModule.image_url, mainModule.title) ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
-                    src={mainModule.image_url}
+                    src={getModuleImageUrl(mainModule.image_url, mainModule.title)!}
                     alt="Thumbnail Pro"
                     className="w-full h-full object-cover"
                   />

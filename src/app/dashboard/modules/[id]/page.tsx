@@ -2,6 +2,7 @@ import { redirect, notFound } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { getModuleById } from "@/lib/db/modules";
+import { getModuleImageUrl } from "@/lib/module-images";
 import { getEpisodesByModule, getCompletedEpisodeIds } from "@/lib/db/episodes";
 import { EpisodeGrid } from "@/components/EpisodeGrid";
 import { Video, Users, Clock } from "lucide-react";
@@ -83,10 +84,10 @@ export default async function ModuleDetailPage({
       <div className="relative h-[450px] rounded-lg border border-white/10 overflow-hidden bg-[#0a0a0a]">
         {/* Image de fond - pleine hauteur */}
         <div className="absolute inset-0 w-full h-full">
-          {module.image_url ? (
+          {getModuleImageUrl(module.image_url, module.title) ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
-              src={module.image_url}
+              src={getModuleImageUrl(module.image_url, module.title)!}
               alt={module.title}
               className="w-full h-full object-cover"
             />

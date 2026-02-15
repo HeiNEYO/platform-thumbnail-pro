@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { BookOpen, Play } from "lucide-react";
 import type { ModuleRow } from "@/lib/supabase/database.types";
+import { getModuleImageUrl } from "@/lib/module-images";
 
 interface ModuleWithStats extends ModuleRow {
   episodeCount: number;
@@ -40,10 +41,10 @@ export function NetflixStyleModuleCards({
           >
             {/* Zone visuelle en haut - même ratio que FormationCard */}
             <div className="relative w-full aspect-video overflow-hidden">
-              {module.image_url ? (
+              {getModuleImageUrl(module.image_url, module.title) ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
-                  src={module.image_url}
+                  src={getModuleImageUrl(module.image_url, module.title)!}
                   alt={module.title}
                   className="w-full h-full object-cover"
                 />
