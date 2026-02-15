@@ -39,7 +39,7 @@ export function MemberCard({ member }: MemberCardProps) {
 
   return (
     <div 
-      className="rounded-lg card-biseau bg-white/[0.08] p-5 relative overflow-hidden scale-105"
+      className="rounded-lg card-biseau bg-white/[0.04] p-5 relative overflow-hidden scale-105"
     >
       {/* En-tête avec identifiant et titre */}
       <div className="flex items-start justify-between mb-4">
