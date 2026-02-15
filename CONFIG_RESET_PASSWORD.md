@@ -29,7 +29,7 @@ Puis **redéploie** le projet (Deployments → Redeploy sur le dernier).
 |-----------|--------|
 | **Site URL** | `https://platform-thumbnail-pro.vercel.app` |
 | **Redirect URLs** | `https://platform-thumbnail-pro.vercel.app/**` |
-| | `https://platform-thumbnail-pro.vercel.app/forgot-password` |
+| | `https://platform-thumbnail-pro.vercel.app/reset-password` |
 | | `http://localhost:3000/**` |
 
 Clique sur **Save**.
