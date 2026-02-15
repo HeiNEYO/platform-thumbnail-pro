@@ -15,6 +15,7 @@ import { RequireAuth } from "@/components/RequireAuth";
 import { useAuth } from "@/contexts/AuthContext";
 import { UserAvatar } from "@/components/ui/UserAvatar";
 import { DiscountCodeModal } from "@/components/ui/DiscountCodeModal";
+import { ReferralModal } from "@/components/ui/ReferralModal";
 import { DiscordIcon } from "@/components/ui/DiscordIcon";
 import { NewsPopover } from "@/components/ui/NewsPopover";
 import { SiteSkeleton } from "@/components/ui/SiteSkeleton";
@@ -102,6 +103,7 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const { user, signOut } = useAuth();
   const [showDiscountModal, setShowDiscountModal] = useState(false);
+  const [showReferralModal, setShowReferralModal] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const displayName = user?.full_name ?? user?.email ?? "";
@@ -138,7 +140,11 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
 
         {/* Actions Right */}
         <div className="flex items-center gap-[15.4px]">
-          <button className="hidden md:inline-flex referral-btn px-[15.4px] py-[6.6px] rounded-lg text-white text-[13.2px] font-medium relative overflow-hidden transition-all duration-200">
+          <button
+            type="button"
+            onClick={() => setShowReferralModal(true)}
+            className="hidden md:inline-flex referral-btn px-[15.4px] py-[6.6px] rounded-lg text-white text-[13.2px] font-medium relative overflow-hidden transition-all duration-200"
+          >
             Parraine un ami et gagne 200€
           </button>
           <NewsPopover>
@@ -318,6 +324,12 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
         isOpen={showDiscountModal}
         onClose={() => setShowDiscountModal(false)}
         code="CORENTIN15"
+      />
+
+      {/* Referral Modal */}
+      <ReferralModal
+        isOpen={showReferralModal}
+        onClose={() => setShowReferralModal(false)}
       />
     </div>
   );
