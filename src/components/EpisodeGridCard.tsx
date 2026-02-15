@@ -56,6 +56,24 @@ const getThumbnailPath = (title: string): string | null => {
   if (titleLower.includes("forme") || titleLower.includes("formes")) {
     return "/images/episodes/12-outils-formes.png";
   }
+  if (titleLower.includes("dodge") || titleLower.includes("burn")) {
+    return "/images/episodes/dodge-burn.png";
+  }
+  if ((titleLower.includes("analyse") && titleLower.includes("photos")) || (titleLower.includes("analyse") && titleLower.includes("light"))) {
+    return "/images/episodes/analyse-lights.png";
+  }
+  if (titleLower.includes("light") || titleLower.includes("lights") || titleLower.includes("lumière")) {
+    return "/images/episodes/lights.png";
+  }
+  if (titleLower.includes("ombre") || titleLower.includes("ombres")) {
+    return "/images/episodes/ombres.png";
+  }
+  if (titleLower.includes("ia") && titleLower.includes("photoshop")) {
+    return "/images/episodes/ia-photoshop.png";
+  }
+  if (titleLower.includes("qualité") || titleLower.includes("qualite") || (titleLower.includes("augmenter") && titleLower.includes("qualit"))) {
+    return "/images/episodes/qualite-image.png";
+  }
   
   return null;
 };
