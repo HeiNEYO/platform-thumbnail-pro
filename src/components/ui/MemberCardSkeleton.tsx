@@ -3,7 +3,7 @@
 export function MemberCardSkeleton() {
   return (
     <div 
-      className="rounded-lg card-biseau bg-white/[0.04] p-5 relative overflow-hidden scale-105 animate-pulse"
+      className="rounded-lg card-biseau p-5 relative overflow-hidden scale-105 animate-pulse"
     >
       {/* En-tête avec identifiant et titre */}
       <div className="flex items-start justify-between mb-4">
