@@ -92,9 +92,40 @@ body {
   background-color: rgba(10, 10, 10, 0.5) !important;
 }
 
+/* Wrapper : contour rotatif avec lueur (spot de lumière qui tourne) */
+.referral-btn-wrapper {
+  position: relative;
+  padding: 2px;
+  border-radius: 10px;
+  background: conic-gradient(
+    from 0deg,
+    rgba(255, 255, 255, 0.06) 0deg,
+    rgba(0, 68, 255, 0.3) 45deg,
+    rgba(107, 143, 255, 0.95) 90deg,
+    rgba(0, 68, 255, 0.6) 135deg,
+    rgba(255, 255, 255, 0.1) 180deg,
+    rgba(0, 68, 255, 0.2) 270deg
+  );
+  animation: referral-border-spin 4s linear infinite;
+  box-shadow: 0 0 14px rgba(0, 68, 255, 0.2);
+  transition: box-shadow 0.2s ease;
+}
+
+.referral-btn-wrapper:hover {
+  box-shadow: 0 0 20px rgba(0, 68, 255, 0.35);
+}
+
+@keyframes referral-border-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 .referral-btn {
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: transparent;
+  border: none;
+  background: #0a0a0a;
+  position: relative;
+  border-radius: 8px;
 }
 
 .referral-btn::after {
