@@ -43,7 +43,9 @@ function ForgotPasswordForm() {
     setSubmitting(true);
     try {
       const supabase = createClient();
-      const redirectTo = `${window.location.origin}/forgot-password`;
+      // Utiliser NEXT_PUBLIC_SITE_URL en prod pour éviter les liens vers des déploiements Vercel supprimés
+      const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || (typeof window !== "undefined" ? window.location.origin : "");
+      const redirectTo = `${baseUrl.replace(/\/$/, "")}/forgot-password`;
       const { error: err } = await supabase.auth.resetPasswordForEmail(email.trim(), { redirectTo });
 
       if (err) {
