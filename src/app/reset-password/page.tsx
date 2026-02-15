@@ -13,18 +13,35 @@ function ResetPasswordForm() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [submitting, setSubmitting] = useState(false);
-  const [isValidLink, setIsValidLink] = useState<boolean | null>(null);
+  // Détection : hash dans l'URL (lu à l'init) OU event PASSWORD_RECOVERY OU session établie par Supabase
+  const [isValidLink, setIsValidLink] = useState<boolean | null>(() => {
+    if (typeof window === "undefined") return null;
+    const h = window.location.hash;
+    const s = window.location.search;
+    if (h.includes("type=recovery") || s.includes("type=recovery") || h.includes("access_token")) return true;
+    return null; // inconnu : on va vérifier via session + event
+  });
 
   useEffect(() => {
     if (typeof window === "undefined") return;
-    // Vérifier si on a les tokens de recovery dans l'URL (hash ou query)
-    const hashParams = new URLSearchParams(window.location.hash.replace("#", ""));
-    const searchParams = new URLSearchParams(window.location.search.replace("?", ""));
-    const hasRecovery =
-      hashParams.get("type") === "recovery" ||
-      searchParams.get("type") === "recovery" ||
-      hashParams.has("access_token");
-    setIsValidLink(hasRecovery);
+    if (isValidLink === true) return;
+    const supabase = createClient();
+    // Supabase peut consommer le hash et émettre PASSWORD_RECOVERY - on écoute
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+      if (event === "PASSWORD_RECOVERY") setIsValidLink(true);
+    });
+    // Vérifier la session (Supabase peut avoir déjà traité le hash)
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) setIsValidLink(true);
+    });
+    // Délai avant de considérer invalide (laisser le temps à Supabase de traiter)
+    const t = setTimeout(() => {
+      setIsValidLink((v) => (v === null ? false : v));
+    }, 2500);
+    return () => {
+      subscription.unsubscribe();
+      clearTimeout(t);
+    };
   }, []);
 
   const handleSetPassword = async (e: React.FormEvent) => {
