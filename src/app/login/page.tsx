@@ -63,7 +63,7 @@ function LoginForm() {
   const isDemoMode = process.env.NEXT_PUBLIC_DEV_MODE === "true" || process.env.NEXT_PUBLIC_DEMO_MODE === "true";
 
   return (
-    <main className="min-h-screen flex">
+    <main className="min-h-screen flex select-none [&_input]:select-text">
       {/* Panneau gauche - Formulaire */}
       <div className="w-full lg:w-[48%] min-h-screen bg-[#0d0d0d] flex flex-col p-8 lg:p-12">
         {/* Logo en haut à gauche */}

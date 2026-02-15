@@ -94,166 +94,180 @@ function ForgotPasswordForm() {
     }
   };
 
+  const inputClass = "w-full px-4 py-3.5 rounded-xl border-biseau-top bg-white/5 text-white placeholder-white/40 focus:outline-none transition-all text-base";
+  const inputClassPr12 = "w-full px-4 py-3.5 pr-12 rounded-xl border-biseau-top bg-white/5 text-white placeholder-white/40 focus:outline-none transition-all text-base";
+  const inputClassPr14 = "w-full px-4 py-3.5 pr-14 rounded-xl border-biseau-top bg-white/5 text-white placeholder-white/40 focus:outline-none transition-all text-base";
+  const btnClass = "w-full py-4 rounded-xl border-biseau-top-primary bg-primary hover:bg-primary-hover text-white font-semibold flex items-center justify-center gap-2 transition-all focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed";
+
   return (
-    <main className="min-h-screen flex items-center justify-center auth-bg-honeycomb relative overflow-hidden px-4">
-      <div className="relative w-full max-w-[420px] rounded-2xl border border-[#1a1a1a] bg-[#0a0a0a]/90 backdrop-blur-xl shadow-2xl p-8 sm:p-10">
-        <div className="flex justify-center mb-6">
-          <Link href="/" className="block">
-            <Image src="/images/logo.svg" alt="Thumbnail Pro" width={56} height={56} className="shrink-0" />
-          </Link>
-        </div>
+    <main className="min-h-screen flex select-none [&_input]:select-text">
+      {/* Panneau gauche - Formulaire */}
+      <div className="w-full lg:w-[48%] min-h-screen bg-[#0d0d0d] flex flex-col p-8 lg:p-12">
+        {/* Logo en haut à gauche */}
+        <Link href="/" className="flex items-center gap-3 mb-auto pt-2">
+          <Image
+            src="/images/logo.svg"
+            alt="Thumbnail Pro"
+            width={40}
+            height={40}
+            className="shrink-0"
+          />
+          <span className="text-xl font-semibold text-white">Thumbnail Pro</span>
+        </Link>
 
-        {isRecovery ? (
-          <>
-            <h1 className="text-2xl sm:text-3xl font-bold text-white text-center mb-1">Définir votre mot de passe</h1>
-            <p className="text-sm text-white/60 text-center mb-8">
-              Choisissez un nouveau mot de passe pour votre compte.
-            </p>
+        {/* Zone formulaire centrée verticalement */}
+        <div className="flex-1 flex items-center justify-center py-12">
+          <div className="w-full max-w-[400px]">
+            {isRecovery ? (
+              <>
+                <h1 className="text-3xl lg:text-4xl font-bold text-white mb-2">Définir votre mot de passe</h1>
+                <p className="text-white/60 text-sm lg:text-base mb-10">
+                  Choisissez un nouveau mot de passe pour votre compte.
+                </p>
 
-            {success && (
-              <div className="rounded-lg border border-green-500/30 bg-green-500/10 text-green-200 text-sm px-4 py-3 mb-6 flex items-center gap-2">
-                <CheckCircle className="h-5 w-5 shrink-0" />
-                <p className="font-medium">{success}</p>
-              </div>
-            )}
-
-            {error && (
-              <div className="rounded-lg border border-red-500/30 bg-red-500/10 text-red-200 text-sm px-4 py-3 mb-6">
-                <p className="font-medium">{error}</p>
-              </div>
-            )}
-
-            <form onSubmit={handleSetPassword} className="space-y-5">
-              <div>
-                <label htmlFor="password" className="block text-sm font-medium text-white/90 mb-2">
-                  Nouveau mot de passe
-                </label>
-                <div className="relative">
-                  <input
-                    id="password"
-                    type={showPassword ? "text" : "password"}
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="••••••••••••"
-                    autoComplete="new-password"
-                    required
-                    minLength={6}
-                    className="w-full pl-4 pr-12 py-3.5 rounded-xl border border-[#1a1a1a] bg-[#141414] text-white placeholder-white/40 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/30 transition-all text-base"
-                  />
-                  <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-2">
-                    <Lock className="h-4 w-4 text-white/50" />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="text-white/50 hover:text-white transition-colors"
-                    >
-                      {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                    </button>
+                {success && (
+                  <div className="rounded-lg border border-green-500/30 bg-green-500/10 text-green-200 text-sm px-4 py-3 mb-6 flex items-center gap-2">
+                    <CheckCircle className="h-5 w-5 shrink-0" />
+                    <p className="font-medium">{success}</p>
                   </div>
-                </div>
-              </div>
-              <div>
-                <label htmlFor="confirm" className="block text-sm font-medium text-white/90 mb-2">
-                  Confirmer le mot de passe
-                </label>
-                <input
-                  id="confirm"
-                  type={showPassword ? "text" : "password"}
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  placeholder="••••••••••••"
-                  autoComplete="new-password"
-                  required
-                  minLength={6}
-                  className="w-full px-4 py-3.5 rounded-xl border border-[#1a1a1a] bg-[#141414] text-white placeholder-white/40 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/30 transition-all text-base"
-                />
-              </div>
-              <button
-                type="submit"
-                disabled={submitting}
-                className="w-full py-3.5 rounded-xl bg-primary hover:bg-primary-hover text-white font-medium flex items-center justify-center gap-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed border border-primary/50"
-              >
-                {submitting ? (
-                  <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                  </svg>
-                ) : (
-                  <>
-                    Définir mon mot de passe
-                    <ArrowRight className="h-4 w-4" />
-                  </>
                 )}
-              </button>
-            </form>
-          </>
-        ) : (
-          <>
-            <h1 className="text-2xl sm:text-3xl font-bold text-white text-center mb-1">Mot de passe oublié</h1>
-            <p className="text-sm text-white/60 text-center mb-8">
-              Entrez votre email et nous vous enverrons un lien pour réinitialiser votre mot de passe.
-            </p>
 
-            {success && (
-              <div className="rounded-lg border border-green-500/30 bg-green-500/10 text-green-200 text-sm px-4 py-3 mb-6 flex items-center gap-2">
-                <CheckCircle className="h-5 w-5 shrink-0" />
-                <p className="font-medium">{success}</p>
-              </div>
-            )}
+                {error && (
+                  <div className="rounded-lg border border-red-500/30 bg-red-500/10 text-red-200 text-sm px-4 py-3 mb-6">
+                    <p className="font-medium">{error}</p>
+                  </div>
+                )}
 
-            {error && (
-              <div className="rounded-lg border border-red-500/30 bg-red-500/10 text-red-200 text-sm px-4 py-3 mb-6">
-                <p className="font-medium">{error}</p>
-              </div>
-            )}
-
-            <form onSubmit={handleRequestReset} className="space-y-6">
-              <div>
-                <label htmlFor="email" className="block text-sm font-medium text-white/90 mb-2">Email</label>
-                <div className="relative">
-                  <input
-                    id="email"
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="votre@email.com"
-                    autoComplete="email"
-                    required
-                    className="w-full pr-14 pl-4 py-3.5 rounded-xl border border-[#1a1a1a] bg-[#141414] text-white placeholder-white/40 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/30 transition-all text-base"
-                  />
-                  <button
-                    type="submit"
-                    disabled={submitting}
-                    className="absolute right-2 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-primary hover:bg-primary-hover flex items-center justify-center text-white transition-colors disabled:opacity-50"
-                  >
-                    <ArrowRight className="h-4 w-4" />
+                <form onSubmit={handleSetPassword} className="space-y-6">
+                  <div>
+                    <label htmlFor="password" className="block text-sm font-medium text-white mb-2">
+                      Nouveau mot de passe
+                    </label>
+                    <div className="relative">
+                      <input
+                        id="password"
+                        type={showPassword ? "text" : "password"}
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        placeholder="Votre mot de passe"
+                        autoComplete="new-password"
+                        required
+                        minLength={6}
+                        className={inputClassPr12}
+                        suppressHydrationWarning
+                      />
+                      <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-2">
+                        <Lock className="h-4 w-4 text-white/50" />
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword(!showPassword)}
+                          className="text-white/50 hover:text-white transition-colors focus:outline-none"
+                        >
+                          {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                  <div>
+                    <label htmlFor="confirm" className="block text-sm font-medium text-white mb-2">
+                      Confirmer le mot de passe
+                    </label>
+                    <input
+                      id="confirm"
+                      type={showPassword ? "text" : "password"}
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      placeholder="Confirmer le mot de passe"
+                      autoComplete="new-password"
+                      required
+                      minLength={6}
+                      className={inputClass}
+                      suppressHydrationWarning
+                    />
+                  </div>
+                  <button type="submit" disabled={submitting} className={btnClass}>
+                    {submitting ? (
+                      <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                      </svg>
+                    ) : (
+                      <>
+                        Définir mon mot de passe
+                        <ArrowRight className="h-5 w-5" />
+                      </>
+                    )}
                   </button>
-                </div>
-              </div>
-              <button
-                type="submit"
-                disabled={submitting}
-                className="w-full py-3.5 rounded-xl bg-primary hover:bg-primary-hover text-white font-medium flex items-center justify-center gap-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed border border-primary/50"
-              >
-                {submitting ? (
-                  <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                  </svg>
-                ) : (
-                  "Envoyer le lien de réinitialisation"
-                )}
-              </button>
-            </form>
-          </>
-        )}
+                </form>
+              </>
+            ) : (
+              <>
+                <h1 className="text-3xl lg:text-4xl font-bold text-white mb-2">Mot de passe oublié</h1>
+                <p className="text-white/60 text-sm lg:text-base mb-10">
+                  Entrez votre email et nous vous enverrons un lien pour réinitialiser votre mot de passe.
+                </p>
 
-        <p className="text-center text-sm text-white/60 mt-8">
-          <Link href="/login" className="text-icon font-medium underline underline-offset-2 hover:text-primary transition-colors">
-            Retour à la connexion
-          </Link>
-        </p>
+                {success && (
+                  <div className="rounded-lg border border-green-500/30 bg-green-500/10 text-green-200 text-sm px-4 py-3 mb-6 flex items-center gap-2">
+                    <CheckCircle className="h-5 w-5 shrink-0" />
+                    <p className="font-medium">{success}</p>
+                  </div>
+                )}
+
+                {error && (
+                  <div className="rounded-lg border border-red-500/30 bg-red-500/10 text-red-200 text-sm px-4 py-3 mb-6">
+                    <p className="font-medium">{error}</p>
+                  </div>
+                )}
+
+                <form onSubmit={handleRequestReset} className="space-y-6">
+                  <div>
+                    <label htmlFor="email" className="block text-sm font-medium text-white mb-2">Email</label>
+                    <div className="relative">
+                      <input
+                        id="email"
+                        type="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder="Votre adresse email"
+                        autoComplete="email"
+                        required
+                        className={inputClassPr14}
+                      />
+                      <button
+                        type="submit"
+                        disabled={submitting}
+                        className="absolute right-2 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-primary hover:bg-primary-hover flex items-center justify-center text-white transition-colors focus:outline-none disabled:opacity-50"
+                      >
+                        <ArrowRight className="h-4 w-4" />
+                      </button>
+                    </div>
+                  </div>
+                  <button type="submit" disabled={submitting} className={btnClass}>
+                    {submitting ? (
+                      <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                      </svg>
+                    ) : (
+                      "Envoyer le lien de réinitialisation"
+                    )}
+                  </button>
+                </form>
+              </>
+            )}
+
+            <p className="text-center text-sm text-white/50 mt-8">
+              <Link href="/login" className="text-primary font-medium underline underline-offset-2 hover:text-primary-hover transition-colors">
+                Retour à la connexion
+              </Link>
+            </p>
+          </div>
+        </div>
       </div>
+
+      {/* Panneau droit */}
+      <div className="hidden lg:flex lg:w-[52%] min-h-screen relative bg-gradient-to-b from-black to-[#000d3f]" />
     </main>
   );
 }
@@ -262,7 +276,7 @@ export default function ForgotPasswordPage() {
   return (
     <Suspense
       fallback={
-        <main className="min-h-screen flex items-center justify-center auth-bg-honeycomb">
+        <main className="min-h-screen flex items-center justify-center bg-[#0d0d0d]">
           <div className="w-12 h-12 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
         </main>
       }
