@@ -3,10 +3,7 @@
 export function MemberCardSkeleton() {
   return (
     <div 
-      className="rounded-lg border border-card-border p-5 relative overflow-hidden scale-105 animate-pulse"
-      style={{
-        background: "linear-gradient(135deg, rgba(10, 10, 10, 0.95) 0%, rgba(36, 36, 36, 0.98) 100%)",
-      }}
+      className="rounded-lg card-biseau bg-white/[0.04] p-5 relative overflow-hidden scale-105 animate-pulse"
     >
       {/* En-tête avec identifiant et titre */}
       <div className="flex items-start justify-between mb-4">

@@ -14,8 +14,8 @@ import dynamic from "next/dynamic";
 const MembersMap = dynamic(() => import("./MembersMap"), {
   ssr: false,
   loading: () => (
-    <div className="h-[600px] rounded-lg border border-white/10 bg-[#0a0a0a] flex items-center justify-center">
-      <div className="text-white/50">Chargement de la carte...</div>
+    <div className="h-[600px] rounded-lg border border-white/10 bg-white/[0.04] flex items-center justify-center animate-pulse">
+      <div className="h-full w-full bg-white/5 rounded-lg" />
     </div>
   ),
 });
@@ -87,7 +87,8 @@ export function CommunityClient({ initialMembers }: { initialMembers: CommunityM
     }
     
     isLoadingRef.current = true;
-    setLoading(true);
+    // Skeleton uniquement quand pas de membres (évite le flash "reload" quand on a déjà des données)
+    if (members.length === 0) setLoading(true);
     setError(null);
 
       try {
@@ -219,14 +220,11 @@ export function CommunityClient({ initialMembers }: { initialMembers: CommunityM
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentUser?.id, initialMembers.length]);
 
-  // Rafraîchir quand on revient sur la route /dashboard/community
+  // Rafraîchir quand on revient sur la route /dashboard/community (pas au premier chargement)
   useEffect(() => {
-    // Si on vient d'une autre route et qu'on revient sur /dashboard/community
-    if (pathname === "/dashboard/community" && lastPathnameRef.current !== pathname && hasLoadedRef.current && currentUser) {
-      // Attendre un peu avant de rafraîchir pour éviter les requêtes multiples
-      const timeoutId = setTimeout(() => {
-        loadMembers(true);
-      }, 300);
+    const isReturning = lastPathnameRef.current !== "" && lastPathnameRef.current !== pathname;
+    if (pathname === "/dashboard/community" && isReturning && hasLoadedRef.current && currentUser) {
+      const timeoutId = setTimeout(() => loadMembers(true), 300);
       return () => clearTimeout(timeoutId);
     }
     lastPathnameRef.current = pathname;
