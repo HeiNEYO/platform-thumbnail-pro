@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
-const priceId = process.env.STRIPE_PRICE_ID;
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://platform-thumbnail-pro.vercel.app";
-
 export async function POST(request: NextRequest) {
-  if (!process.env.STRIPE_SECRET_KEY || !priceId) {
+  const secretKey = process.env.STRIPE_SECRET_KEY;
+  const priceId = process.env.STRIPE_PRICE_ID;
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://platform-thumbnail-pro.vercel.app";
+
+  if (!secretKey || !priceId) {
     return NextResponse.json(
       { error: "Configuration Stripe manquante (STRIPE_SECRET_KEY, STRIPE_PRICE_ID)" },
       { status: 500 }
@@ -22,6 +22,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Email invalide" }, { status: 400 });
     }
 
+    const stripe = new Stripe(secretKey);
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
       line_items: [{ price: priceId, quantity: 1 }],

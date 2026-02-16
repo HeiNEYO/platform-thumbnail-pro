@@ -2,15 +2,15 @@ import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import { createClient } from "@supabase/supabase-js";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
-const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
-
 const TEMP_PASSWORD = "ThumbnailPro2024!ChgMdp";
 
 export async function POST(request: NextRequest) {
-  if (!webhookSecret || !supabaseUrl || !supabaseServiceKey) {
+  const secretKey = process.env.STRIPE_SECRET_KEY;
+  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+  if (!secretKey || !webhookSecret || !supabaseUrl || !supabaseServiceKey) {
     console.error("[Stripe webhook] Configuration manquante");
     return NextResponse.json({ error: "Configuration manquante" }, { status: 500 });
   }
@@ -23,6 +23,7 @@ export async function POST(request: NextRequest) {
 
   let event: Stripe.Event;
   try {
+    const stripe = new Stripe(secretKey);
     event = stripe.webhooks.constructEvent(body, sig, webhookSecret);
   } catch (err) {
     console.error("[Stripe webhook] Signature invalide:", err);
