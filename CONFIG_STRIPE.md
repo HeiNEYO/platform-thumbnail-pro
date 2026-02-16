@@ -39,8 +39,7 @@ Utilise le `whsec_...` affiché pour `STRIPE_WEBHOOK_SECRET` en local.
 
 ## Flux
 
-1. Client va sur `/acheter` → (optionnel) saisit son email → clique « Procéder au paiement »
-2. Redirection vers ton lien Stripe
-3. Paiement validé → webhook crée le compte Supabase
-4. Redirection vers `/login?payment=success`
-5. Client reçoit l'email « Mot de passe oublié », définit son mot de passe, se connecte
+1. Client paie via ton lien Stripe (bouton sur ta landing, etc.)
+2. Paiement validé → webhook crée le compte Supabase
+3. Redirection vers `/login?payment=success` (configurée dans Stripe → Payment link → After payment)
+4. Client reçoit l'email « Mot de passe oublié », définit son mot de passe, se connecte

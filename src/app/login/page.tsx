@@ -212,10 +212,7 @@ function LoginForm() {
             </form>
 
             <p className="text-center text-sm text-white/50 mt-8">
-              Accès réservé aux membres.{" "}
-              <Link href="/acheter" className="text-primary hover:text-primary-hover underline underline-offset-2">
-                Acheter la formation
-              </Link>
+              Accès réservé aux membres.
             </p>
           </div>
         </div>
