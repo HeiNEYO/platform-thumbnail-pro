@@ -92,7 +92,7 @@ body {
   background-color: rgba(10, 10, 10, 0.5) !important;
 }
 
-/* Bouton Parraine un ami - dégradé travaillé + brillance réaliste */
+/* Lueur qui avance le long du contour (sans rotation du bouton) */
 @property --referral-angle {
   syntax: "<angle>";
   initial-value: 0deg;
@@ -106,29 +106,20 @@ body {
   --referral-angle: 0deg;
   background: conic-gradient(
     from var(--referral-angle),
-    rgba(255, 255, 255, 0.04) 0deg,
-    rgba(0, 68, 255, 0.25) 30deg,
-    rgba(107, 143, 255, 0.7) 60deg,
-    rgba(150, 180, 255, 0.95) 90deg,
-    rgba(107, 143, 255, 0.6) 120deg,
-    rgba(0, 68, 255, 0.4) 150deg,
-    rgba(255, 255, 255, 0.08) 180deg,
-    rgba(0, 68, 255, 0.15) 240deg,
-    rgba(107, 143, 255, 0.35) 300deg
+    rgba(255, 255, 255, 0.06) 0deg,
+    rgba(0, 68, 255, 0.3) 45deg,
+    rgba(107, 143, 255, 0.95) 90deg,
+    rgba(0, 68, 255, 0.6) 135deg,
+    rgba(255, 255, 255, 0.1) 180deg,
+    rgba(0, 68, 255, 0.2) 270deg
   );
-  animation: referral-glow-move 5s linear infinite;
-  box-shadow:
-    0 0 12px rgba(0, 68, 255, 0.15),
-    inset 0 1px 0 rgba(255, 255, 255, 0.03);
-  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: referral-glow-move 4s linear infinite;
+  box-shadow: 0 0 14px rgba(0, 68, 255, 0.2);
+  transition: box-shadow 0.2s ease;
 }
 
 .referral-btn-wrapper:hover {
-  box-shadow:
-    0 0 24px rgba(0, 68, 255, 0.4),
-    0 0 48px rgba(107, 143, 255, 0.15),
-    inset 0 1px 0 rgba(255, 255, 255, 0.08);
-  transform: translateY(-1px);
+  box-shadow: 0 0 20px rgba(0, 68, 255, 0.35);
 }
 
 @keyframes referral-glow-move {
@@ -139,81 +130,41 @@ body {
 
 .referral-btn {
   border: none;
-  background: linear-gradient(
-    180deg,
-    #0d0d12 0%,
-    #0a0a0a 50%,
-    #08080c 100%
-  );
+  background: #0a0a0a;
   position: relative;
   border-radius: 8px;
   overflow: hidden;
-  transition: background 0.35s ease;
 }
 
-.referral-btn:hover {
-  background: linear-gradient(
-    180deg,
-    #0f0f16 0%,
-    #0a0a0a 50%,
-    #07070a 100%
-  );
-}
-
-/* Reflet lumineux en haut (biseau réaliste) */
-.referral-btn::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 45%;
-  border-radius: 8px 8px 0 0;
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.12) 0%,
-    rgba(255, 255, 255, 0.04) 50%,
-    transparent 100%
-  );
-  pointer-events: none;
-}
-
-/* Brillance qui traverse au survol - effet lumière réaliste */
+/* Trait blanc style reflet au survol */
 .referral-btn::after {
   content: "";
   position: absolute;
-  inset: -2px;
+  inset: 0;
   background: linear-gradient(
-    105deg,
+    120deg,
     transparent 0%,
-    transparent 35%,
-    rgba(255, 255, 255, 0.08) 45%,
-    rgba(255, 255, 255, 0.25) 50%,
-    rgba(255, 255, 255, 0.08) 55%,
-    transparent 65%,
+    transparent 40%,
+    rgba(255, 255, 255, 0.15) 48%,
+    rgba(255, 255, 255, 0.4) 50%,
+    rgba(255, 255, 255, 0.15) 52%,
+    transparent 60%,
     transparent 100%
   );
-  background-size: 200% 100%;
   transform: translateX(-100%);
   pointer-events: none;
-  border-radius: 10px;
 }
 
 .referral-btn:hover::after {
-  animation: referral-shine 0.9s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  animation: flash-gradient 0.8s ease-out forwards;
 }
 
-@keyframes referral-shine {
-  0% {
-    transform: translateX(-100%) skewX(-15deg);
-    opacity: 1;
+@keyframes flash-gradient {
+  from {
+    transform: translateX(-100%);
   }
-  50% {
-    opacity: 1;
-  }
-  100% {
-    transform: translateX(100%) skewX(-15deg);
-    opacity: 0.8;
+  to {
+    transform: translateX(100%);
   }
 }
 
