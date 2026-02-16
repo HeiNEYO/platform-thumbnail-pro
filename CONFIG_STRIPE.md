@@ -1,42 +1,46 @@
 # Configuration Stripe
 
-## 1. Créer un produit Stripe
+## 1. Créer un Payment Link Stripe
 
-1. Va sur [Stripe Dashboard](https://dashboard.stripe.com) → **Products** → **Add product**
-2. Nom : "Formation Thumbnail Pro"
-3. Prix : définit le montant (ex. 97 €)
-4. Copie l’**ID du prix** (`price_xxx`)
+1. Va sur [Stripe Dashboard](https://dashboard.stripe.com) → **Payment links** → **New**
+2. Choisis ton produit (ou crée-en un : Products → Add product)
+3. Configure le prix, puis **Create link**
+4. Copie l'**URL du lien** (ex. `https://buy.stripe.com/xxx`)
 
-## 2. Variables d’environnement
+## 2. Variables d'environnement
 
-Dans `.env.local` :
+Dans `.env.local` et **Vercel** (Settings → Environment Variables) :
 
 ```
-STRIPE_SECRET_KEY=sk_live_...          # Stripe → Developers → API keys
-STRIPE_WEBHOOK_SECRET=whsec_...       # Voir étape 4
-STRIPE_PRICE_ID=price_...             # ID du prix créé
+NEXT_PUBLIC_STRIPE_PAYMENT_LINK=https://buy.stripe.com/xxx   # Ton lien Stripe
+STRIPE_SECRET_KEY=sk_live_...                                # Stripe → Developers → API keys
+STRIPE_WEBHOOK_SECRET=whsec_...                              # Voir étape 3
 ```
 
-## 3. Webhook Stripe
+## 3. Webhook Stripe (pour créer le compte après paiement)
 
 1. Stripe Dashboard → **Developers** → **Webhooks** → **Add endpoint**
-2. **URL** : `https://platform-thumbnail-pro.vercel.app/api/stripe/webhook` (ou ton domaine)
+2. **URL** : `https://platform-thumbnail-pro.vercel.app/api/stripe/webhook`
 3. **Événements** : `checkout.session.completed`
 4. Copie le **Signing secret** (`whsec_...`) dans `STRIPE_WEBHOOK_SECRET`
 
-## 4. Test en local
+## 4. Success URL dans ton Payment Link
+
+Dans Stripe → Payment links → ton lien → **After payment** :
+- Success URL : `https://platform-thumbnail-pro.vercel.app/login?payment=success`
+
+## 5. Test en local
 
 ```bash
 stripe listen --forward-to localhost:3000/api/stripe/webhook
 ```
 
-Utilise le `whsec_...` affiché dans la sortie pour `STRIPE_WEBHOOK_SECRET` en local.
+Utilise le `whsec_...` affiché pour `STRIPE_WEBHOOK_SECRET` en local.
 
 ## Flux
 
-1. Client va sur `/acheter` → saisit email + nom
-2. Redirection vers Stripe Checkout
-3. Paiement validé → webhook crée le compte Supabase (email + nom)
+1. Client va sur `/acheter` → (optionnel) saisit son email → clique « Procéder au paiement »
+2. Redirection vers ton lien Stripe
+3. Paiement validé → webhook crée le compte Supabase
 4. Redirection vers `/login?payment=success`
-5. Message : « Utilisez Mot de passe oublié pour définir votre mot de passe »
-6. Client reçoit l’email de reset, définit son mot de passe, se connecte
+5. Client reçoit l'email « Mot de passe oublié », définit son mot de passe, se connecte

@@ -3,37 +3,25 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowRight, Loader2 } from "lucide-react";
+import { ArrowRight } from "lucide-react";
+
+const PAYMENT_LINK = process.env.NEXT_PUBLIC_STRIPE_PAYMENT_LINK || "";
 
 export default function AcheterPage() {
   const [email, setEmail] = useState("");
-  const [fullName, setFullName] = useState("");
   const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-    if (!email.trim() || !fullName.trim()) {
-      setError("Veuillez remplir tous les champs.");
+    if (!PAYMENT_LINK) {
+      setError("Lien de paiement non configuré. Contactez l'administrateur.");
       return;
     }
-    setLoading(true);
-    try {
-      const res = await fetch("/api/stripe/checkout", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: email.trim(), full_name: fullName.trim() }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Erreur lors de la création du paiement");
-      if (data.url) window.location.href = data.url;
-      else throw new Error("URL de paiement manquante");
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Une erreur s'est produite.");
-    } finally {
-      setLoading(false);
-    }
+    const url = email.trim()
+      ? `${PAYMENT_LINK}${PAYMENT_LINK.includes("?") ? "&" : "?"}prefilled_email=${encodeURIComponent(email.trim())}`
+      : PAYMENT_LINK;
+    window.location.href = url;
   };
 
   return (
@@ -48,7 +36,7 @@ export default function AcheterPage() {
           <div className="w-full max-w-[400px]">
             <h1 className="text-3xl lg:text-4xl font-bold text-white mb-2">Acheter la formation</h1>
             <p className="text-white/60 text-sm lg:text-base mb-10">
-              Renseignez vos informations pour accéder au paiement sécurisé Stripe.
+              Cliquez pour accéder au paiement sécurisé Stripe. Vous pouvez pré-remplir votre email.
             </p>
 
             {error && (
@@ -59,23 +47,8 @@ export default function AcheterPage() {
 
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>
-                <label htmlFor="full_name" className="block text-sm font-medium text-white mb-2">
-                  Nom complet
-                </label>
-                <input
-                  id="full_name"
-                  type="text"
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
-                  placeholder="Jean Dupont"
-                  autoComplete="name"
-                  required
-                  className="w-full px-4 py-3.5 rounded-xl border-biseau-top bg-white/5 text-white placeholder-white/40 focus:outline-none transition-all text-base"
-                />
-              </div>
-              <div>
                 <label htmlFor="email" className="block text-sm font-medium text-white mb-2">
-                  Email
+                  Email (optionnel, pré-rempli sur Stripe)
                 </label>
                 <input
                   id="email"
@@ -84,26 +57,15 @@ export default function AcheterPage() {
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="votre@email.com"
                   autoComplete="email"
-                  required
                   className="w-full px-4 py-3.5 rounded-xl border-biseau-top bg-white/5 text-white placeholder-white/40 focus:outline-none transition-all text-base"
                 />
               </div>
               <button
                 type="submit"
-                disabled={loading}
                 className="w-full py-4 rounded-xl border-biseau-top-primary bg-primary hover:bg-primary-hover text-white font-semibold flex items-center justify-center gap-2 transition-all focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {loading ? (
-                  <>
-                    <Loader2 className="h-5 w-5 animate-spin" />
-                    Redirection vers le paiement...
-                  </>
-                ) : (
-                  <>
-                    Procéder au paiement
-                    <ArrowRight className="h-5 w-5" />
-                  </>
-                )}
+                Procéder au paiement
+                <ArrowRight className="h-5 w-5" />
               </button>
             </form>
 
