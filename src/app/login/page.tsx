@@ -3,7 +3,7 @@
 import { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { Eye, EyeOff, CheckCircle, ArrowRight } from "lucide-react";
 
@@ -17,10 +17,18 @@ function LoginForm() {
   const [submitting, setSubmitting] = useState(false);
   const { user, signIn } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   useEffect(() => {
     if (user) router.replace("/dashboard");
   }, [user, router]);
+
+  useEffect(() => {
+    if (searchParams.get("payment") === "success") {
+      setSuccess("Paiement réussi ! Votre compte a été créé. Utilisez « Mot de passe oublié » pour définir votre mot de passe.");
+      router.replace("/login", { scroll: false });
+    }
+  }, [searchParams, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -204,7 +212,10 @@ function LoginForm() {
             </form>
 
             <p className="text-center text-sm text-white/50 mt-8">
-              Accès réservé aux membres ayant acheté la formation.
+              Accès réservé aux membres.{" "}
+              <Link href="/acheter" className="text-primary hover:text-primary-hover underline underline-offset-2">
+                Acheter la formation
+              </Link>
             </p>
           </div>
         </div>
